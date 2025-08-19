@@ -141,9 +141,10 @@ for u in range(len(contextNumber)):
         if contextNumber[u][2] > 2 :
             print(contextNumber[u])
     elif number == 3:
-        if contextNumber[u][3] > 2 :
+        if contextNumber[u][3] > 0 :
 
             print(contextNumber[u])
+
 
 
 
