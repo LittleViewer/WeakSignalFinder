@@ -16,7 +16,7 @@ for r in resources:
     try:
         nltk.data.find(r)
     except LookupError:
-        nltk.download(r, download_dir=nltk_data_dir)
+        nltk.download(r, download_dir=nltk_data_dir, quiet=True)
 from nltk.stem import WordNetLemmatizer
 import re
 from intensityContext import intensityContext
@@ -144,6 +144,7 @@ for u in range(len(contextNumber)):
         if contextNumber[u][3] > 2 :
 
             print(contextNumber[u])
+
 
 
 
