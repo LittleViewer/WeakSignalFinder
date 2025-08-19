@@ -9,3 +9,8 @@ https://rss.politico.com/defense.xml
 https://rss.politico.com/politics-news.xml
 https://www.defense.gov/DesktopModules/ArticleCS/RSS.ashx?max=10&ContentType=1&Site=945
 https://www.ajplus.net/stories?format=rss
+https://www.france24.com/en/europe/rss
+https://www.france24.com/en/africa/rss
+https://www.france24.com/en/middle-east/rss
+https://www.france24.com/en/americas/rss
+https://www.france24.com/en/asia-pacific/rss
