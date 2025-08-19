@@ -26,16 +26,20 @@ def wordInsentyPrintImportantRepresent(wordIntensity) :
         if wordIntensity[l][1] >= 5:
             print(wordIntensity[l])
 
-def parseRss(file = "rss.txt"):
+def parseRss(file="rss.txt"):
     arrayNewFeed = []
     nameRssSender = []
-    stream = open(file, "r")
-    fileContent = stream.read()
-    arrayFileContent = fileContent.split("\n")
-    for k in range(len(arrayFileContent)):
-        arrayNewFeed.append(feedparser.parse(arrayFileContent[k]))
-        nameRssSender.append(WordNetLemmatizer().lemmatize(arrayFileContent[k].split(".")[1]))
+    with open(file, "r") as stream:
+        arrayFileContent = [line.strip() for line in stream if line.strip()]
+    for line in arrayFileContent:
+        arrayNewFeed.append(feedparser.parse(line))
+        parts = line.split(".")
+        if len(parts) > 1:
+            nameRssSender.append(WordNetLemmatizer().lemmatize(parts[1]))
+        else:
+            print("URL ignorée (pas de point) :", line)
     return [arrayNewFeed, set(nameRssSender)]
+
 
 def stopWordUsual(file = "stopword.txt"):
     stream = open(file, "r")
@@ -124,6 +128,7 @@ for u in range(len(contextNumber)):
         if contextNumber[u][3] > 2 :
 
             print(contextNumber[u])
+
 
 
 
