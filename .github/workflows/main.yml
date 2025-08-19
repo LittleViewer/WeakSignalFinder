@@ -6,7 +6,6 @@ on:
       - main
   workflow_dispatch:
 
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,30 +15,31 @@ jobs:
     - name: Check out calling repository
       uses: actions/checkout@v3
 
-    # Step 2: Check out this repository to get the python script
+    # Step 2: Check out this repository to get the Python script
     - name: Check out action repository
       uses: actions/checkout@v3
       with:
         repository: alphaleadership/WeakSignalFinder
         path: action_repo
 
+    # Step 3: Set up Python
     - name: Set up Python 3.9
       uses: actions/setup-python@v3
       with:
         python-version: "3.9"
 
+    # Step 4: Install dependencies
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        # Install requirements from the action repo, not the calling repo
         if [ -f action_repo/requirements.txt ]; then pip install -r action_repo/requirements.txt; fi
-        
-        - name: Download NLTK data
-        run: |
-          python -m nltk.downloader punkt averaged_perceptron_tagger wordnet
 
-    # Step 3: Run the script from the action repo
-    # The script will use the config files from the calling repo's checkout
+    # Step 5: Download NLTK data
+    - name: Download NLTK data
+      run: |
+        python -m nltk.downloader punkt averaged_perceptron_tagger wordnet
+
+    # Step 6: Run the script
     - name: Run script
       run: |
         python main.py
