@@ -123,11 +123,17 @@ The script will print two types of results to the console:
 
 ## Reusable GitHub Action
 
-This repository contains a reusable GitHub Action workflow to run the NLP analysis. You can use it in your own repositories to run the `lowSignal/main.py` script.
+This repository contains a reusable GitHub Action that runs the NLP analysis script.
+
+The action provides the Python script and its dependencies. Your repository only needs to provide the configuration files.
 
 ### Usage
 
-To use this action, create a file named `.github/workflows/main.yml` in your repository with the following content:
+1.  In your repository, create a `lowSignal` directory.
+2.  Inside `lowSignal`, add your configuration files:
+    *   `rss.txt`: A list of RSS feed URLs, one per line.
+    *   `stopword.txt`: A list of stopwords, one per line.
+3.  Create a workflow file at `.github/workflows/main.yml` with the following content:
 
 ```yaml
 name: Run NLP Analysis
@@ -142,4 +148,4 @@ jobs:
     uses: alphaleadership/WeakSignalFinder/.github/workflows/main.yml@main
 ```
 
-**Note:** Your repository must contain the `lowSignal/main.py` script and the necessary configuration files (`lowSignal/rss.txt`, `lowSignal/stopword.txt`, and `requirements.txt`) for the action to work correctly.
+The action will then use its own script combined with your repository's configuration files to run the analysis.
