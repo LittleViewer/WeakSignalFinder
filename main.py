@@ -1,6 +1,7 @@
 import feedparser
 import time
 import nltk
+nltk.data.path.append("./nltk_data")
 from nltk.stem import WordNetLemmatizer
 import re
 from intensityContext import intensityContext
@@ -128,6 +129,7 @@ for u in range(len(contextNumber)):
         if contextNumber[u][3] > 2 :
 
             print(contextNumber[u])
+
 
 
 
