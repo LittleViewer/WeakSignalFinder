@@ -5,12 +5,18 @@ import os
 nltk_data_dir = os.path.join(os.getcwd(), "nltk_data")
 os.makedirs(nltk_data_dir, exist_ok=True)
 nltk.data.path.append(nltk_data_dir)
-required_resources = ['punkt', 'punkt_tab', 'averaged_perceptron_tagger', 'wordnet']
-for resource in required_resources:
+resources = [
+    'punkt',
+    'punkt_tab',
+    'wordnet',
+    'averaged_perceptron_tagger',
+    'averaged_perceptron_tagger_eng'
+]
+for r in resources:
     try:
-        nltk.data.find(resource)
+        nltk.data.find(r)
     except LookupError:
-        nltk.download(resource, download_dir=nltk_data_dir)
+        nltk.download(r, download_dir=nltk_data_dir)
 from nltk.stem import WordNetLemmatizer
 import re
 from intensityContext import intensityContext
@@ -138,6 +144,7 @@ for u in range(len(contextNumber)):
         if contextNumber[u][3] > 2 :
 
             print(contextNumber[u])
+
 
 
 
