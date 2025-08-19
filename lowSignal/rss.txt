@@ -5,4 +5,7 @@ https://rss.nytimes.com/services/xml/rss/nyt/World.xml
 https://www.consilium.europa.eu/en/rss/pressreleases.ashx
 https://www.europarl.europa.eu/rss/doc/press-releases/en.xml
 https://www.latimes.com/world-nation/rss2.0.xml
-https://www.latimes.com/politics/rss2.0.xml
+https://rss.politico.com/defense.xml
+https://rss.politico.com/politics-news.xml
+https://www.defense.gov/DesktopModules/ArticleCS/RSS.ashx?max=10&ContentType=1&Site=945
+https://www.ajplus.net/stories?format=rss
