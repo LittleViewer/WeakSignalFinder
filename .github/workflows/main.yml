@@ -11,35 +11,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Step 1: Check out the calling repository to access its config files
-    - name: Check out calling repository
+    - name: Check out the calling repository
       uses: actions/checkout@v3
 
-    # Step 2: Check out this repository to get the Python script
     - name: Check out action repository
       uses: actions/checkout@v3
       with:
         repository: alphaleadership/WeakSignalFinder
         path: action_repo
 
-    # Step 3: Set up Python
     - name: Set up Python 3.9
       uses: actions/setup-python@v3
       with:
         python-version: "3.9"
 
-    # Step 4: Install dependencies
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         if [ -f action_repo/requirements.txt ]; then pip install -r action_repo/requirements.txt; fi
 
-    # Step 5: Download NLTK data
     - name: Download NLTK data
       run: |
-        python -m nltk.downloader punkt averaged_perceptron_tagger wordnet
+        python -m nltk.downloader -d ./nltk_data punkt averaged_perceptron_tagger wordnet
 
-    # Step 6: Run the script
     - name: Run script
       run: |
         python main.py
