@@ -1,6 +1,6 @@
 # WeakSignalFinder
 
-This project is a Python-based tool designed to perform automated content analysis on a collection of RSS feeds. It goes beyond simple keyword counting by leveraging Natural Language Processing (NLP) to identify significant topics, measure their frequency, and, most importantly, analyze the context in which they appear.
+This project is a Python-based tool designed to perform automated content analysis on a collection of RSS English feeds. It goes beyond simple keyword counting by leveraging Natural Language Processing (NLP) to identify significant topics, measure their frequency, and, most importantly, analyze the context in which they appear.
 
 The primary goal is to act as an intelligence-gathering tool, helping users detect "low signals"—emerging trends, topics, and relationships that are not yet obvious but are gaining traction across various information sources.
 
