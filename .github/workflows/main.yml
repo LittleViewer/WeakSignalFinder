@@ -1,7 +1,11 @@
 name: Reusable Python NLP Workflow
 
 on:
-  workflow_call:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
 
 jobs:
   build:
