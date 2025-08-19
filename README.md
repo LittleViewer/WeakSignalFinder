@@ -120,3 +120,26 @@ The script will print two types of results to the console:
 -   **Frequency Thresholds**: You can easily change the minimum frequency for a word or context to be considered "important" by modifying the integer values in the final loops of the script (e.g., `if wordIntensity[l][1] >= 5:`).
 -   **Analysis Scope**: Add or remove URLs from `rss.txt` to change the scope of your analysis.
 -   **Filtering**: Expand `stopword.txt` to fine-tune the noise reduction for your specific domain.
+
+## Reusable GitHub Action
+
+This repository contains a reusable GitHub Action workflow to run the NLP analysis. You can use it in your own repositories to run the `lowSignal/main.py` script.
+
+### Usage
+
+To use this action, create a file named `.github/workflows/main.yml` in your repository with the following content:
+
+```yaml
+name: Run NLP Analysis
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  run-nlp:
+    uses: alphaleadership/WeakSignalFinder/.github/workflows/main.yml@main
+```
+
+**Note:** Your repository must contain the `lowSignal/main.py` script and the necessary configuration files (`lowSignal/rss.txt`, `lowSignal/stopword.txt`, and `requirements.txt`) for the action to work correctly.
