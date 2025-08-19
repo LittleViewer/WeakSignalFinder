@@ -42,4 +42,4 @@ jobs:
     # The script will use the config files from the calling repo's checkout
     - name: Run script
       run: |
-        python action_repo/main.py
+        python main.py
