@@ -37,7 +37,7 @@ def parseRss(file = "lowSignal\\rss.txt"):
         nameRssSender.append(WordNetLemmatizer().lemmatize(arrayFileContent[k].split(".")[1]))
     return [arrayNewFeed, set(nameRssSender)]
 
-def stopWordUsual(file = "lowSignal\stopword.txt"):
+def stopWordUsual(file = "lowSignal\\stopword.txt"):
     stream = open(file, "r")
     arrayStopWord = stream.read()
     return set(arrayStopWord.split("\n"))
@@ -122,4 +122,5 @@ for u in range(len(contextNumber)):
             print(contextNumber[u])
     elif number == 3:
         if contextNumber[u][3] > 2 :
+
             print(contextNumber[u])
