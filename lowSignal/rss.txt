@@ -1,0 +1,8 @@
+https://news.un.org/feed/subscribe/en/news/topic/peace-and-security/feed/rss.xml
+https://news.un.org/feed/subscribe/en/news/topic/un-affairs/feed/rss.xml
+https://feeds.bbci.co.uk/news/world/rss.xml
+https://rss.nytimes.com/services/xml/rss/nyt/World.xml
+https://www.consilium.europa.eu/en/rss/pressreleases.ashx
+https://www.europarl.europa.eu/rss/doc/press-releases/en.xml
+https://www.latimes.com/world-nation/rss2.0.xml
+https://www.latimes.com/politics/rss2.0.xml
