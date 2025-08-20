@@ -37,27 +37,30 @@ def presenceWord(word, wordIntensity):
     
     return wordIntensity
 
+def excludeLowestIntensityWord (wordIntensity, Intensity = 5):
+    intensityWordWithJustImportant = []
+    for y in range(len(wordIntensity)):
+        if wordIntensity[y][1] >= 5:
+            intensityWordWithJustImportant.append(wordIntensity[y])
+    return intensityWordWithJustImportant
+
+
 def wordInsentyPrintImportantRepresent(wordIntensity) :
     for l in range(len(wordIntensity)):
-        if wordIntensity[l][1] >= 5:
-            print(wordIntensity[l])
+        print(wordIntensity[l])
 
-def parseRss(file="rss.txt"):
+def parseRss(file = "lowSignal\\rss.txt"):
     arrayNewFeed = []
     nameRssSender = []
-    with open(file, "r") as stream:
-        arrayFileContent = [line.strip() for line in stream if line.strip()]
-    for line in arrayFileContent:
-        arrayNewFeed.append(feedparser.parse(line))
-        parts = line.split(".")
-        if len(parts) > 1:
-            nameRssSender.append(WordNetLemmatizer().lemmatize(parts[1]))
-        else:
-            print("URL ignorée (pas de point) :", line)
+    stream = open(file, "r")
+    fileContent = stream.read()
+    arrayFileContent = fileContent.split("\n")
+    for k in range(len(arrayFileContent)):
+        arrayNewFeed.append(feedparser.parse(arrayFileContent[k]))
+        nameRssSender.append(WordNetLemmatizer().lemmatize(arrayFileContent[k].split(".")[1]))
     return [arrayNewFeed, set(nameRssSender)]
 
-
-def stopWordUsual(file = "stopword.txt"):
+def stopWordUsual(file = "lowSignal\stopword.txt"):
     stream = open(file, "r")
     arrayStopWord = stream.read()
     return set(arrayStopWord.split("\n"))
@@ -93,6 +96,7 @@ def saveContext(word, index, content, contextWord, setStopWordUsual):
 
 arrayStopWordUsual = stopWordUsual()
 arrayOutputParseRss = parseRss()
+intensityWordWithJustImportant = []
 contexWordSave = []
 arrayNewFeed = arrayOutputParseRss[0]
 nameRssOrganisationSender = arrayOutputParseRss[1]
@@ -124,8 +128,8 @@ for x in range(len(arrayNewFeed)):
                     contexWordSave = saveContext(lemWord, j, tagTokenizePost, contexWordSave, arrayStopWordUsual)
                                     
 
-
-wordInsentyPrintImportantRepresent(wordIntensity)
+intensityWordWithJustImportant = excludeLowestIntensityWord(wordIntensity)
+wordInsentyPrintImportantRepresent(intensityWordWithJustImportant)
 #print(nameRssOrganisationSender)
 #print(contexWordSave)
 
@@ -145,6 +149,7 @@ for u in range(len(contextNumber)):
             print(contextNumber[u])
 
 thematicContext(contextNumber)
+
 
 
 
