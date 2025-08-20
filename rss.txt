@@ -14,3 +14,4 @@ https://www.france24.com/en/africa/rss
 https://www.france24.com/en/middle-east/rss
 https://www.france24.com/en/americas/rss
 https://www.france24.com/en/asia-pacific/rss
+https://www.diplomatie.gouv.fr/spip.php?page=backend-fd&lang=en
