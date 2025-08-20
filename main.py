@@ -142,8 +142,10 @@ for u in range(len(contextNumber)):
             print(contextNumber[u])
     elif number == 3:
         if contextNumber[u][3] > 0 :
-
             print(contextNumber[u])
+
+thematicContext(contextNumber)
+
 
 
 
