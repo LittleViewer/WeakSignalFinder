@@ -49,7 +49,7 @@ def wordInsentyPrintImportantRepresent(wordIntensity) :
     for l in range(len(wordIntensity)):
         print(wordIntensity[l])
 
-def parseRss(file = "lowSignal\\rss.txt"):
+def parseRss(file = "rss.txt"):
     arrayNewFeed = []
     nameRssSender = []
     stream = open(file, "r")
@@ -60,7 +60,7 @@ def parseRss(file = "lowSignal\\rss.txt"):
         nameRssSender.append(WordNetLemmatizer().lemmatize(arrayFileContent[k].split(".")[1]))
     return [arrayNewFeed, set(nameRssSender)]
 
-def stopWordUsual(file = "lowSignal\stopword.txt"):
+def stopWordUsual(file = "stopword.txt"):
     stream = open(file, "r")
     arrayStopWord = stream.read()
     return set(arrayStopWord.split("\n"))
@@ -149,6 +149,7 @@ for u in range(len(contextNumber)):
             print(contextNumber[u])
 
 thematicContext(contextNumber)
+
 
 
 
