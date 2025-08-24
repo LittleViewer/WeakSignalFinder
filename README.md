@@ -1,20 +1,17 @@
 # WeakSignalFinder
 
-This project is a Python-based tool designed to perform automated content analysis on a collection of RSS English feeds. It goes beyond simple keyword counting by leveraging Natural Language Processing (NLP) to identify significant topics, measure their frequency, and, most importantly, analyze the context in which they appear.
+This project is a Python-based tool designed to perform automated content analysis on a collection of RSS English feeds. It goes beyond simple keyword counting by leveraging Natural Language Processing (NLP) to identify significant topics, measure their frequency, and analyze the thematic context in which they appear.
 
-The primary goal is to act as an intelligence-gathering tool, helping users detect "low signals"—emerging trends, topics, and relationships that are not yet obvious but are gaining traction across various information sources.
+The primary goal is to act as an intelligence-gathering tool, helping users detect "weak signals"—emerging trends, topics, and relationships that are not yet obvious but are gaining traction across various information sources.
 
 ## Key Features
 
 -   **RSS Feed Aggregation**: Automatically fetches and parses the latest entries from a list of user-defined RSS feeds.
--   **Advanced NLP Processing**: Utilizes the `nltk` library for sophisticated text analysis, including:
-    -   **Tokenization**: Breaking down text into individual words.
-    -   **Part-of-Speech (POS) Tagging**: Identifying the grammatical role of each word (noun, verb, etc.).
-    -   **Lemmatization**: Reducing words to their root form (e.g., "technologies" becomes "technology") for accurate counting.
+-   **Advanced NLP Processing**: Utilizes the `nltk` library for sophisticated text analysis, including tokenization, Part-of-Speech (POS) tagging, and lemmatization.
 -   **Intelligent Keyword Extraction**: Focuses specifically on nouns (`NN`) to extract key concepts, entities, and subjects, filtering out less meaningful words.
--   **Frequency Analysis**: Counts the occurrences of significant keywords to identify the most discussed topics.
--   **Contextual Analysis**: Its core strength. The tool captures the words immediately preceding and following a key term, allowing it to identify common phrases and relationships (e.g., detecting that "security" frequently appears in the context of "data security" or "security breach").
--   **Smart Filtering**: Excludes common stopwords (like "the", "a", "is") and the names of the RSS feed sources themselves to reduce noise and improve the quality of the results.
+-   **Visual Reporting**: Automatically generates a bar chart of the most frequent topics using `matplotlib`, providing an immediate visual summary of the data.
+-   **Thematic Context Analysis**: Its core strength. Instead of just counting simple pairs or triplets, the tool builds a **semantic profile** for each major keyword. It aggregates all words that appear immediately before and after a key term across the entire dataset, revealing the complete thematic landscape around a topic.
+-   **Smart Filtering**: Excludes common stopwords and the names of the RSS feed sources themselves to reduce noise and improve the quality of the results.
 
 ## How It Works
 
@@ -22,22 +19,20 @@ The script follows a systematic pipeline to transform raw text into actionable i
 
 1.  **Configuration**: Reads a list of RSS feed URLs from `lowSignal/rss.txt` and a list of custom stopwords from `lowSignal/stopword.txt`.
 2.  **Data Ingestion**: Parses each RSS feed to extract the title and summary of every article.
-3.  **Text Processing**: For each article, the text is combined, tokenized, and tagged for part-of-speech.
-4.  **Keyword Filtering**: The script iterates through the tagged words and selects only those that are:
-    -   Identified as nouns.
-    -   Alphanumeric and of a reasonable length.
-    -   Not present in the stopword list or the list of RSS source names.
-5.  **Analysis**:
-    -   **Frequency Count**: The frequency of each valid, lemmatized keyword is tallied.
-    -   **Context Capture**: For each valid keyword, the immediate preceding and succeeding words (if they are also meaningful) are saved as a "context triplet" or "context pair".
-6.  **Reporting**: The script outputs two lists to the console:
-    -   A list of the most frequent keywords that meet a certain threshold.
-    -   A list of the most frequent contexts, revealing common phrases and word associations.
+3.  **Text Processing & Filtering**: For each article, the text is combined, tokenized, and tagged. The script filters to keep only significant, lemmatized nouns that are not stopwords.
+4.  **Analysis**:
+    -   **Frequency Count**: The frequency of each valid keyword is tallied.
+    -   **Context Capture**: The immediate preceding and succeeding words for each keyword are captured.
+    -   **Thematic Aggregation**: The script builds a dictionary where each key is a significant topic, and the values are lists of all unique words that appeared before or after it.
+5.  **Reporting**: The script generates three distinct outputs to provide a multi-layered view of the data:
+    -   A list of the most frequent keywords printed to the console.
+    -   A bar chart visualizing the frequency of top keywords.
+    -   A structured dictionary of thematic contexts, showing the semantic neighborhood of each topic.
 
 ## Prerequisites
 
 -   Python 3.x
--   The following Python libraries: `feedparser`, `nltk`.
+-   The following Python libraries: `feedparser`, `nltk`, `matplotlib`.
 
 ## Installation & Setup
 
@@ -51,10 +46,11 @@ The script follows a systematic pipeline to transform raw text into actionable i
     ```bash
     pip install -r requirements.txt
     ```
-    *(You may need to create a `requirements.txt` file with the following content):*
+    *Make sure your `requirements.txt` file contains:*
     ```
     feedparser
     nltk
+    matplotlib
     ```
 
 3.  **Download NLTK data:**
@@ -74,58 +70,54 @@ The script follows a systematic pipeline to transform raw text into actionable i
     ```
 
 2.  **Configure RSS Feeds:**
-    Create a file named `lowSignal/rss.txt`. Add the URLs of the RSS feeds you want to analyze, with one URL per line.
-    *Example `lowSignal/rss.txt`:*
-    ```
-    http://rss.cnn.com/rss/cnn_topstories.rss
-    https://www.wired.com/feed/rss
-    https://feeds.arstechnica.com/arstechnica/index/
-    ```
+    Create a file named `lowSignal/rss.txt`. Add the URLs of the RSS feeds you want to analyze, one per line.
 
 3.  **Configure Stopwords:**
-    Create a file named `lowSignal/stopword.txt`. Add any common or domain-specific words you wish to ignore during the analysis, with one word per line.
-    *Example `lowSignal/stopword.txt`:*
-    ```
-    the
-    is
-    a
-    about
-    and
-    ```
+    Create a file named `lowSignal/stopword.txt`. Add any words you wish to ignore, one per line.
 
 4.  **Run the script:**
-    Execute the main Python file from your terminal.
     ```bash
-    python your_script_name.py
+    python main.py
     ```
 
 ### Understanding the Output
 
-The script will print two types of results to the console:
+The script produces three types of results:
 
--   **Important Keywords**: A list of words and their frequency count. This shows the most discussed topics.
+1.  **Important Keywords (Console Text)**: A simple list of the most discussed topics and their raw frequency count.
     ```
     ['security', 15]
-    ['data', 12]
+    ['trade', 12]
     ```
 
--   **Important Contexts**: A list of word groups and their frequency. This reveals how topics are being discussed.
-    ```
-    ['data', 'security', 10]          # The phrase "data security" appeared 10 times.
-    ['cyber', 'attack', 'threat', 5] # The phrase "cyber attack threat" appeared 5 times.
+2.  **Topic Frequency Chart (Pop-up Window)**: A bar chart that visually represents the most frequent keywords, allowing for a quick overview of the main topics.
+
+    
+
+3.  **Thematic Contexts (Console Dictionary)**: The most powerful output. It's a dictionary showing the complete "semantic neighborhood" for each key topic. This reveals how concepts are being discussed across all sources.
+    ```python
+    {
+        'security': {
+            'Before': ['homeland', 'aspen', 'food', 'national', 'vital'],
+            'After': ['law', 'interests', 'experts', 'forum', 'guarantees']
+        },
+        'trade': {
+            'Before': ['cold', 'free', 'reaches', 'trump'],
+            'After': ['agreement', 'deal', 'disputes']
+        }
+    }
     ```
 
 ## How to Customize
 
--   **Frequency Thresholds**: You can easily change the minimum frequency for a word or context to be considered "important" by modifying the integer values in the final loops of the script (e.g., `if wordIntensity[l][1] >= 5:`).
+-   **Keyword Thresholds**: Modify the integer values in the filtering loops of the script (e.g., `if word_intensity[y][1] >= 5:`) to change the minimum count for a word to be considered important.
+-   **Chart Customization**: In the `graph_intensity_word` function, change the `limit` parameter to control how many of the top keywords are displayed in the bar chart.
 -   **Analysis Scope**: Add or remove URLs from `rss.txt` to change the scope of your analysis.
 -   **Filtering**: Expand `stopword.txt` to fine-tune the noise reduction for your specific domain.
 
 ## Reusable GitHub Action
 
-This repository contains a reusable GitHub Action that runs the NLP analysis script.
-
-The action provides the Python script and its dependencies. Your repository only needs to provide the configuration files.
+This repository contains a reusable GitHub Action that runs the NLP analysis script. The action provides the Python script and its dependencies. Your repository only needs to provide the configuration files.
 
 ### Usage
 
