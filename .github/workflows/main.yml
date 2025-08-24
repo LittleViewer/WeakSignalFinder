@@ -3,15 +3,15 @@ name: WeakSignalFinder
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  run-python-script:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -21,11 +21,10 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install feedparser matplotlib nltk
+        pip install -r requirements.txt
 
     - name: Download NLTK data
-      run: |
-        python -m nltk.downloader -d ./nltk_data punkt wordnet averaged_perceptron_tagger averaged_perceptron_tagger_eng
+      run: python -m nltk.downloader punkt_tab
 
-    - name: Run main.py
+    - name: Run script
       run: python main.py
