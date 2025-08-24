@@ -50,8 +50,9 @@ class thematic_context :
     #init sert ici de pipeline d'execution à la classe thematic_context
     def __init__(self, context_with_intensity):
         central_semantic_word = self.find_word_context_by_semantic_for_categorized(context_with_intensity)
-        semantic_categorie = self.semantic_categorie(context_with_intensity, central_semantic_word)
-        self.semantic_categorie = self.cleaner_semantic_categorie(semantic_categorie)
+        dictionnary_for_semantic_categorized = self.create_dictionnary_for_semantic_categorized(central_semantic_word)
+        dictionnary_semantic_central_word_with_context = self.semantic_categorie(context_with_intensity, dictionnary_for_semantic_categorized, central_semantic_word)
+        self.semantic_categorie = self.cleaner_semantic_categorie(central_semantic_word, dictionnary_semantic_central_word_with_context)
 
     #Permet de trouver tout les mots dit central se trouvent comment mots pivot entre after et before dans intensity_context
     def find_word_context_by_semantic_for_categorized(self, context_with_intensity):
@@ -65,41 +66,47 @@ class thematic_context :
         central_semantic_word = set(central_semantic_word)
         return list(central_semantic_word)
     
-    #Permet de récupéré tout le voisinage avant ou après des mots centraux définit part find_word_context_by_semantic_engine() afin d'obtenir des catégorie sémantique qui regroupent tout les mot n-1 ou n+1 du central word afin que l'utilisateur puissent se faire des idées des discussion qu'il y a autour de différent termes centraux (émergent ou majeur) soulever part les flux rss
-    def semantic_categorie(self, context_with_intensity, semantic_central_word):
-        family_semantic_word = []
+    def create_dictionnary_for_semantic_categorized(self, semantic_central_word):
+        dictionnary = {}
         for word_central in semantic_central_word:
-            family_semantic_word.append(word_central)
-            family_semantic_word.append(["After",[],"Before",[]])
-            for word_context in context_with_intensity:
-                for only_one_word_context in range(len(word_context)):
-                    if word_central == word_context[only_one_word_context]:
-                        for only_one_family_semantic_word in range(len(family_semantic_word)):
-                                if family_semantic_word[only_one_family_semantic_word] == word_central:
-                                    for z in range(len(family_semantic_word[only_one_family_semantic_word+1])):
-                                        if only_one_word_context == 0 and range(len(family_semantic_word[only_one_family_semantic_word+1])) == 3:
-                                            if family_semantic_word[only_one_family_semantic_word+1][z] == "After":
-                                                family_semantic_word[only_one_family_semantic_word+1][z+1].append(word_context[only_one_word_context+1])
-                                                family_semantic_word[only_one_family_semantic_word+1][z+1] = list(set(family_semantic_word[only_one_family_semantic_word+1][z+1]))
-                                        if only_one_word_context == 1:
-                                            if family_semantic_word[only_one_family_semantic_word+1][z] == "Before":
-                                                family_semantic_word[only_one_family_semantic_word+1][z+1].append(word_context[only_one_word_context-1])
-                                                family_semantic_word[only_one_family_semantic_word+1][z+1] = list(set(family_semantic_word[only_one_family_semantic_word+1][z+1]))
-                                        if only_one_word_context == 0 and len(family_semantic_word[only_one_family_semantic_word+1]) == 4 :
-                                            if family_semantic_word[only_one_family_semantic_word+1][z] == "After":
-                                                family_semantic_word[only_one_family_semantic_word+1][z+1].append(word_context[only_one_word_context+1])
-                                                family_semantic_word[only_one_family_semantic_word+1][z+1] = list(set(family_semantic_word[only_one_family_semantic_word+1][z+1]))
-        return family_semantic_word
+            dictionnary[word_central] = {"Before" : [], "After" : []}
+        return dictionnary
 
+    #Permet de récupéré tout le voisinage avant ou après des mots centraux définit part find_word_context_by_semantic_engine() afin d'obtenir des catégorie sémantique qui regroupent tout les mot n-1 ou n+1 du central word afin que l'utilisateur puissent se faire des idées des discussion qu'il y a autour de différent termes centraux (émergent ou majeur) soulever part les flux rss
+    def semantic_categorie(self, context_with_intensity, dictionnary_semantic_central_word, central_semantic_word):
+        for only_one_word_central_by_context in context_with_intensity:
+            print(only_one_word_central_by_context)
+            if len(only_one_word_central_by_context) == 4:
+                tmp_dict_section = dictionnary_semantic_central_word[only_one_word_central_by_context[1]]["Before"]
+                tmp_dict_section.append(only_one_word_central_by_context[0])
+                dictionnary_semantic_central_word[only_one_word_central_by_context[1]]["Before"] = list(set(tmp_dict_section))
+
+                tmp_dict_section = dictionnary_semantic_central_word[only_one_word_central_by_context[1]]["After"]
+                tmp_dict_section.append(only_one_word_central_by_context[2])
+                dictionnary_semantic_central_word[only_one_word_central_by_context[1]]["After"] = list(set(tmp_dict_section))
+
+            elif len(only_one_word_central_by_context) == 3 :
+                    wordBefore = only_one_word_central_by_context[0]
+                    wordAfter = only_one_word_central_by_context[1]
+                    if wordAfter in central_semantic_word:
+                        tmp_dict_section = dictionnary_semantic_central_word[only_one_word_central_by_context[1]]["Before"]
+                        tmp_dict_section.append(only_one_word_central_by_context[0])
+                        dictionnary_semantic_central_word[only_one_word_central_by_context[1]]["Before"] = list(set(tmp_dict_section))
+                    if wordBefore in central_semantic_word:
+                        tmp_dict_section = dictionnary_semantic_central_word[only_one_word_central_by_context[1]]["After"]
+                        tmp_dict_section.append(only_one_word_central_by_context[1])
+                        dictionnary_semantic_central_word[only_one_word_central_by_context[1]]["After"] = list(set(tmp_dict_section))
+
+        return dictionnary_semantic_central_word
+
+        
     #Permet de nettoyer le résultat de semantic_categorie() des catégorie sémantique des central_word qui n'aurait pas de mots important (pas stop word et NN) dans le voisingae n-1 ou n+1
-    def cleaner_semantic_categorie(self, semantic_categorie):
-        for only_one_semantic_categorie in range(len(semantic_categorie)):
-                if len(semantic_categorie[only_one_semantic_categorie]) > 3:
-                    if semantic_categorie[only_one_semantic_categorie][1] == "" and semantic_categorie[only_one_semantic_categorie][3] == "":
-                        semantic_categorie.pop(only_one_semantic_categorie-1)
-                        semantic_categorie.pop(only_one_semantic_categorie)
-        return semantic_categorie
-    
+    def cleaner_semantic_categorie(self, word_central, dictionnary_semantic_central_word, limit = 4):
+        for only_one_word_central in word_central:
+            if (len(dictionnary_semantic_central_word[only_one_word_central]["Before"]) + len(dictionnary_semantic_central_word[only_one_word_central]["After"])) < limit:
+                del dictionnary_semantic_central_word[only_one_word_central]
+        return dictionnary_semantic_central_word
+
     #Permet de renvoyer le résultat de l'ensemble du pipeline
     def return_semantic_categorie(self):
         return self.semantic_categorie
