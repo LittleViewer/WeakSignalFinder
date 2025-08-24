@@ -36,17 +36,15 @@ jobs:
 
       - name: Download NLTK data
         run: python -m nltk.downloader -d ./nltk_data punkt averaged_perceptron_tagger wordnet
-        env:
-          NLTK_DATA: ./nltk_data
 
       - name: Run script (if direct push)
         if: github.event_name == 'push'
         run: python main.py
         env:
-          NLTK_DATA: ./nltk_data
+          NLTK_DATA: ${{ github.workspace }}/nltk_data
 
       - name: Run script (if reusable call)
         if: github.event_name == 'workflow_call'
         run: python action_repo/main.py
         env:
-          NLTK_DATA: ./nltk_data
+          NLTK_DATA: ${{ github.workspace }}/nltk_data
