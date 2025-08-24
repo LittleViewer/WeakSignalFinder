@@ -1,4 +1,4 @@
-name: Run LowSignal Python Script
+name: WeakSignalFinder
 
 on:
   push:
@@ -25,7 +25,7 @@ jobs:
 
     - name: Download NLTK data
       run: |
-        python -m nltk.downloader -d ./nltk_data punkt wordnet averaged_perceptron_tagger
+        python -m nltk.downloader -d ./nltk_data punkt wordnet averaged_perceptron_tagger averaged_perceptron_tagger_eng
 
     - name: Run main.py
       run: python main.py
