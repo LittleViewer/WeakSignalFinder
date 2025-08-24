@@ -24,7 +24,8 @@ jobs:
         pip install -r requirements.txt
 
     - name: Download NLTK data
-      run: python -m nltk.downloader punkt_tab
+      run: |
+        python -m nltk.downloader punkt punkt_tab wordnet
 
     - name: Run script
       run: python main.py
