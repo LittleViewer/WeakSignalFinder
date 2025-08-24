@@ -23,7 +23,9 @@ jobs:
 
     - name: Download NLTK data
       run: |
-        python -m nltk.downloader -d ./nltk_data punkt wordnet averaged_perceptron_tagger
+        python -m nltk.downloader -d ./nltk_data punkt punkt_tab wordnet averaged_perceptron_tagger
 
     - name: Run main.py
+      env:
+        NLTK_DATA: ./nltk_data
       run: python main.py
