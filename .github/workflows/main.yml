@@ -1,4 +1,4 @@
-name: Reusable Python NLP Workflow
+name: WeakSignalFinder
 
 on:
   push:
@@ -11,29 +11,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Check out the calling repository
-      uses: actions/checkout@v3
+    - name: Check out calling repository with config
+      uses: actions/checkout@v4
 
-    - name: Check out action repository
-      uses: actions/checkout@v3
+    - name: Check out action repository with script
+      uses: actions/checkout@v4
       with:
         repository: alphaleadership/WeakSignalFinder
         path: action_repo
 
     - name: Set up Python 3.9
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
         python-version: "3.9"
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        if [ -f action_repo/requirements.txt ]; then pip install -r action_repo/requirements.txt; fi
+        pip install -r action_repo/requirements.txt
 
     - name: Download NLTK data
-      run: |
-        python -m nltk.downloader -d ./nltk_data punkt averaged_perceptron_tagger wordnet
+      run: python -m nltk.downloader -d ./nltk_data punkt averaged_perceptron_tagger wordnet
+      env:
+        NLTK_DATA: ./nltk_data
 
     - name: Run script
-      run: |
-        python main.py
+      run: python action_repo/main.py
+      env:
+        NLTK_DATA: ./nltk_data
