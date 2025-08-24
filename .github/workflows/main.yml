@@ -1,31 +1,52 @@
-name: Reusable Python NLP Environment Setup
+name: Python NLP Workflow
 
 on:
+  push:
+    branches:
+      - main
   workflow_call:
 
 jobs:
-  run-script:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out user's code and config
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Checkout action repo (if reusable call)
+        if: github.event_name == 'workflow_call'
+        uses: actions/checkout@v4
+        with:
+          repository: alphaleadership/WeakSignalFinder
+          path: action_repo
+
+      - name: Set up Python 3.9
         uses: actions/setup-python@v4
         with:
           python-version: "3.9"
 
-      - name: Install dependencies
+      - name: Install dependencies (if direct push)
+        if: github.event_name == 'push'
         run: pip install -r requirements.txt
+
+      - name: Install dependencies (if reusable call)
+        if: github.event_name == 'workflow_call'
+        run: pip install -r action_repo/requirements.txt
 
       - name: Download NLTK data
         run: python -m nltk.downloader -d ./nltk_data punkt averaged_perceptron_tagger wordnet
         env:
           NLTK_DATA: ./nltk_data
 
-      - name: Run user's script
-        # L'utilisateur doit avoir un main.py dans son propre dépôt
+      - name: Run script (if direct push)
+        if: github.event_name == 'push'
         run: python main.py
+        env:
+          NLTK_DATA: ./nltk_data
+
+      - name: Run script (if reusable call)
+        if: github.event_name == 'workflow_call'
+        run: python action_repo/main.py
         env:
           NLTK_DATA: ./nltk_data
