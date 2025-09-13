@@ -1,6 +1,7 @@
 import feedparser
 import matplotlib.pyplot
 import nltk
+import spacy
 import re
 import os
 from nltk.stem import WordNetLemmatizer
@@ -17,6 +18,8 @@ resources = [
     'averaged_perceptron_tagger_eng'
 ]
 
+nlp = spacy.load("en_core_web_sm")
+
 #Vas dans le fichier rss.txt l'ensemble des flux rss définit part l'user
 def parseRss(file="rss.txt"):
     array_new_feed = []
@@ -24,12 +27,15 @@ def parseRss(file="rss.txt"):
     with open(file, "r") as stream:
         array_file_content = [line.strip() for line in stream if line.strip()]
     for line in array_file_content:
-        array_new_feed.append(feedparser.parse(line))
-        parts = line.split(".")
-        if len(parts) > 1:
-            name_rss_sender.append(WordNetLemmatizer().lemmatize(parts[1]))
-        else:
-            print("URL ignorée (pas de point) :", line)
+        try:
+            array_new_feed.append(feedparser.parse(line))
+            parts = line.split(".")
+            if len(parts) > 1:
+                name_rss_sender.append(WordNetLemmatizer().lemmatize(parts[1]))
+            else:
+                print("URL ignorée (pas de point) :", line)
+        except:
+            pass
     return [array_new_feed, set(name_rss_sender)]
 
 #Vas dans le fichier stopword définit part l'user pour nettoyer les résultat
@@ -66,7 +72,8 @@ def exclude_lowest_intensity_word_by_occurence (word_with_intensity_occurence, l
 #Permet l'affichage des mots trouver dans calcul_intensity_word() est choisi part leur intensité dans exclude_lowest_intensity_word_by_occurence()
 def word_insenty_print_important_represent(word_intensity) :
     for only_one_word in range(len(word_intensity)):
-        print(word_intensity[only_one_word])
+        #print(word_intensity[only_one_word])
+        pass
 
 #Vas dans le data set trouver tout les mots important (NN) est vas prendre leur voisinage directe avant ou après (n+1) pour avoir des concept les plus précis possible
 def find_and_save_context(word, index, content, contextWord, set_stop_word_usual):
@@ -127,6 +134,8 @@ for x in range(len(array_new_feed)):
         #print(time.strftime("%Y-%m-%d %H:%M:%S", arrayNewFeed[x].entries[i]["published_parsed"]))
         #print(arrayNewFeed[x].entries[i]["summary"])
         #print("\ \ \ \ ")
+        rss_tokenize = nlp(array_new_feed[x].entries[i]["title"] + array_new_feed[x].entries[i]["summary"])
+        print(type(rss_tokenize))
         tokenize_post = list(nltk.word_tokenize(array_new_feed[x].entries[i]["title"]) + list(nltk.word_tokenize(array_new_feed[x].entries[i]["summary"])))
         tag_tokenize_post = nltk.pos_tag(tokenize_post)
         for j in range(len(tag_tokenize_post)) :
@@ -160,17 +169,16 @@ for u in range(len(context_number)):
     elif type(context_number[u][3]) == int:
         number = 3 
 
-    if number == 2 :
-        if context_number[u][2] > 2 :
-            print(context_number[u])
-    elif number == 3:
-        if context_number[u][3] > 0 :
-            print(context_number[u])
+    # if number == 2 :
+    #     if context_number[u][2] > 2 :
+    #         print(context_number[u])
+    # elif number == 3:
+    #     if context_number[u][3] > 0 :
+    #         print(context_number[u])
 
 obj_thematic_context = thematic_context(context_number)
 semantique_categorie = obj_thematic_context.return_semantic_categorie()
-print(semantique_categorie)
+#print(semantique_categorie)
 
 #Affiche le diagramme en barre visant à simplifier la lectures des grand sujet remonter part les flux rss
 graph_intensity_word(intensity_word_with_just_important)
-
