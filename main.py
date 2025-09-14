@@ -1,22 +1,11 @@
 import feedparser
 import matplotlib.pyplot
-import nltk
 import spacy
 import re
 import os
-from nltk.stem import WordNetLemmatizer
 from intensityContext import intensity_context
 from intensityContext import thematic_context
-nltk_data_dir = os.path.join(os.getcwd(), "nltk_data")
-os.makedirs(nltk_data_dir, exist_ok=True)
-nltk.data.path.append(nltk_data_dir)
-resources = [
-    'punkt',
-    'punkt_tab',
-    'wordnet',
-    'averaged_perceptron_tagger',
-    'averaged_perceptron_tagger_eng'
-]
+
 
 nlp = spacy.load("en_core_web_sm")
 
@@ -30,10 +19,6 @@ def parseRss(file="rss.txt"):
         try:
             array_new_feed.append(feedparser.parse(line))
             parts = line.split(".")
-            if len(parts) > 1:
-                name_rss_sender.append(WordNetLemmatizer().lemmatize(parts[1]))
-            else:
-                print("URL ignorée (pas de point) :", line)
         except:
             pass
     return [array_new_feed, set(name_rss_sender)]
@@ -79,26 +64,27 @@ def word_insenty_print_important_represent(word_intensity) :
 def find_and_save_context(word, index, content, contextWord, set_stop_word_usual):
     before_realise = False
     if (index-1) >= 0 :
-        if  re.match('^(?!nbsp$)[A-Za-z0-9]+$', content[index - 1][0].lower()) :
-            if content[index - 1][0].lower() in set_stop_word_usual:
-                pass
-            else:
-                beforeWord = [content[index - 1][0].lower(), word.lower()]
-                before_realise = True
+        if type(content[index - 1]) != int and  type(content[index - 1]) != float:
+            if re.match('^(?!nbsp$)[A-Za-z0-9]+$', content[index - 1].lower()) :
+                if content[index - 1].lower() in set_stop_word_usual:
+                    pass
+                else:
+                    beforeWord = [content[index - 1].lower(), word.lower()]
+                    before_realise = True
     
     if len(content) > (index+1) and before_realise == True :
-        if  re.match('^(?!nbsp$)[A-Za-z0-9]+$', content[index + 1][0].lower()) :
-            if content[index + 1][0].lower() in set_stop_word_usual:
+        if  re.match('^(?!nbsp$)[A-Za-z0-9]+$', content[index + 1].lower()) :
+            if content[index + 1].lower() in set_stop_word_usual:
                 pass
             else :
-                beforeWord.append(content[index + 1][0].lower())
+                beforeWord.append(content[index + 1].lower())
                 contextWord.append(beforeWord)
     elif len(content) > (index+1) and before_realise == False:
-        if  re.match('^(?!nbsp$)[A-Za-z0-9]+$', content[index + 1][0].lower()) :
+        if  re.match('^(?!nbsp$)[A-Za-z0-9]+$', content[index + 1].lower()) :
             if content[index + 1][0].lower() in set_stop_word_usual:
                 pass
             else :
-                contextWord.append([word.lower(), content[index + 1][0].lower()])
+                contextWord.append([word.lower(), content[index + 1].lower()])
     elif before_realise == True:
         contextWord.append(beforeWord)
     return contextWord
@@ -120,6 +106,8 @@ figure_matpolib, axis = matplotlib.pyplot.subplots()
 
 array_stop_word_usual = stopWordUsual()
 array_output_parse_rss = parseRss()
+rss_tokenize = []
+token_validate_to_analysis = []
 intensity_word_with_just_important = []
 contex_word_save = []
 array_new_feed = array_output_parse_rss[0]
@@ -134,31 +122,34 @@ for x in range(len(array_new_feed)):
         #print(time.strftime("%Y-%m-%d %H:%M:%S", arrayNewFeed[x].entries[i]["published_parsed"]))
         #print(arrayNewFeed[x].entries[i]["summary"])
         #print("\ \ \ \ ")
-        rss_tokenize = nlp(array_new_feed[x].entries[i]["title"] + array_new_feed[x].entries[i]["summary"])
-        print(type(rss_tokenize))
-        tokenize_post = list(nltk.word_tokenize(array_new_feed[x].entries[i]["title"]) + list(nltk.word_tokenize(array_new_feed[x].entries[i]["summary"])))
-        tag_tokenize_post = nltk.pos_tag(tokenize_post)
-        for j in range(len(tag_tokenize_post)) :
-            tag = tag_tokenize_post[j][1]
-            word = (tag_tokenize_post[j][0]).lower()
-            if tag.startswith("NN") and re.match('^(?!nbsp$)[A-Za-z0-9]+$', word) and len(word) > 1 : 
-                lem_word = WordNetLemmatizer().lemmatize(word)
+        rss_tokenize.append(nlp(array_new_feed[x].entries[i]["title"] + array_new_feed[x].entries[i]["summary"]))
+                                                    
+
+for array_rss_tokenize in rss_tokenize:
+    tick = 0
+    for token in array_rss_tokenize :
+            text_token_noun = []
+            token_ = token
+            token_lemmatize = token.lemma_
+            if token_.pos_ == 'NOUN' and re.match('^(?!nbsp$)[A-Za-z0-9]+$', str(token_)) and len(str(token_)) > 1 :
+                text_token_noun.append(token)
+                tick = tick + 1
+                token_validate_to_analysis.append(token_lemmatize)
                 is_organisation_sender_rss = False
                 is_usual_stop_word = False
-                if lem_word in name_rss_organisation_sender :
+                if token_lemmatize in name_rss_organisation_sender :
                     is_organisation_sender_rss = True
-                if lem_word in array_stop_word_usual:
+                if token_lemmatize in array_stop_word_usual:
                     is_usual_stop_word = True
                 if is_organisation_sender_rss == False and is_usual_stop_word == False :       
-                    word_intensity = calcul_intensity_word(lem_word, word_intensity)
-                    contex_word_save = find_and_save_context(lem_word, j, tag_tokenize_post, contex_word_save, array_stop_word_usual)
-                                    
+                    word_intensity = calcul_intensity_word(token_lemmatize, word_intensity)
+                    contex_word_save = find_and_save_context(token, tick, str(text_token_noun), str(contex_word_save), array_stop_word_usual)
+print(word_intensity)
 
 #appel des fonctions liès à la categorisation semantique
 intensity_word_with_just_important = exclude_lowest_intensity_word_by_occurence(word_intensity)
 word_insenty_print_important_represent(intensity_word_with_just_important)
-#print(nameRssOrganisationSender)
-#print(contexWordSave)
+print(contex_word_save)
 
 #Affiche de manière ordonnée les mots avec leur contexte via intensity_context()
 obj_intensity_context = intensity_context(contex_word_save)

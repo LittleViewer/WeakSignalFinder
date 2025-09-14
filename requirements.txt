@@ -1,4 +1,3 @@
 feedparser
-nltk
 matplotlib
 spacy
