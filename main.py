@@ -63,7 +63,6 @@ def word_insenty_print_important_represent(word_intensity) :
 #Vas dans le data set trouver tout les mots important (NN) est vas prendre leur voisinage directe avant ou après (n+1) pour avoir des concept les plus précis possible
 def find_and_save_context(word, index, content, contextWord, set_stop_word_usual):
     before_realise = False
-    print(word)
     if (index-1) >= 0 :
         if type(word) == str:
             if re.match('^(?!nbsp$)[A-Za-z0-9]+$', content[index - 1].lower()) :
@@ -180,4 +179,5 @@ semantique_categorie = obj_thematic_context.return_semantic_categorie()
 print(semantique_categorie)
 
 #Affiche le diagramme en barre visant à simplifier la lectures des grand sujet remonter part les flux rss
+
 graph_intensity_word(intensity_word_with_just_important)
