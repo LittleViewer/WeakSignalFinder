@@ -46,7 +46,7 @@ class intensity_context:
         return self.context_with_intensity
     
 class thematic_context :
-    
+
     #init sert ici de pipeline d'execution à la classe thematic_context
     def __init__(self, context_with_intensity):
         central_semantic_word = self.find_word_context_by_semantic_for_categorized(context_with_intensity)
@@ -75,7 +75,7 @@ class thematic_context :
     #Permet de récupéré tout le voisinage avant ou après des mots centraux définit part find_word_context_by_semantic_engine() afin d'obtenir des catégorie sémantique qui regroupent tout les mot n-1 ou n+1 du central word afin que l'utilisateur puissent se faire des idées des discussion qu'il y a autour de différent termes centraux (émergent ou majeur) soulever part les flux rss
     def semantic_categorie(self, context_with_intensity, dictionnary_semantic_central_word, central_semantic_word):
         for only_one_word_central_by_context in context_with_intensity:
-            print(only_one_word_central_by_context)
+            #print(only_one_word_central_by_context)
             if len(only_one_word_central_by_context) == 4:
                 tmp_dict_section = dictionnary_semantic_central_word[only_one_word_central_by_context[1]]["Before"]
                 tmp_dict_section.append(only_one_word_central_by_context[0])
