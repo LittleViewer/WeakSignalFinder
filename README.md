@@ -1,31 +1,31 @@
 # WeakSignalFinder
 
-This project is a Python-based tool designed to perform automated content analysis on a collection of English RSS feeds. It goes beyond simple keyword counting by leveraging Natural Language Processing (NLP) to identify significant topics, measure their frequency, and analyze the thematic context in which they appear.
+This project provides a Python-based toolkit for automated informational analysis of English-language RSS feeds. It moves beyond simple keyword counting, leveraging Natural Language Processing (NLP) to identify significant topics, quantify their prominence, and analyze their surrounding thematic context.
 
-The primary goal is to act as an intelligence-gathering tool, helping users detect "weak signals"—emerging trends, topics, and relationships that are not yet obvious but are gaining traction across various information sources.
+The primary objective is to function as a powerful intelligence-gathering aid. By processing large volumes of text, it helps analysts detect "weak signals"—emerging trends, nascent topics, and subtle shifts in discourse that are not yet mainstream but are gaining traction across diverse information sources.
 
 ## Key Features
 
--   **RSS Feed Aggregation**: Automatically fetches and parses the latest entries from a list of user-defined RSS feeds.
--   **Advanced NLP Processing**: Utilizes the `spaCy` library for efficient, production-grade text analysis, including tokenization, Part-of-Speech (POS) tagging, and lemmatization.
--   **Intelligent Keyword Extraction**: Focuses specifically on nouns to extract key concepts, entities, and subjects, filtering out less meaningful words.
--   **Visual Reporting**: Automatically generates a bar chart of the most frequent topics using `matplotlib`, providing an immediate visual summary of the data.
--   **Thematic Context Analysis**: Its core strength. Instead of just counting simple pairs or triplets, the tool builds a **semantic profile** for each major keyword. It aggregates all words that appear immediately before and after a key term across the entire dataset, revealing the complete thematic landscape around a topic.
--   **Smart Filtering**: Excludes common stopwords and the names of the RSS feed sources themselves to reduce noise and improve the quality of the results.
+-   **RSS Feed Aggregation**: Seamlessly aggregates and parses the latest entries from a user-defined list of RSS feeds.
+-   **Advanced NLP Processing**: Leverages the high-performance `spaCy` library for production-grade text analysis, including tokenization, Part-of-Speech (POS) tagging, and lemmatization.
+-   **Intelligent Keyword Extraction**: Strategically focuses on nouns to extract core concepts, entities, and subjects, filtering out less meaningful words for a cleaner signal.
+-   **Visual Reporting**: Generates an instant visual summary with a `matplotlib` bar chart, highlighting the most frequent topics at a glance.
+-   **Thematic Context Analysis**: This is the tool's core strength. Instead of just tracking co-occurrence, it builds a **semantic profile** for each major keyword. It aggregates all words appearing immediately before and after a key term across the entire dataset, revealing the complete thematic landscape and the nuances of how a topic is being discussed.
+-   **Smart Filtering**: Reduces noise and improves signal quality by automatically excluding common stopwords and the names of the RSS feed sources from the analysis.
 
 ## How It Works
 
 The script follows a systematic pipeline to transform raw text into actionable insights:
 
 1.  **Configuration**: Reads a list of RSS feed URLs from `lowSignal/rss.txt` and a list of custom stopwords from `lowSignal/stopword.txt`.
-2.  **Data Ingestion**: Parses each RSS feed to extract the title and summary of every article.
-3.  **Text Processing & Filtering**: For each article, the text is combined and processed by spaCy. The script filters to keep only significant, lemmatized nouns that are not stopwords.
+2.  **Data Ingestion & Parsing**: Parses each RSS feed to extract the title and summary of every article.
+3.  **Text Normalization & Filtering**: For each article, text is combined and processed by spaCy. The script then isolates significant, lemmatized nouns that are not stopwords.
 4.  **Analysis**:
     -   **Frequency Count**: The frequency of each valid keyword is tallied.
     -   **Context Capture**: The immediate preceding and succeeding words for each keyword are captured.
-    -   **Thematic Aggregation**: The script builds a dictionary where each key is a significant topic, and the values are lists of all unique words that appeared before or after it.
+    -   **Thematic Aggregation**: A thematic dictionary is constructed where each key is a significant topic, and its values are lists of all unique words that appeared in its immediate context.
 5.  **Reporting**: The script generates three distinct outputs to provide a multi-layered view of the data:
-    -   A list of the most frequent keywords printed to the console.
+    -   A ranked list of the most frequent keywords printed to the console.
     -   A bar chart visualizing the frequency of top keywords.
     -   A structured dictionary of thematic contexts, showing the semantic neighborhood of each topic.
 
@@ -81,15 +81,15 @@ The script follows a systematic pipeline to transform raw text into actionable i
 
 The script produces three types of results:
 
-1.  **Important Keywords (Console Text)**: A simple list of the most discussed topics and their raw frequency count.
+1.  **Important Keywords (Console Text)**: A ranked list of the most discussed topics and their raw frequency count.
     ```
     ['security', 15]
     ['trade', 12]
     ```
 
-2.  **Topic Frequency Chart (Pop-up Window)**: A bar chart that visually represents the most frequent keywords, allowing for a quick overview of the main topics.
+2.  **Topic Frequency Chart (Pop-up Window)**: A bar chart that provides a quick, visual overview of the dominant topics.
 
-3.  **Thematic Contexts (Console Dictionary)**: The most powerful output. It's a dictionary showing the complete "semantic neighborhood" for each key topic. This reveals how concepts are being discussed across all sources.
+3.  **Thematic Contexts (Console Dictionary)**: This is the most powerful output, revealing the "semantic neighborhood" of each key topic. It shows *how* concepts are being framed and discussed across all sources, providing crucial context beyond simple frequency counts.
     ```python
     {
         'security': {
@@ -105,10 +105,10 @@ The script produces three types of results:
 
 ## How to Customize
 
--   **Keyword Thresholds**: Modify the integer values in the filtering loops of the script (e.g., `if word_intensity[y][1] >= 5:`) to change the minimum count for a word to be considered important.
--   **Chart Customization**: In the `graph_intensity_word` function, change the `limit` parameter to control how many of the top keywords are displayed in the bar chart.
--   **Analysis Scope**: Add or remove URLs from `rss.txt` to change the scope of your analysis.
--   **Filtering**: Expand `stopword.txt` to fine-tune the noise reduction for your specific domain.
+-   **Keyword Thresholds**: Adjust the threshold in the script (e.g., `if word_intensity[y][1] >= 5:`) to control the minimum count for a word to be considered significant.
+-   **Chart Customization**: In the `graph_intensity_word` function, customize the `limit` parameter to control how many top keywords are displayed in the bar chart.
+-   **Analysis Scope**: Expand or narrow the scope of your analysis by adding or removing URLs from `rss.txt`.
+-   **Filtering**: Refine noise reduction for your specific domain by expanding the `stopword.txt` file.
 
 ## Reusable GitHub Action
 
@@ -133,4 +133,10 @@ on:
 jobs:
   run-nlp:
     uses: alphaleadership/WeakSignalFinder/.github/workflows/main.yml@main
-`
+```
+
+---
+
+## Disclaimer
+
+This tool is designed as an analytical aid to support intelligence gathering and weak signal analysis. The outputs it generates are not definitive conclusions but rather data points intended to guide and inform human interpretation. The quality, accuracy, and relevance of the analysis are directly dependent on the RSS feeds provided as input. The tool processes content as-is and does not verify the factual accuracy of the source material. The results represent a snapshot in time based on the content available at the moment of execution. Users should always apply critical judgment and cross-reference findings with other sources.
