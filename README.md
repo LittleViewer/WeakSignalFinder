@@ -1,14 +1,18 @@
+Of course. Here is the corrected version of your text, with all references to `nltk` replaced by their `spaCy` equivalents.
+
+---
+
 # WeakSignalFinder
 
-This project is a Python-based tool designed to perform automated content analysis on a collection of RSS English feeds. It goes beyond simple keyword counting by leveraging Natural Language Processing (NLP) to identify significant topics, measure their frequency, and analyze the thematic context in which they appear.
+This project is a Python-based tool designed to perform automated content analysis on a collection of English RSS feeds. It goes beyond simple keyword counting by leveraging Natural Language Processing (NLP) to identify significant topics, measure their frequency, and analyze the thematic context in which they appear.
 
 The primary goal is to act as an intelligence-gathering tool, helping users detect "weak signals"—emerging trends, topics, and relationships that are not yet obvious but are gaining traction across various information sources.
 
 ## Key Features
 
 -   **RSS Feed Aggregation**: Automatically fetches and parses the latest entries from a list of user-defined RSS feeds.
--   **Advanced NLP Processing**: Utilizes the `nltk` library for sophisticated text analysis, including tokenization, Part-of-Speech (POS) tagging, and lemmatization.
--   **Intelligent Keyword Extraction**: Focuses specifically on nouns (`NN`) to extract key concepts, entities, and subjects, filtering out less meaningful words.
+-   **Advanced NLP Processing**: Utilizes the `spaCy` library for efficient, production-grade text analysis, including tokenization, Part-of-Speech (POS) tagging, and lemmatization.
+-   **Intelligent Keyword Extraction**: Focuses specifically on nouns to extract key concepts, entities, and subjects, filtering out less meaningful words.
 -   **Visual Reporting**: Automatically generates a bar chart of the most frequent topics using `matplotlib`, providing an immediate visual summary of the data.
 -   **Thematic Context Analysis**: Its core strength. Instead of just counting simple pairs or triplets, the tool builds a **semantic profile** for each major keyword. It aggregates all words that appear immediately before and after a key term across the entire dataset, revealing the complete thematic landscape around a topic.
 -   **Smart Filtering**: Excludes common stopwords and the names of the RSS feed sources themselves to reduce noise and improve the quality of the results.
@@ -19,7 +23,7 @@ The script follows a systematic pipeline to transform raw text into actionable i
 
 1.  **Configuration**: Reads a list of RSS feed URLs from `lowSignal/rss.txt` and a list of custom stopwords from `lowSignal/stopword.txt`.
 2.  **Data Ingestion**: Parses each RSS feed to extract the title and summary of every article.
-3.  **Text Processing & Filtering**: For each article, the text is combined, tokenized, and tagged. The script filters to keep only significant, lemmatized nouns that are not stopwords.
+3.  **Text Processing & Filtering**: For each article, the text is combined and processed by spaCy. The script filters to keep only significant, lemmatized nouns that are not stopwords.
 4.  **Analysis**:
     -   **Frequency Count**: The frequency of each valid keyword is tallied.
     -   **Context Capture**: The immediate preceding and succeeding words for each keyword are captured.
@@ -32,7 +36,7 @@ The script follows a systematic pipeline to transform raw text into actionable i
 ## Prerequisites
 
 -   Python 3.x
--   The following Python libraries: `feedparser`, `nltk`, `matplotlib`.
+-   The following Python libraries: `feedparser`, `spacy`, `matplotlib`.
 
 ## Installation & Setup
 
@@ -49,17 +53,14 @@ The script follows a systematic pipeline to transform raw text into actionable i
     *Make sure your `requirements.txt` file contains:*
     ```
     feedparser
-    nltk
+    spacy
     matplotlib
     ```
 
-3.  **Download NLTK data:**
-    Run the following Python script once to download the necessary NLTK models:
-    ```python
-    import nltk
-    nltk.download('punkt')
-    nltk.download('averaged_perceptron_tagger')
-    nltk.download('wordnet')
+3.  **Download spaCy Model:**
+    spaCy requires a pre-trained language model. Run the following command in your terminal to download the small English model:
+    ```bash
+    python -m spacy download en_core_web_sm
     ```
 
 ## Usage
@@ -91,8 +92,6 @@ The script produces three types of results:
     ```
 
 2.  **Topic Frequency Chart (Pop-up Window)**: A bar chart that visually represents the most frequent keywords, allowing for a quick overview of the main topics.
-
-    
 
 3.  **Thematic Contexts (Console Dictionary)**: The most powerful output. It's a dictionary showing the complete "semantic neighborhood" for each key topic. This reveals how concepts are being discussed across all sources.
     ```python
