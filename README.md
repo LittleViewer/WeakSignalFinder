@@ -1,7 +1,3 @@
-Of course. Here is the corrected version of your text, with all references to `nltk` replaced by their `spaCy` equivalents.
-
----
-
 # WeakSignalFinder
 
 This project is a Python-based tool designed to perform automated content analysis on a collection of English RSS feeds. It goes beyond simple keyword counting by leveraging Natural Language Processing (NLP) to identify significant topics, measure their frequency, and analyze the thematic context in which they appear.
@@ -137,6 +133,4 @@ on:
 jobs:
   run-nlp:
     uses: alphaleadership/WeakSignalFinder/.github/workflows/main.yml@main
-```
-
-The action will then use its own script combined with your repository's configuration files to run the analysis.
+`
