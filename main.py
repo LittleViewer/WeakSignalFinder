@@ -63,8 +63,9 @@ def word_insenty_print_important_represent(word_intensity) :
 #Vas dans le data set trouver tout les mots important (NN) est vas prendre leur voisinage directe avant ou après (n+1) pour avoir des concept les plus précis possible
 def find_and_save_context(word, index, content, contextWord, set_stop_word_usual):
     before_realise = False
+    print(word)
     if (index-1) >= 0 :
-        if type(content[index - 1]) != int and  type(content[index - 1]) != float:
+        if type(word) == str:
             if re.match('^(?!nbsp$)[A-Za-z0-9]+$', content[index - 1].lower()) :
                 if content[index - 1].lower() in set_stop_word_usual:
                     pass
@@ -72,21 +73,21 @@ def find_and_save_context(word, index, content, contextWord, set_stop_word_usual
                     beforeWord = [content[index - 1].lower(), word.lower()]
                     before_realise = True
     
-    if len(content) > (index+1) and before_realise == True :
-        if  re.match('^(?!nbsp$)[A-Za-z0-9]+$', content[index + 1].lower()) :
-            if content[index + 1].lower() in set_stop_word_usual:
-                pass
-            else :
-                beforeWord.append(content[index + 1].lower())
-                contextWord.append(beforeWord)
-    elif len(content) > (index+1) and before_realise == False:
-        if  re.match('^(?!nbsp$)[A-Za-z0-9]+$', content[index + 1].lower()) :
-            if content[index + 1][0].lower() in set_stop_word_usual:
-                pass
-            else :
-                contextWord.append([word.lower(), content[index + 1].lower()])
-    elif before_realise == True:
-        contextWord.append(beforeWord)
+        if len(content) > (index+1) and before_realise == True :
+            if  re.match('^(?!nbsp$)[A-Za-z0-9]+$', content[index + 1].lower()) :
+                if content[index + 1].lower() in set_stop_word_usual:
+                    pass
+                else :
+                    beforeWord.append(content[index + 1].lower())
+                    contextWord.append(beforeWord)
+        elif len(content) > (index+1) and before_realise == False:
+            if  re.match('^(?!nbsp$)[A-Za-z0-9]+$', content[index + 1].lower()) :
+                if content[index + 1][0].lower() in set_stop_word_usual:
+                    pass
+                else :
+                    contextWord.append([word.lower(), content[index + 1].lower()])
+        elif before_realise == True:
+            contextWord.append(beforeWord)
     return contextWord
 
 #Via matplotlib.pyplot dessine un diagramme de barre des termes selon la limit user, ayant les plus d'occurence dans le data-set permettant d'un coup d'oeil d'un avoir les point important émise part les flux rss
@@ -122,17 +123,19 @@ for x in range(len(array_new_feed)):
         #print(time.strftime("%Y-%m-%d %H:%M:%S", arrayNewFeed[x].entries[i]["published_parsed"]))
         #print(arrayNewFeed[x].entries[i]["summary"])
         #print("\ \ \ \ ")
-        rss_tokenize.append(nlp(array_new_feed[x].entries[i]["title"] + array_new_feed[x].entries[i]["summary"]))
+        rss_tokenize.append((array_new_feed[x].entries[i]["title"] + array_new_feed[x].entries[i]["summary"]))
                                                     
-
+print(len(rss_tokenize))
 for array_rss_tokenize in rss_tokenize:
     tick = 0
-    for token in array_rss_tokenize :
-            text_token_noun = []
+    tick_text = 0
+    array_rss_tokenize_nlp = nlp(array_rss_tokenize)
+    token_validate_to_analysis = []
+    for token in array_rss_tokenize_nlp :
+            tick_text = tick_text + 1
             token_ = token
             token_lemmatize = token.lemma_
             if token_.pos_ == 'NOUN' and re.match('^(?!nbsp$)[A-Za-z0-9]+$', str(token_)) and len(str(token_)) > 1 :
-                text_token_noun.append(token)
                 tick = tick + 1
                 token_validate_to_analysis.append(token_lemmatize)
                 is_organisation_sender_rss = False
@@ -143,8 +146,13 @@ for array_rss_tokenize in rss_tokenize:
                     is_usual_stop_word = True
                 if is_organisation_sender_rss == False and is_usual_stop_word == False :       
                     word_intensity = calcul_intensity_word(token_lemmatize, word_intensity)
-                    contex_word_save = find_and_save_context(token, tick, str(text_token_noun), str(contex_word_save), array_stop_word_usual)
-print(word_intensity)
+
+    for one_noun in token_validate_to_analysis:
+            contex_word_save = find_and_save_context(one_noun, tick, token_validate_to_analysis, contex_word_save, array_stop_word_usual)
+
+print(contex_word_save)
+print("///")
+#print(word_intensity)
 
 #appel des fonctions liès à la categorisation semantique
 intensity_word_with_just_important = exclude_lowest_intensity_word_by_occurence(word_intensity)
@@ -160,16 +168,16 @@ for u in range(len(context_number)):
     elif type(context_number[u][3]) == int:
         number = 3 
 
-    # if number == 2 :
-    #     if context_number[u][2] > 2 :
-    #         print(context_number[u])
-    # elif number == 3:
-    #     if context_number[u][3] > 0 :
-    #         print(context_number[u])
+    if number == 2 :
+        if context_number[u][2] > 2 :
+            print(context_number[u])
+    elif number == 3:
+         if context_number[u][3] > 0 :
+             print(context_number[u])
 
 obj_thematic_context = thematic_context(context_number)
 semantique_categorie = obj_thematic_context.return_semantic_categorie()
-#print(semantique_categorie)
+print(semantique_categorie)
 
 #Affiche le diagramme en barre visant à simplifier la lectures des grand sujet remonter part les flux rss
 graph_intensity_word(intensity_word_with_just_important)

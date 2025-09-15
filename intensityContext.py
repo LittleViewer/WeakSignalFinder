@@ -46,7 +46,7 @@ class intensity_context:
         return self.context_with_intensity
     
 class thematic_context :
-    
+
     #init sert ici de pipeline d'execution à la classe thematic_context
     def __init__(self, context_with_intensity):
         central_semantic_word = self.find_word_context_by_semantic_for_categorized(context_with_intensity)
