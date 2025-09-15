@@ -2,7 +2,7 @@
 
 This project provides a Python-based toolkit for automated informational analysis of English-language RSS feeds. It moves beyond simple keyword counting, leveraging Natural Language Processing (NLP) to identify significant topics, quantify their prominence, and analyze their surrounding thematic context.
 
-Its primary objective is to serve as a strategic intelligence tool for analyzing the informational landscape. By processing large volumes of text, it empowers analysts to understand the direction and evolution of key topics. The tool is engineered to map dominant narratives and macro-level trends while also detecting "weak signals"—nascent topics and subtle shifts in discourse that are not yet mainstream. Ultimately, it helps users build a dynamic understanding of not just what is being discussed, but how the conversation is framed and where its trajectory is leading.
+Its primary purpose is to serve as a business intelligence tool for analyzing the information landscape. By processing large volumes of text, it allows analysts to understand the direction and evolution of key topics. The tool is designed to map dominant narratives and macro trends, while providing the means to support the detection of “soft signals”: ​​emerging topics and subtle shifts in discourse that have not yet become widespread. Ultimately, it helps users develop a dynamic understanding not only of the topic at hand, but also of how the conversation is structured and its trajectory.
 
 ## Key Features
 
