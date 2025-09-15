@@ -1,8 +1,8 @@
 # WeakSignalFinder
 
-This project provides a Python-based toolkit for automated informational analysis of English-language RSS feeds. It moves beyond simple keyword counting, leveraging Natural Language Processing (NLP) to identify significant topics, quantify their prominence, and analyze their surrounding thematic context.
+his project provides a Python-based toolkit for automated informational analysis of English-language RSS feeds. It moves beyond simple keyword counting, leveraging Natural Language Processing (NLP) to identify significant topics, quantify their prominence, and analyze their surrounding thematic context.
 
-The primary objective is to function as a powerful intelligence-gathering aid. By processing large volumes of text, it helps analysts detect "weak signals"—emerging trends, nascent topics, and subtle shifts in discourse that are not yet mainstream but are gaining traction across diverse information sources.
+Its primary objective is to serve as a strategic intelligence tool for analyzing the informational landscape. By processing large volumes of text, it empowers analysts to understand the direction and evolution of key topics. The tool is engineered to map dominant narratives and macro-level trends while also detecting "weak signals"—nascent topics and subtle shifts in discourse that are not yet mainstream. Ultimately, it helps users build a dynamic understanding of not just what is being discussed, but how the conversation is framed and where its trajectory is leading.
 
 ## Key Features
 
