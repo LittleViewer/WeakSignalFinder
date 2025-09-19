@@ -1,0 +1,6 @@
+[
+    {"language": "English", "code_language" : "en", "model_name": "en_core_web_md"},
+    {"language": "Spanish", "code_language" : "es", "model_name": "es_core_news_md"},
+    {"language": "German", "code_language" : "de", "model_name": "de_core_news_md"},
+    {"language": "French", "code_language" : "fr", "model_name": "fr_core_news_md"}
+]
