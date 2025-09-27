@@ -3,11 +3,12 @@ import matplotlib.pyplot
 import spacy
 import re
 import os
+from gestionMultiLanguage.feedGestion import feedGestion
 from intensityContext import intensity_context
 from intensityContext import thematic_context
 
 
-nlp = spacy.load("en_core_web_sm")
+nlp = spacy.load("en_core_web_md")
 
 #Vas dans le fichier rss.txt l'ensemble des flux rss définit part l'user
 def parseRss(file="rss.txt"):
@@ -181,3 +182,6 @@ print(semantique_categorie)
 #Affiche le diagramme en barre visant à simplifier la lectures des grand sujet remonter part les flux rss
 
 graph_intensity_word(intensity_word_with_just_important)
+
+obj_feed_gestion = feedGestion()
+obj_feed_gestion
