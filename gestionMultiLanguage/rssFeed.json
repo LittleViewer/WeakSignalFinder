@@ -9,6 +9,10 @@
     },
     {"name_organization" : "nytimes",
      "rss_link" : "https://rss.nytimes.com/services/xml/rss/nyt/World.xmls",
+     "language" : "cn"
+    },
+    {"name_organization" : "nytimes",
+     "rss_link" : "https://rss.nytimes.com/services/xml/rss/nyt/World.xmls",
      "language" : "fr"
     },
     {"name_organization" : "nytimes",
