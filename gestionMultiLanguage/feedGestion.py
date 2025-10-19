@@ -23,7 +23,7 @@ class feedGestion :
         for model in data:
             if model["code_language"] in list_language_exist[0]:
                 list_language_exist[0][model["model_name"]] =  list_language_exist[0].pop(model["code_language"])
-        print(self.delete_not_exist_model(list_language_exist[0],list_language_exist[1]))
+        return self.delete_not_exist_model(list_language_exist[0],list_language_exist[1])
     
     def delete_not_exist_model(self, list_model_with_feed, country_code):
         for key in list(list_model_with_feed):
@@ -32,5 +32,9 @@ class feedGestion :
         return list_model_with_feed
 
     def __init__(self):
+       pass
+
+    def return_dict_with_model_and_feed(self):
         language_dict = self.class_by_language()
-        self.list_model_by_language(language_dict)
+        return self.list_model_by_language(language_dict)
+        
