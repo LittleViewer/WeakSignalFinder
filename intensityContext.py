@@ -4,13 +4,16 @@ class intensity_context:
     #init sert ici de pipeline d'execution à la classe intensity_context
     def __init__(self, context):
         context_number = [["a", "b", "c", 1]]
-
+        self.context_cache = {}
         for sentence_tales in range(len(context)):
-            is_exist = self.compare_one_sentence(context[sentence_tales], context_number)
-            if is_exist == False:
-               context_number = self.add_sentence(context[sentence_tales],context_number)
-            elif is_exist[0] == True:
-                context_number = self.sentence_exist(context_number, is_exist)
+            key = tuple(context[sentence_tales])
+            if key in self.context_cache:
+                idx = self.context_cache[key]
+                context_number[idx][-1] += 1
+            else:
+                context_number = self.add_sentence(context[sentence_tales], context_number)
+                self.context_cache[key] = len(context_number) - 1
+
         self.context_with_intensity = context_number
         self.return_result()
             

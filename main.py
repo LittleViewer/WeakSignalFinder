@@ -1,27 +1,29 @@
+import importlib
 import feedparser
 import matplotlib.pyplot
 import spacy
 import re
 import os
+from gestionMultiLanguage.feedGestion import feedGestion
 from intensityContext import intensity_context
 from intensityContext import thematic_context
 
 
-nlp = spacy.load("en_core_web_sm")
 
-#Vas dans le fichier rss.txt l'ensemble des flux rss définit part l'user
-def parseRss(file="rss.txt"):
+def gestionText():
+    feedGestion_obj = feedGestion()
+    model_with_feed = feedGestion_obj.return_dict_with_model_and_feed()
     array_new_feed = []
-    name_rss_sender = []
-    with open(file, "r") as stream:
-        array_file_content = [line.strip() for line in stream if line.strip()]
-    for line in array_file_content:
-        try:
-            array_new_feed.append(feedparser.parse(line))
-            parts = line.split(".")
-        except:
-            pass
-    return [array_new_feed, set(name_rss_sender)]
+    for one_model in model_with_feed:
+        nlp = spacy.load(one_model)
+        for one_feed in model_with_feed[one_model]:
+            try :
+                flux = feedparser.parse(one_feed)
+                for entry in flux.entries:
+                    array_new_feed.append(nlp(entry.title + entry.summary))
+            except:
+                pass
+    return array_new_feed
 
 #Vas dans le fichier stopword définit part l'user pour nettoyer les résultat
 def stopWordUsual(file = "stopword.txt"):
@@ -90,7 +92,7 @@ def find_and_save_context(word, index, content, contextWord, set_stop_word_usual
     return contextWord
 
 #Via matplotlib.pyplot dessine un diagramme de barre des termes selon la limit user, ayant les plus d'occurence dans le data-set permettant d'un coup d'oeil d'un avoir les point important émise part les flux rss
-def graph_intensity_word(intensity_word_with_just_important_occurence, limit = 25):
+def graph_intensity_word(intensity_word_with_just_important_occurence, limit = 500):
     word_intensity = []
     occurence_intensity = []
     for word_and_occurence in intensity_word_with_just_important_occurence:
@@ -105,32 +107,22 @@ def graph_intensity_word(intensity_word_with_just_important_occurence, limit = 2
 figure_matpolib, axis = matplotlib.pyplot.subplots()
 
 array_stop_word_usual = stopWordUsual()
-array_output_parse_rss = parseRss()
+array_output_parse_rss = gestionText()
 rss_tokenize = []
 token_validate_to_analysis = []
 intensity_word_with_just_important = []
 contex_word_save = []
-array_new_feed = array_output_parse_rss[0]
-name_rss_organisation_sender = array_output_parse_rss[1]
+name_rss_organisation_sender = []  
 word_intensity = [["a", 1]]
-
-
-#Effectu l'ensemble du nettoyage ainsi que de la préparations des données (titre + résumé) fournis part les flux rss pour leur utilisation
-for x in range(len(array_new_feed)):
-    for i in range(len(array_new_feed[x].entries)):
-        #print(arrayNewFeed[x].entries[i]["title"])
-        #print(time.strftime("%Y-%m-%d %H:%M:%S", arrayNewFeed[x].entries[i]["published_parsed"]))
-        #print(arrayNewFeed[x].entries[i]["summary"])
-        #print("\ \ \ \ ")
-        rss_tokenize.append((array_new_feed[x].entries[i]["title"] + array_new_feed[x].entries[i]["summary"]))
                                                     
-print(len(rss_tokenize))
-for array_rss_tokenize in rss_tokenize:
+print(len(array_output_parse_rss))
+for array_rss_tokenize in array_output_parse_rss:
     tick = 0
     tick_text = 0
-    array_rss_tokenize_nlp = nlp(array_rss_tokenize)
+
     token_validate_to_analysis = []
-    for token in array_rss_tokenize_nlp :
+    for text in array_output_parse_rss:
+        for token in text :
             tick_text = tick_text + 1
             token_ = token
             token_lemmatize = token.lemma_
@@ -146,12 +138,10 @@ for array_rss_tokenize in rss_tokenize:
                 if is_organisation_sender_rss == False and is_usual_stop_word == False :       
                     word_intensity = calcul_intensity_word(token_lemmatize, word_intensity)
 
-    for one_noun in token_validate_to_analysis:
-            contex_word_save = find_and_save_context(one_noun, tick, token_validate_to_analysis, contex_word_save, array_stop_word_usual)
+    for i, one_noun in enumerate(token_validate_to_analysis):
+        contex_word_save = find_and_save_context(one_noun, i, token_validate_to_analysis, contex_word_save, array_stop_word_usual)
 
-print(contex_word_save)
-print("///")
-#print(word_intensity)
+print(word_intensity)
 
 #appel des fonctions liès à la categorisation semantique
 intensity_word_with_just_important = exclude_lowest_intensity_word_by_occurence(word_intensity)

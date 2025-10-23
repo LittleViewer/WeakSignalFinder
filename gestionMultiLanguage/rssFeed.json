@@ -1,0 +1,14 @@
+[
+    {"name_organization" : "bbc",
+     "rss_link" : "https://feeds.bbci.co.uk/news/world/rss.xml",
+     "language" : "en"
+    },
+    {"name_organization" : "lemonde",
+     "rss_link" : "https://www.lemonde.fr/rss/en_continu.xml",
+     "language" : "fr"
+    },
+    {"name_organization" : "elpais",
+     "rss_link" : "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/internacional/portada",
+     "language" : "es"
+    }
+]
