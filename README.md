@@ -1,6 +1,6 @@
 # WeakSignalFinder
 
-This project provides a Python-based toolkit for automated informational analysis of English-language RSS feeds. It moves beyond simple keyword counting, leveraging Natural Language Processing (NLP) to identify significant topics, quantify their prominence, and analyze their surrounding thematic context.
+This project provides a Python-based toolkit for automated informational analysis of multi-language RSS feeds. It moves beyond simple keyword counting, leveraging Natural Language Processing (NLP) to identify significant topics, quantify their prominence, and analyze their surrounding thematic context.
 
 Its primary purpose is to serve as a business intelligence tool for analyzing the information landscape. By processing large volumes of text, it allows analysts to understand the direction and evolution of key topics. The tool is designed to map dominant narratives and macro trends, while providing the means to support the detection of “weak signals”: ​​emerging topics and subtle shifts in discourse that have not yet become widespread. Ultimately, it helps users develop a dynamic understanding not only of the topic at hand, but also of how the conversation is structured and its trajectory.
 
@@ -17,7 +17,7 @@ Its primary purpose is to serve as a business intelligence tool for analyzing th
 
 The script follows a systematic pipeline to transform raw text into actionable insights:
 
-1.  **Configuration**: Reads a list of RSS feed URLs from `lowSignal/rss.txt` and a list of custom stopwords from `lowSignal/stopword.txt`.
+1.  **Configuration**: Reads a list of RSS feed URLs from `gestionMultiLanguage\rssFeed.json` and a list of custom stopwords from `lowSignal/stopword.txt`.
 2.  **Data Ingestion & Parsing**: Parses each RSS feed to extract the title and summary of every article.
 3.  **Text Normalization & Filtering**: For each article, text is combined and processed by spaCy. The script then isolates significant, lemmatized nouns that are not stopwords.
 4.  **Analysis**:
@@ -54,7 +54,7 @@ The script follows a systematic pipeline to transform raw text into actionable i
     ```
 
 3.  **Download spaCy Model:**
-    spaCy requires a pre-trained language model. Run the following command in your terminal to download the small English model:
+    spaCy requires a pre-trained language model. Run the following command in your terminal to download the small multi-language model or use `requirements.txt`:
     ```bash
     python -m spacy download en_core_web_sm
     ```
@@ -140,3 +140,5 @@ jobs:
 ## Disclaimer
 
 This tool is designed as an analytical aid to support intelligence gathering and weak signal analysis. The outputs it generates are not definitive conclusions but rather data points intended to guide and inform human interpretation. The quality, accuracy, and relevance of the analysis are directly dependent on the RSS feeds provided as input. The tool processes content as-is and does not verify the factual accuracy of the source material. The results represent a snapshot in time based on the content available at the moment of execution. Users should always apply critical judgment and cross-reference findings with other sources.
+
+

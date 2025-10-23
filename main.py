@@ -138,12 +138,10 @@ for array_rss_tokenize in array_output_parse_rss:
                 if is_organisation_sender_rss == False and is_usual_stop_word == False :       
                     word_intensity = calcul_intensity_word(token_lemmatize, word_intensity)
 
-    for one_noun in token_validate_to_analysis:
-            contex_word_save = find_and_save_context(one_noun, tick, token_validate_to_analysis, contex_word_save, array_stop_word_usual)
+    for i, one_noun in enumerate(token_validate_to_analysis):
+        contex_word_save = find_and_save_context(one_noun, i, token_validate_to_analysis, contex_word_save, array_stop_word_usual)
 
-print(contex_word_save)
-print("///")
-#print(word_intensity)
+print(word_intensity)
 
 #appel des fonctions liès à la categorisation semantique
 intensity_word_with_just_important = exclude_lowest_intensity_word_by_occurence(word_intensity)
@@ -173,5 +171,3 @@ print(semantique_categorie)
 #Affiche le diagramme en barre visant à simplifier la lectures des grand sujet remonter part les flux rss
 
 graph_intensity_word(intensity_word_with_just_important)
-
-print(len(array_output_parse_rss))
