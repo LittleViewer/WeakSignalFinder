@@ -10,7 +10,7 @@ class api_local:
         return handle
 
     def write_value(self, intensity_word, contextual_neighborhood, word_central_neighborhood, handle):
-        content_api = json.dumps({"time" : f"[{self.date}]", "time_jobid" : f"[{self.date.year}{self.date.month}{self.date.second}{self.date.microsecond}{self.date.day}]", "intensity_word" : intensity_word, "contextual_neighborhood" : contextual_neighborhood, "word_central_neighborhood" : word_central_neighborhood})
+        content_api = json.dumps({"time" : f"[{self.date}]", "time_jobid" : f"[{self.date.year}{self.date.month}{self.date.second}{self.date.microsecond}{self.date.day}]", "intensity_word" : intensity_word, "contextual_neighborhood" : contextual_neighborhood, "word_central_neighborhood" : word_central_neighborhood})+"\n"
         handle.write(content_api)
     
     def pipe_api_local(self, intensity_word, contextual_neighborhood, word_central_neighborhood, link = "local_api\\"):

@@ -42,14 +42,17 @@ class contextual_neighboord:
 
         if number_words_sentence <= 1:
             return False
+
         if id_word_sentence == number_words_sentence:
             dictionnary_all_word[central_word]["before"].append(sentence[id_word_sentence-1])
+            return dictionnary_all_word
         elif id_word_sentence == 0:
             dictionnary_all_word[central_word]["after"].append(sentence[id_word_sentence+1])
+            return dictionnary_all_word
         else:
             dictionnary_all_word[central_word]["before"].append(sentence[id_word_sentence-1])
             dictionnary_all_word[central_word]["after"].append(sentence[id_word_sentence+1])
-        return dictionnary_all_word
+            return dictionnary_all_word
     
     def optimize_block_neighborhood(self, dictionnary_all_word):
         for one_central_word in dictionnary_all_word:
@@ -60,12 +63,11 @@ class contextual_neighboord:
     def pipe_neighborhood_center_on_word(self, contextual_neighboorhood_sentence):
         all_word = []
         dictionnary_all_word = {}
-        template_word_list = {"before" : [], "after" : []}
         for one_index in contextual_neighboorhood_sentence:
             for one_sentence in contextual_neighboorhood_sentence[one_index]:
                 for one_word in one_sentence:
                     if one_word not in set(all_word):
-                        dictionnary_all_word[one_word] = template_word_list
+                        dictionnary_all_word[one_word] = {"before": [], "after": []}
                         all_word.append(one_word)
                         result = self.obtain_word(one_word, one_sentence, dictionnary_all_word)
                     else:
