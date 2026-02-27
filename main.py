@@ -4,6 +4,7 @@ import libCore.log_class as llC
 import libCore.utils_class as luC
 import libCore.frequency_one_word_class as fowC
 import libCore.contextual_neighborhood_class as cnC
+import libCore.api_local_class as alC
 
 lfC_ = lfC.feed()
 llC_ = llC.log()
@@ -11,11 +12,13 @@ luC_ = luC.utils()
 lpC_ = lpC.prepare_data()
 fowC_ = fowC.frequency_one_word()
 cnC_ = cnC.contextual_neighboord()
+alC_ = alC.api_local()
 
 llC_.pipe_log("Start execute program", "INFO","main")
 all_article = lfC_.pipe_extract_rss(luC_.absolute_link("libCore\\input\\rssFeed.json"))
 data_clean_for_analyse = lpC_.pipe_prepare_data(all_article)
-fowC_.pipe_frequency_one_word(data_clean_for_analyse)
-neighboord_multiple_dict = cnC_.pipe_contextual_neighboord(data_clean_for_analyse)
-cnC_.pipe_neighborhood_center_on_word(neighboord_multiple_dict)
+intensity_word = fowC_.pipe_frequency_one_word(data_clean_for_analyse)
+contextual_neighborhood = neighboord_multiple_dict = cnC_.pipe_contextual_neighboord(data_clean_for_analyse)
+word_central_neighborhood = cnC_.pipe_neighborhood_center_on_word(neighboord_multiple_dict)
+alC_.pipe_api_local(intensity_word, contextual_neighborhood, word_central_neighborhood)
 llC_.pipe_log("Stop execute program", "INFO","main")
