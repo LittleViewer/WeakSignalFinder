@@ -16,21 +16,21 @@ class frequency_one_word:
             word_intensity[word] = 1
         return word_intensity
 
-    def delete_little_intensity(self, word_intensity_dict, filter = 1):
+    def delete_little_intensity(self, word_intensity_dict, filter):
         word_intensity_dict_clean = word_intensity_dict.copy()
         for one_index in word_intensity_dict:
-            if word_intensity_dict[one_index] <= 1:
+            if word_intensity_dict[one_index] <= filter:
                 del(word_intensity_dict_clean[one_index])
         return word_intensity_dict_clean
 
-    def pipe_frequency_one_word(self, data):
+    def pipe_frequency_one_word(self, data, filter = 1):
         word_claim = []
         word_intensity = {}
         for one_index in data:
             for one_bloc in data[one_index]:
                 for one_word in one_bloc:
                     word_intensity = self.word_claimer(one_word, word_claim, word_intensity)
-        word_intensity_clean = self.delete_little_intensity(word_intensity)
+        word_intensity_clean = self.delete_little_intensity(word_intensity, filter)
         self.llC_.save_data_set((word_intensity_clean), word_intensity_clean, "word_intensity")
         self.llC_.pipe_log("The word intensity is calculated as well as saved in the dataset.","INFO","frequency_one_word() : pipe_frequency_one_word()")
         return word_intensity_clean
