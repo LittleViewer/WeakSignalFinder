@@ -77,7 +77,9 @@ Simply run the main script:
 ```bash
 python main.py
 ```
->It is strongly recommended to launch the program via a Unix system or an IDE since it must run from its current directory, i.e. C:\...\WeakSignalFinder (for window system).
+>⚠️ Important : It is strongly recommended to run this program from a Unix system or via an IDE (e.g. VSCode).
+>On Windows, the program must be launched from its own directory (C:\...\WeakSignalFinder), otherwise file paths will not resolve correctly.
+>To do so, open a terminal in the project folder and run : python main.py
 
 The pipeline will:
 1. Read the RSS feed list from `libCore/input/rssFeed.json`
