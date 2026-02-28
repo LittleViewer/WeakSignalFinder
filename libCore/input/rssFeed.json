@@ -1,19 +1,9 @@
 [
-    {"name_organization" : "bbc",
-     "rss_link" : "https://feeds.bbci.co.uk/news/world/rss.xml",
+    {"name_organization" : "exemple",
+     "rss_link" : "https://exemple.xml",
      "country" : "en"
     },
-    {"name_organization" : "New-YorkTimes",
-      "rss_link" :  "https://rss.nytimes.com/services/xml/rss/nyt/World.xml",
-      "country" : "en"},
-    {"name_organization" : "France24",
-      "rss_link" :  "https://www.france24.com/fr/rss",
+    {"name_organization" : "exemple",
+      "rss_link" :  "https://exemple.xml",
       "country" : "fr"},
-    {"name_organization" : "LeMonde",
-     "rss_link" : "https://www.lemonde.fr/rss/en_continu.xml",
-     "country" : "fr"
-    },
-    {"name_organization" : "LeParisien",
-     "rss_link" : "https://feeds.leparisien.fr/leparisien/rss/international",
-     "country" : "fr"}
   ]
