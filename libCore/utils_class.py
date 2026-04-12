@@ -5,9 +5,8 @@ import datetime
 import unicodedata
 
 class utils :
-
     def check_file_exist(self, link):
-        handle = pathlib.Path(link)
+        handle = pathlib.Path(self.absolute_link(link))
         return handle.exists()
     
     def error_with_reason(self, reason, to_break = False, code = 1000):
@@ -16,12 +15,12 @@ class utils :
             sys.exit(code)
 
     def file_open(self, link, mode = "r", encoding_would="utf-8"):
-        handle = open(link, mode, encoding=encoding_would)
+        handle = open(os.path.abspath(self.absolute_link(link)), mode, encoding=encoding_would)
         return handle
     
     def create_dir(self, link, would_create = True) :
         if would_create == True:
-            os.mkdir(link)
+            os.mkdir(self.absolute_link(link))
         return True
     
     def order_dict(self, items_add_dict, organiser_element, dict_orderized, tick ):
@@ -46,7 +45,7 @@ class utils :
         return string_formated
     
     def absolute_link(self, link):
-            return os.path.join(os.getcwd(), link)
+            return os.path.abspath(link)
     
     def remove_accent(self, text):
         if self.is_string(text) == False:
