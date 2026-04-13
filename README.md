@@ -22,8 +22,9 @@ rssFeed.json
      ▼
  api_local_class     ← Output as a dated local JSON file
 ```
+![ULM plan of WeakSignalFinder](docs/ulmvone.png)
+
 ---
-![ULM plan of WeakSignalFinder](docs\ulmvone.png)
 
 ## 🖥️ System Requirements
 
