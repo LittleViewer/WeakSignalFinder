@@ -2,7 +2,6 @@ import libCore.utils_class as utils
 import libCore.log_class as log
 import feedparser
 import json
-import functools
 import asyncio
 
 class feed:
@@ -27,7 +26,7 @@ class feed:
         for one_key in list_key:
             task[one_key] = []
             for one_feed in dict_feed[one_key]:
-                task[one_key].append(asyncio.to_thread(functools.partial(feedparser.parse, one_feed)))
+                task[one_key].append(asyncio.to_thread(feedparser.parse, one_feed))
         result = {}
         for one_index in task:
             result[one_index] = await asyncio.gather(*task[one_index], return_exceptions=True)
