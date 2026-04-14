@@ -1,9 +1,12 @@
 [
     {"name_organization" : "exemple",
-     "rss_link" : "https://exemple.xml",
+     "rss_link" : "https://liviewer.tv",
      "country" : "en"
     },
     {"name_organization" : "exemple",
-      "rss_link" :  "https://exemple.xml",
-      "country" : "fr"}
+      "rss_link" :  "https://liviewer.tv",
+      "country" : "fr"},
+    {"name_organization" : "bbc",
+      "rss_link" :  "https://feeds.bbci.co.uk/news/world/rss.xml",
+      "country" : "en"}
 ]

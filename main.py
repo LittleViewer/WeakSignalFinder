@@ -6,6 +6,8 @@ import libCore.frequency_one_word_class as fowC
 import libCore.contextual_neighborhood_class as cnC
 import libCore.api_local_class as alC
 
+import asyncio
+
 lfC_ = lfC.feed()
 llC_ = llC.log()
 luC_ = luC.utils()
@@ -15,7 +17,7 @@ cnC_ = cnC.contextual_neighboord()
 alC_ = alC.api_local()
 
 llC_.pipe_log("Start execute program", "INFO","main")
-all_article = lfC_.pipe_extract_rss(luC_.absolute_link("libCore\\input\\rssFeed.json"))
+all_article = asyncio.run(lfC_.pipe_extract_rss(luC_.absolute_link("libCore\\input\\rssFeed.json")))
 data_clean_for_analyse = lpC_.pipe_prepare_data(all_article)
 intensity_word = fowC_.pipe_frequency_one_word(data_clean_for_analyse)
 contextual_neighborhood = neighboord_multiple_dict = cnC_.pipe_contextual_neighboord(data_clean_for_analyse)

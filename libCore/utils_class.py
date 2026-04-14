@@ -45,7 +45,7 @@ class utils :
         return string_formated
     
     def absolute_link(self, link):
-            return os.path.abspath(link)
+            return os.path.abspath(link)+"\\"
     
     def remove_accent(self, text):
         if self.is_string(text) == False:

@@ -2,6 +2,8 @@ import libCore.utils_class as utils
 import libCore.log_class as log
 import feedparser
 import json
+import functools
+import asyncio
 
 class feed:
 
@@ -17,18 +19,20 @@ class feed:
             return dict_feed                
         else:
             self.utC_.error_with_reason("Bad File Path of RSS Feed", True)
-    
-    def parse_rss(self, dict_feed):
-        parsed_feed_list = {}
+
+    async def parse_rss(self, dict_feed):
         list_key = list(dict_feed.keys())
         tick_feed = 0
+        task = {}
         for one_key in list_key:
-            parsed_feed_list[one_key] = []
+            task[one_key] = []
             for one_feed in dict_feed[one_key]:
-                tick_feed += 1
-                print(f"Read: {one_feed} #{tick_feed}")
-                parsed_feed_list[one_key].append(feedparser.parse(one_feed))
-        return parsed_feed_list
+                task[one_key].append(asyncio.to_thread(functools.partial(feedparser.parse, one_feed)))
+        result = {}
+        for one_index in task:
+            result[one_index] = await asyncio.gather(*task[one_index], return_exceptions=True)
+            print(f"RSS Feed in {one_index} is read!")
+        return result
                 
     
     def formated_result(self, parsed_feed_list):
@@ -44,9 +48,9 @@ class feed:
             tick += 1
         return formated_feed_list
     
-    def pipe_extract_rss(self, link = "configFolder/rssFeed.json"):
+    async def pipe_extract_rss(self, link = "configFolder/rssFeed.json"):
         dict_feed = self.extract_feed_link(self.utC_.absolute_link(link))
-        parsed_feed_list = self.parse_rss(dict_feed)
+        parsed_feed_list = await self.parse_rss(dict_feed)
         formated_feed = self.formated_result(parsed_feed_list)
         total_article = 0
         for one_index in formated_feed:
