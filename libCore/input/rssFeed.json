@@ -5,8 +5,5 @@
     },
     {"name_organization" : "exemple",
       "rss_link" :  "https://liviewer.tv",
-      "country" : "fr"},
-    {"name_organization" : "bbc",
-      "rss_link" :  "https://feeds.bbci.co.uk/news/world/rss.xml",
-      "country" : "en"}
+      "country" : "fr"}
 ]
