@@ -1,4 +1,5 @@
 import pathlib
+from pathlib import Path, PureWindowsPath
 import sys
 import os
 import datetime
@@ -45,7 +46,7 @@ class utils :
         return string_formated
     
     def absolute_link(self, link):
-            return os.path.abspath(link)+"\\"
+        return Path(str(link).replace("\\","/")).resolve()
     
     def remove_accent(self, text):
         if self.is_string(text) == False:

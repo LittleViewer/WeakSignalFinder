@@ -6,7 +6,7 @@ import json
 class api_local:
     
     def open_file(self, link):
-        handle = self.luC_.file_open(self.luC_.absolute_link(link)+f"{self.date.year}_{self.date.month}_{self.date.day}.local_api.txt","a+")
+        handle = self.luC_.file_open(self.luC_.absolute_link(link)/f"{self.date.year}_{self.date.month}_{self.date.day}.local_api.txt","a+")
         return handle
 
     def write_value(self, intensity_word, contextual_neighborhood, word_central_neighborhood, handle):

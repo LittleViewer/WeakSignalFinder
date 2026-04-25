@@ -28,7 +28,7 @@ class log:
         self.send_message(handle,json_message)
     
     def save_state(self, text, type_data = "Unknow", link = "saveState\\", ):
-        handle = self.luC_.file_open(self.luC_.absolute_link(link)+f"{self.date.year}_{self.date.month}_{self.date.day}.savestate.txt","a+")
+        handle = self.luC_.file_open(self.luC_.absolute_link(link)/f"{self.date.year}_{self.date.month}_{self.date.day}.savestate.txt","a+")
         total_article =  0
         for one_index in text:
             total_article += len(text[one_index])
@@ -42,7 +42,7 @@ class log:
         handle.close()
 
     def save_data_set(self, text, data, type_data = "Unknow", link = "dataset\\", ):
-        handle = self.luC_.file_open(self.luC_.absolute_link(link)+f"{self.date.year}_{self.date.month}_{self.date.day}.dataset.txt","a+")
+        handle = self.luC_.file_open(self.luC_.absolute_link(link)/f"{self.date.year}_{self.date.month}_{self.date.day}.dataset.txt","a+")
         try :
             if type(data) != int:
                 data = len(data)
