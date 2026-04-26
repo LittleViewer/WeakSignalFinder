@@ -5,6 +5,7 @@ import libCore.utils_class as luC
 import libCore.frequency_one_word_class as fowC
 import libCore.contextual_neighborhood_class as cnC
 import libCore.api_local_class as alC
+import database.prepare_request_class as prC
 
 import asyncio
 
@@ -15,12 +16,16 @@ lpC_ = lpC.prepare_data()
 fowC_ = fowC.frequency_one_word()
 cnC_ = cnC.contextual_neighboord()
 alC_ = alC.api_local()
+prC_ = prC.prepare_request()
+
+obj_database = prC_.connect_dabase("database\\database_don_t_touch\\db_Weak_Signal_Finder.db")
 
 llC_.pipe_log("Start execute program", "INFO","main")
+job_id = llC_.pipe_jobId_session_generator(obj_database)
 all_article = asyncio.run(lfC_.pipe_extract_rss(luC_.absolute_link("libCore\\input\\rssFeed.json")))
-data_clean_for_analyse = lpC_.pipe_prepare_data(all_article)
-intensity_word = fowC_.pipe_frequency_one_word(data_clean_for_analyse)
-contextual_neighborhood = neighboord_multiple_dict = cnC_.pipe_contextual_neighboord(data_clean_for_analyse)
-word_central_neighborhood = cnC_.pipe_neighborhood_center_on_word(neighboord_multiple_dict)
-alC_.pipe_api_local(intensity_word, contextual_neighborhood, word_central_neighborhood)
+data_clean_for_analyse = lpC_.pipe_prepare_data(all_article,obj_database,job_id)
+intensity_word = fowC_.pipe_frequency_one_word(data_clean_for_analyse,obj_database,job_id)
+contextual_neighborhood = neighboord_multiple_dict = cnC_.pipe_contextual_neighboord(data_clean_for_analyse,obj_database,job_id)
+word_central_neighborhood = cnC_.pipe_neighborhood_center_on_word(neighboord_multiple_dict,obj_database,job_id)
+alC_.pipe_api_local(obj_database,"'"+job_id+"'")
 llC_.pipe_log("Stop execute program", "INFO","main")

@@ -1,4 +1,6 @@
-# 🔍 Weak Signal Finder
+# 🔍 Experimental Weak Signal Finder
+
+This experimental version of Weak Signal Finder for stable version -> https://github.com/LittleViewer/WeakSignalFinder
 
 Weak Signal Finder is a Python pipeline that **detects emerging themes and weak signals** from RSS news feeds. It aggregates articles by language/country, cleans and lemmatizes the text using NLP, computes word frequency scores, and builds contextual semantic neighborhoods, then exposes all results via a local JSON API.
 

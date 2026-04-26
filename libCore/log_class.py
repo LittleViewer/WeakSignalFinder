@@ -1,6 +1,8 @@
 import libCore.utils_class as luC
+import database.prepare_request_class as prC
 import datetime
 import json
+import random
 
 class log:
 
@@ -53,7 +55,15 @@ class log:
             self.pipe_log("A savestate could not be saved.","ERROR","log() : save_data_set()")
             self.luC_.error_with_reason("A savestate could not be saved :  save_data_set()")
         handle.close()
-       
+    
+    def pipe_jobId_session_generator(self, obj_database):
+        date_sql = self.date.strftime('%Y-%m-%d %H:%M:%S')
+        self.hex_code = random.randbytes(4).hex()
+        job_id = f"{self.hex_code}-{self.date.year}{self.date.month}{self.date.second}{self.date.microsecond}{self.date.day}"
+        self.prC_.insert_data_database(obj_database[0], obj_database[1], "jobIdDateTime", ["jobId","dateTime"], [[job_id,date_sql]])
+        return job_id
+    
     def __init__(self):
         self.luC_ = luC.utils()
         self.date = datetime.datetime.now()
+        self.prC_ = prC.prepare_request()

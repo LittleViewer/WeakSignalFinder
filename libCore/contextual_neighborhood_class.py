@@ -1,5 +1,7 @@
 import libCore.utils_class as luC
 import libCore.log_class as llC
+import database.prepare_request_class as prC
+import datetime
 import json
 
 class contextual_neighboord:
@@ -26,13 +28,14 @@ class contextual_neighboord:
         value["all"] = all
         return value
 
-    def pipe_contextual_neighboord(self, data):
+    def pipe_contextual_neighboord(self, data,obj_database,job_id):
         neighboord_multiple_dict = {"before" : [], "beetween" : [], "after" : []}
         for one_index in data:
             for one_block in data[one_index]:
                neighboord_multiple_dict = self.create_neigbhoor(one_block, neighboord_multiple_dict)
         stat_neighboord = self.number_total_neighboord(neighboord_multiple_dict)
         self.llC_.save_data_set(neighboord_multiple_dict, stat_neighboord["all"],"contextual_neighboord")
+        self.prC_.insert_data_database(obj_database[0],obj_database[1],"saveData",["jobId","dateTime","type","data"],[[job_id,datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),"dataSetContextualNeighboords",str(neighboord_multiple_dict).replace("'",'"')]])
         self.llC_.pipe_log(f"A dictionary of all semantic neighborhoods is created with {stat_neighboord['all']} neighboord.","INFO","contextual_neighboord() : pipe_contextual_neighboord()")
         return neighboord_multiple_dict
 
@@ -60,7 +63,7 @@ class contextual_neighboord:
                 dictionnary_all_word[one_central_word][one_block] = list(set(dictionnary_all_word[one_central_word][one_block]))
         return dictionnary_all_word
 
-    def pipe_neighborhood_center_on_word(self, contextual_neighboorhood_sentence):
+    def pipe_neighborhood_center_on_word(self, contextual_neighboorhood_sentence,obj_database,job_id):
         all_word = []
         dictionnary_all_word = {}
         for one_index in contextual_neighboorhood_sentence:
@@ -76,6 +79,7 @@ class contextual_neighboord:
                         dictionnary_all_word = result.copy()
         dictionnary_all_word = self.optimize_block_neighborhood(dictionnary_all_word)
         self.llC_.save_data_set(dictionnary_all_word, len(dictionnary_all_word),"central_word_neighboord")
+        self.prC_.insert_data_database(obj_database[0],obj_database[1],"saveData",["jobId","dateTime","type","data"],[[job_id,datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),"dataSetcentralWordNeighboord",str(dictionnary_all_word).replace("'",'"')]])
         self.llC_.pipe_log(f"A dictionary of semantic neighborhoods center in central word is created with {len(dictionnary_all_word)} neighboord.","INFO","contextual_neighboord() : pipe_neighborhood_center_on_word()")
         return dictionnary_all_word
 
@@ -84,3 +88,4 @@ class contextual_neighboord:
     def __init__(self):
         self.luC_ = luC.utils()
         self.llC_ = llC.log()
+        self.prC_ = prC.prepare_request()

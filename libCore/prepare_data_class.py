@@ -1,7 +1,9 @@
 import libCore.utils_class as luC
 import libCore.log_class as llC
+import database.prepare_request_class as prC
 import spacy
 import json
+import datetime
 import re
 
 class prepare_data:
@@ -68,7 +70,7 @@ class prepare_data:
         return new_dict
             
 
-    def pipe_prepare_data(self,data_brut):
+    def pipe_prepare_data(self,data_brut,obj_database,job_id):
         structured_data_sub_clean = {}
         if self.luC_.is_dict(data_brut) == False:
             self.llC_.pipe_log("Input variable is not dict: prepare_data() : pipe_prepare_data()","CRITICAL","pipe_prepare_data()")
@@ -80,11 +82,14 @@ class prepare_data:
 
         structured_data_sub_clean = self.extract_possible_word(structured_data_brut)
         self.llC_.save_state(structured_data_sub_clean,"Brut")
+        self.prC_.insert_data_database(obj_database[0],obj_database[1],"saveData",["jobId","dateTime","type","data"],[[job_id,datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),"saveStateBrut",str(structured_data_sub_clean).replace("'",'"')]])
 
         structured_data_clean_ = {}
         for one_index_lang in structured_data_brut:
             structured_data_clean_ = self.remove_no_essential_word(structured_data_sub_clean, one_index_lang, structured_data_clean_)
         self.llC_.save_state(structured_data_clean_,"Clean")
+        self.prC_.insert_data_database(obj_database[0],obj_database[1],"saveData",["jobId","dateTime","type","data"],[[job_id,datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),"saveStateClean",str(structured_data_clean_).replace("'",'"')]])
+
 
         return structured_data_clean_
 
@@ -93,3 +98,4 @@ class prepare_data:
     def __init__(self):
         self.luC_ = luC.utils()
         self.llC_ = llC.log()
+        self.prC_ = prC.prepare_request()

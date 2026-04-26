@@ -58,6 +58,11 @@ class utils :
             return True
         return False
     
+    def is_list(self, possible_list):
+        if type(possible_list) == list:
+            return True
+        return False
+    
     def is_dict(self, possible_dict):
         if type(possible_dict) == dict:
             return True
