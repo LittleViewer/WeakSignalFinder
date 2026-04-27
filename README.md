@@ -1,27 +1,34 @@
 # 🔍 Weak Signal Finder
 
-Weak Signal Finder is a Python pipeline that **detects emerging themes and weak signals** from RSS news feeds. It aggregates articles by language/country, cleans and lemmatizes the text using NLP, computes word frequency scores, and builds contextual semantic neighborhoods, then exposes all results via a local JSON API.
+Weak Signal Finder is a Python pipeline that **detects emerging themes and weak signals** from RSS news feeds. It aggregates articles by language/country, cleans and lemmatizes the text using NLP, computes word frequency scores, builds contextual semantic neighborhoods, persists every run in a local SQLite database, and exposes the final results as a dated JSON file.
 
 ---
 
 ## 📐 Architecture
 
 ```
-rssFeed.json
-     │
-     ▼
- feed_class          ← RSS aggregation (feedparser)
-     │
-     ▼
- prepare_data_class  ← Cleaning, lemmatization, stopword removal (spaCy)
-     │
-     ▼
- frequency_one_word_class     ← Word intensity / frequency scoring
- contextual_neighborhood_class ← Semantic neighborhood computation
-     │
-     ▼
- api_local_class     ← Output as a dated local JSON file
+                rssFeed.json
+                     │
+                     ▼
+              feed_class                ← RSS aggregation (feedparser)
+                     │
+                     ▼
+              prepare_data_class        ← Cleaning, lemmatization, stopword removal (spaCy)
+                     │
+                     ▼
+   frequency_one_word_class             ← Word intensity / frequency scoring
+   contextual_neighborhood_class        ← Semantic neighborhood computation
+                     │
+                     ▼
+              api_local_class           ← Output as a dated local JSON file
+
+   ─────────────────────────────────────
+   Every step writes to a shared SQLite DB,
+   tagged with a per-run job_id.
+   Tables: jobIdDateTime, saveData
+   ─────────────────────────────────────
 ```
+
 ![ULM plan of WeakSignalFinder](docs/ulmvone.png)
 
 ---
@@ -34,39 +41,29 @@ rssFeed.json
 | RAM | 2 GB | 4 GB+ |
 | OS | Windows / Linux / macOS | Linux / macOS |
 
-> spaCy language models can be memory-intensive, especially when processing large volumes of articles simultaneously. 4 GB+ of RAM is recommended if you monitor more than 10 feeds.
+> spaCy `_md` language models can be memory-intensive, especially when processing large volumes of articles simultaneously. 4 GB+ of RAM is recommended if you monitor more than 10 feeds.
 
 ---
 
 ## ⚙️ Installation
 
-1. Clone the repository:
+1. Clone the repository (the SQLite database and required folders are already shipped with the repo, no manual init needed):
 
 ```bash
 git clone https://github.com/your-username/weak-signal-finder.git
 cd weak-signal-finder
 ```
 
-2. Install the dependencies:
+2. Install the dependencies. `requirements.txt` already pulls spaCy **and** the medium models for English, French, German, Spanish, and Russian:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Download the required spaCy language model(s) defined in `libCore/input/languageModel.json`. Example for French and English:
+3. *(Optional)* Download an additional spaCy model if you want to support a language beyond the five preinstalled. The mapping is defined in `libCore/input/languageModel.json`. Example:
 
 ```bash
-python -m spacy download fr_core_news_sm
-python -m spacy download en_core_web_sm
-```
-
-4. Make sure the following directories exist at the project root (they are used for output and logs):
-
-```
-log/
-saveState/
-dataset/
-local_api/
+python -m spacy download it_core_news_md
 ```
 
 ---
@@ -78,16 +75,15 @@ Simply run the main script:
 ```bash
 python main.py
 ```
->⚠️ Important : It is strongly recommended to run this program from a Unix system or via an IDE (e.g. VSCode).
->On Windows, the program must be launched from its own directory (C:\...\WeakSignalFinder), otherwise file paths will not resolve correctly.
->To do so, open a terminal in the project folder and run : python main.py
 
-The pipeline will:
-1. Read the RSS feed list from `libCore/input/rssFeed.json`
-2. Fetch and parse all articles
-3. Clean and lemmatize the text
-4. Compute word frequency scores and semantic neighborhoods
-5. Write the results to `local_api/YYYY_M_D.local_api.txt`
+Each run:
+1. Generates a unique `job_id` and registers it in the SQLite database.
+2. Reads the RSS feed list from `libCore/input/rssFeed.json`.
+3. Fetches and parses all articles asynchronously.
+4. Cleans and lemmatizes the text.
+5. Computes word frequency scores and semantic neighborhoods.
+6. Persists every intermediate state in the database (tagged with the `job_id`).
+7. Writes the final result to `local_api/YYYY_M_D.local_api.txt`.
 
 ### Output format
 
@@ -128,51 +124,55 @@ The output is a newline-delimited JSON file. Each line is a full dated snapshot:
 
 ## 🛠️ Configuration
 
-### RSS Feeds, `libCore/input/rssFeed.json`
+### RSS Feeds — `libCore/input/rssFeed.json`
 
-Define the feeds to monitor, grouped by country/language code:
-
-```json
-[
-  { "country": "fr", "rss_link": "https://www.lemonde.fr/rss/une.xml" },
-  { "country": "en", "rss_link": "https://feeds.bbci.co.uk/news/rss.xml" }
-]
-```
-
-### Language Models, `libCore/input/languageModel.json`
-
-Maps language codes to their spaCy model names:
+Define the feeds to monitor. Each entry has a source name, a feed URL, and a country/language code:
 
 ```json
 [
-  { "code_language": "fr", "model_name": "fr_core_news_sm" },
-  { "code_language": "en", "model_name": "en_core_web_sm" }
+  {
+    "name_organization": "Le Monde",
+    "rss_link": "https://www.lemonde.fr/rss/une.xml",
+    "country": "fr"
+  },
+  {
+    "name_organization": "BBC News",
+    "rss_link": "https://feeds.bbci.co.uk/news/rss.xml",
+    "country": "en"
+  }
 ]
 ```
 
-### Stopwords, `libCore/input/stopword.txt`
+### Language Models — `libCore/input/languageModel.json`
 
-One word per line. These words are excluded from the analysis in addition to the spaCy POS filter (only nouns, proper nouns, verbs and adjectives are kept).
+Maps language codes to their spaCy model names. The `language` field is informational, `code_language` is the key actually used to dispatch articles:
 
+```json
+[
+  { "language": "French",  "code_language": "fr", "model_name": "fr_core_news_md" },
+  { "language": "English", "code_language": "en", "model_name": "en_core_web_md" }
+]
 ```
-the
-and
-for
-...
-```
+
+### Stopwords — `libCore/input/stopword.txt`
+
+One word per line. The shipped file is **pre-populated** with a large default set: English/French structural words plus a thematic block tied to politics, media, and institutions (e.g. `parliament`, `commission`, `bbc`, `nytimes`, `monday`, `region`, `million`...). Edit it freely to fit your monitoring scope — anything listed here is excluded from analysis on top of the spaCy POS filter (only nouns, proper nouns, verbs, and adjectives are kept).
 
 ---
 
-## 📋 Log & State Files
+## 📋 Run Outputs
 
-The pipeline automatically generates several output files each day, all named with the pattern `YYYY_M_D.*`:
+Every run writes to several places, all tagged with the same `job_id`:
 
-| File | Location | Description |
+| Storage | Location | Role |
 |---|---|---|
-| `YYYY_M_D.log.txt` | `log/` | Execution trace with severity levels (`INFO`, `WARN`, `ERROR`, `CRITICAL`) and the calling function |
-| `YYYY_M_D.savestate.txt` | `saveState/` | Two snapshots of the article data: one before NLP cleaning (`Brut`) and one after (`Clean`) |
-| `YYYY_M_D.dataset.txt` | `dataset/` | Intermediate datasets: word intensity and semantic neighborhoods |
-| `YYYY_M_D.local_api.txt` | `local_api/` | Final output, the full JSON result ready to be consumed |
+| **SQLite DB** | `database/database_don_t_touch/db_Weak_Signal_Finder.db` | **Primary store.** Contains the `jobIdDateTime` table (one row per run) and the `saveData` table (raw and cleaned snapshots, intensity scores, neighborhoods). |
+| `YYYY_M_D.local_api.txt` | `local_api/` | Final consumable JSON output. |
+| `YYYY_M_D.log.txt` | `log/` | Execution trace with severity levels (`INFO`, `WARN`, `ERROR`, `CRITICAL`) and the calling function. |
+| `YYYY_M_D.savestate.txt` | `saveState/` | *Legacy file output* — kept for backward compatibility (see `LEGACY_FUNCTION.md`). The database is now the source of truth. |
+| `YYYY_M_D.dataset.txt` | `dataset/` | *Legacy file output* — same as above. |
+
+> ⚠️ Do **not** open `db_Weak_Signal_Finder.db` manually with another tool while the pipeline runs — risk of corruption.
 
 Each log entry is a JSON object:
 
@@ -189,11 +189,8 @@ Each log entry is a JSON object:
 
 ## ⚠️ Known Limitations
 
-- **Single-word blocks are silently skipped.** If an article produces only one meaningful word after cleaning, its contextual neighborhood cannot be computed and it is ignored without raising an error.
-- **Inaccessible feeds do not raise a soft error.** If a feed URL is unreachable, `feedparser` returns an empty result, the pipeline continues without warning.
-- **Language code must match exactly.** If a `country` key in `rssFeed.json` does not appear in `languageModel.json`, the language is skipped with a `WARN` log but no exception is raised.
-- **Words appearing only once are filtered out.** The `delete_little_intensity` function removes any word with a frequency ≤ 1, so very rare signals are excluded from the final output.
-- **Output directories must exist before running.** The pipeline does not auto-create `log/`, `saveState/`, `dataset/`, or `local_api/`, missing directories will cause a crash.
+- **Silent skips.** Single-word articles, unreachable feeds, and language codes missing from `languageModel.json` are skipped without raising an exception (a `WARN` is logged when relevant). If a run produces nothing, check the log file.
+- **Frequency floor.** Words appearing only once are filtered out by `delete_little_intensity`, so very rare signals never reach the final output.
 
 ---
 
@@ -214,16 +211,35 @@ weak-signal-finder/
 │       ├── rssFeed.json
 │       ├── languageModel.json
 │       └── stopword.txt
+├── database/
+│   ├── prepare_request_class.py
+│   ├── database_don_t_touch/
+│   │   └── db_Weak_Signal_Finder.db
+│   └── request/
+│       ├── request_savedata.sql
+│       ├── request_idCountry.sql
+│       └── erase_all_table.sql
 ├── log/
 ├── saveState/
 ├── dataset/
 └── local_api/
 ```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome. Before opening a pull request, please review:
+
+- [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) — community standards.
+- [`CLA.md`](CLA.md) — the Individual Contributor License Agreement you implicitly accept by submitting a contribution.
+- [`SECURITY.md`](SECURITY.md) — how to responsibly disclose a vulnerability (do **not** open a public issue for security matters).
+
 ---
 
 ## Disclaimer
 
-This tool is designed as an analytical aid to support **media monitoring and weak signal analysis**. The outputs it generates are not definitive conclusions but rather data points intended to guide and inform human interpretation. The quality, accuracy, and relevance of the analysis are directly dependent on the RSS feeds provided as input. The tool does not verify the factual accuracy or reliability of the source material, it solely counts and groups words without interpreting meaning. The results represent a snapshot in time based on the content available at the moment of execution. 
+This tool is designed as an analytical aid to support **media monitoring and weak signal analysis**. The outputs it generates are not definitive conclusions but rather data points intended to guide and inform human interpretation. The quality, accuracy, and relevance of the analysis are directly dependent on the RSS feeds provided as input. The tool does not verify the factual accuracy or reliability of the source material, it solely counts and groups words without interpreting meaning. The results represent a snapshot in time based on the content available at the moment of execution.
 **A high frequency score does not imply importance.** A word that appears frequently across feeds may simply be overrepresented in the selected sources, not genuinely significant. Users should interpret intensity scores in light of the feeds they have configured. The quality of lemmatization and part-of-speech filtering depends on the spaCy language model used. An unsuitable or low-accuracy model may produce incorrect lemmas and distort the analysis. It is recommended to use a model appropriate to the language and domain of your feeds. All processing is performed locally. The tool does not collect, transmit, or store any personal data. All output files remain on the user's machine.
 **The outputs are not anonymized.** If the configured RSS feeds contain proper nouns, names of individuals, organizations, or places, these will appear as-is in the semantic neighborhood results and output files. Users operating in a professional, shared, or regulated environment should be aware of this and handle the output files accordingly.
 **Users are solely responsible for ensuring compliance with the terms of service of each RSS feed they configure.** Some publishers explicitly prohibit automated aggregation or redistribution of their content. This tool provides no guarantee of legal compliance for any given feed, and the responsibility for verifying authorized use rests entirely with the user. Users should always apply critical judgment and cross-reference findings with other sources before drawing any conclusions.
