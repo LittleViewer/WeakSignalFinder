@@ -1,0 +1,25 @@
+[path]
+
+[path .class_feed]
+extract_feed_Path = "libCore\\input\\rssFeed.json"
+
+[path .api_local]
+open_file = "local_api\\"
+
+[path .log]
+save_data_set = "dataset\\"
+save_state = "saveState\\"
+log_file = "log\\"
+
+[path .prepare_data]
+file_model = "libCore\\input\\languageModel.json"
+file_stopword = "libCore\\input\\stopword.txt"
+
+[path .database]
+database_sqlite = "database\\database_don_t_touch\\db_Weak_Signal_Finder.db"
+
+
+[parameter]
+
+[parameter .frequency_one_word]
+filter_word = 1

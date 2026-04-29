@@ -1,11 +1,12 @@
 import libCore.utils_class as luC
+import libCore.config_tool_class as ctC
 import sqlite3
-import sys
 
 class prepare_request:
 
-    def connect_dabase(self, link_to_database):
+    def connect_dabase(self):
         try :
+            link_to_database = self.ctC_.key_return("path","database_sqlite","database")
             if self.luC_.is_string(link_to_database) == True:
                 handle_dabase = sqlite3.connect(self.luC_.absolute_link(link_to_database))
                 cursor_database = handle_dabase.cursor()
@@ -102,3 +103,4 @@ class prepare_request:
 
     def __init__(self):
         self.luC_ = luC.utils()
+        self.ctC_ = ctC.config_toml_tool()

@@ -1,5 +1,6 @@
-import libCore.utils_class as luC
 import database.prepare_request_class as prC
+import libCore.utils_class as luC
+import libCore.config_tool_class as ctC
 import datetime
 import json
 import random
@@ -24,13 +25,13 @@ class log:
         handle.write(json_message+"\n")
         handle.close()
 
-    def pipe_log(self, content = "Unknow", severity = "Unknow", function_call = "Unknow",link_to_dir = "log\\"):
-        handle = self.check_or_create_file_day(link_to_dir, f"{self.date.year}_{self.date.month}_{self.date.day}.log.txt")
+    def pipe_log(self, content = "Unknow", severity = "Unknow", function_call = "Unknow"):
+        handle = self.check_or_create_file_day(self.ctC_.key_return("path","log_file","log"), f"{self.date.year}_{self.date.month}_{self.date.day}.log.txt")
         json_message = self.prepare_message(content, severity, function_call)
         self.send_message(handle,json_message)
     
-    def save_state(self, text, type_data = "Unknow", link = "saveState\\", ):
-        handle = self.luC_.file_open(self.luC_.absolute_link(link)/f"{self.date.year}_{self.date.month}_{self.date.day}.savestate.txt","a+")
+    def save_state(self, text, type_data = "Unknow"):
+        handle = self.luC_.file_open(self.luC_.absolute_link(self.ctC_.key_return("path","save_state","log"))/f"{self.date.year}_{self.date.month}_{self.date.day}.savestate.txt","a+")
         total_article =  0
         for one_index in text:
             total_article += len(text[one_index])
@@ -43,8 +44,8 @@ class log:
             self.luC_.error_with_reason("A savestate could not be saved :  save_state()")
         handle.close()
 
-    def save_data_set(self, text, data, type_data = "Unknow", link = "dataset\\", ):
-        handle = self.luC_.file_open(self.luC_.absolute_link(link)/f"{self.date.year}_{self.date.month}_{self.date.day}.dataset.txt","a+")
+    def save_data_set(self, text, data, type_data = "Unknow"):
+        handle = self.luC_.file_open(self.luC_.absolute_link(self.ctC_.key_return("path","save_data_set","log"))/f"{self.date.year}_{self.date.month}_{self.date.day}.dataset.txt","a+")
         try :
             if type(data) != int:
                 data = len(data)
@@ -67,3 +68,4 @@ class log:
         self.luC_ = luC.utils()
         self.date = datetime.datetime.now()
         self.prC_ = prC.prepare_request()
+        self.ctC_ = ctC.config_toml_tool()

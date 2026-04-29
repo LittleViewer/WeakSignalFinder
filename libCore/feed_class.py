@@ -1,5 +1,6 @@
 import libCore.utils_class as utils
 import libCore.log_class as log
+import libCore.config_tool_class as ctC
 import feedparser
 import json
 import asyncio
@@ -47,8 +48,8 @@ class feed:
             tick += 1
         return formated_feed_list
     
-    async def pipe_extract_rss(self, link = "configFolder/rssFeed.json"):
-        dict_feed = self.extract_feed_link(self.utC_.absolute_link(link))
+    async def pipe_extract_rss(self):
+        dict_feed = self.extract_feed_link(self.utC_.absolute_link(self.ctC_.key_return("path", "extract_feed_Path","class_feed")))
         parsed_feed_list = await self.parse_rss(dict_feed)
         formated_feed = self.formated_result(parsed_feed_list)
         total_article = 0
@@ -61,4 +62,4 @@ class feed:
     def __init__(self):
         self.utC_ = utils.utils()
         self.lC_ = log.log()
-        
+        self.ctC_ = ctC.config_toml_tool()

@@ -1,6 +1,7 @@
+import database.prepare_request_class as prC
 import libCore.utils_class as luC
 import libCore.log_class as llC
-import database.prepare_request_class as prC
+import libCore.config_tool_class as ctC
 import spacy
 import json
 import datetime
@@ -27,11 +28,11 @@ class prepare_data:
                     all_article_with_possible_word[one_index].append(one_bloc)
         return all_article_with_possible_word
     
-    def prepare_file_essential_word(self, link_model = "libCore\\input\\languageModel.json", link_stop_word = "libCore\\input\\stopword.txt"):
+    def prepare_file_essential_word(self):
         data_file = []
         tick = 0
         try :
-            for one_link in [link_model, link_stop_word]:
+            for one_link in [self.ctC_.key_return("path","file_model","prepare_data"), self.ctC_.key_return("path","file_stopword","prepare_data")]:
                 handle_file =  self.luC_.file_open(self.luC_.absolute_link(one_link))
                 if tick == 0:
                     data_file.append(json.loads(handle_file.read()))
@@ -99,3 +100,4 @@ class prepare_data:
         self.luC_ = luC.utils()
         self.llC_ = llC.log()
         self.prC_ = prC.prepare_request()
+        self.ctC_ = ctC.config_toml_tool()

@@ -1,8 +1,8 @@
+import database.prepare_request_class as prC
 import libCore.utils_class as luC
 import libCore.log_class as llC
-import database.prepare_request_class as prC
+import libCore.config_tool_class as ctC
 import datetime
-import json
 
 class frequency_one_word:
 
@@ -25,14 +25,14 @@ class frequency_one_word:
                 del(word_intensity_dict_clean[one_index])
         return word_intensity_dict_clean
 
-    def pipe_frequency_one_word(self, data, obj_database,job_id, filter = 1):
+    def pipe_frequency_one_word(self, data, obj_database,job_id):
         word_claim = []
         word_intensity = {}
         for one_index in data:
             for one_bloc in data[one_index]:
                 for one_word in one_bloc:
                     word_intensity = self.word_claimer(one_word, word_claim, word_intensity)
-        word_intensity_clean = self.delete_little_intensity(word_intensity, filter)
+        word_intensity_clean = self.delete_little_intensity(word_intensity, self.ctC_.key_return("parameter","filter_word","frequency_one_word"))
         self.llC_.save_data_set((word_intensity_clean), word_intensity_clean, "word_intensity")
         self.prC_.insert_data_database(obj_database[0],obj_database[1],"saveData",["jobId","dateTime","type","data"],[[job_id,datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),"saveStateWordIntensity",str(word_intensity_clean).replace("'",'"')]])
         self.llC_.pipe_log("The word intensity is calculated as well as saved in the dataset.","INFO","frequency_one_word() : pipe_frequency_one_word()")
@@ -42,3 +42,4 @@ class frequency_one_word:
         self.luC_ = luC.utils()
         self.llC_ =  llC.log()
         self.prC_ = prC.prepare_request()
+        self.ctC_ = ctC.config_toml_tool()

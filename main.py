@@ -18,11 +18,11 @@ cnC_ = cnC.contextual_neighboord()
 alC_ = alC.api_local()
 prC_ = prC.prepare_request()
 
-obj_database = prC_.connect_dabase("database\\database_don_t_touch\\db_Weak_Signal_Finder.db")
+obj_database = prC_.connect_dabase()
 
 llC_.pipe_log("Start execute program", "INFO","main")
 job_id = llC_.pipe_jobId_session_generator(obj_database)
-all_article = asyncio.run(lfC_.pipe_extract_rss(luC_.absolute_link("libCore\\input\\rssFeed.json")))
+all_article = asyncio.run(lfC_.pipe_extract_rss())
 data_clean_for_analyse = lpC_.pipe_prepare_data(all_article,obj_database,job_id)
 intensity_word = fowC_.pipe_frequency_one_word(data_clean_for_analyse,obj_database,job_id)
 contextual_neighborhood = neighboord_multiple_dict = cnC_.pipe_contextual_neighboord(data_clean_for_analyse,obj_database,job_id)
