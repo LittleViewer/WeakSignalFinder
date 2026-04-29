@@ -76,6 +76,8 @@ Simply run the main script:
 python main.py
 ```
 
+> **Run from the project root.** The pipeline is designed to be launched with the project root as the working directory, either from an IDE configured that way, or from a terminal opened directly in the project folder (e.g. `cd weak-signal-finder` then `python main.py`). This is a deliberate design choice: paths declared in `config_weakSignalFinder.toml` and elsewhere are resolved relative to the current working directory, so executing `python /some/other/path/main.py` from a different location will not find the input files. It is not a bug, just how the pipeline expects to be invoked.
+
 Each run:
 1. Generates a unique `job_id` and registers it in the SQLite database.
 2. Reads the RSS feed list from `libCore/input/rssFeed.json`.
@@ -124,7 +126,56 @@ The output is a newline-delimited JSON file. Each line is a full dated snapshot:
 
 ## 🛠️ Configuration
 
-### RSS Feeds — `libCore/input/rssFeed.json`
+All runtime configuration lives in a single TOML file at the project root, with three input files used by the NLP pipeline. Edit them to fit your monitoring scope.
+
+### Main configuration, `config_weakSignalFinder.toml`
+
+`config_weakSignalFinder.toml` is the **central configuration file**. It declares every path the pipeline uses (inputs, outputs, database, log/dataset/savestate folders) and exposes the tunable parameters of the analysis. It is loaded once at startup by `libCore/config_tool_class.py` and consumed by every module via `key_return(table, key, sub_table)`.
+
+```toml
+[path]
+
+[path .class_feed]
+extract_feed_Path = "libCore\\input\\rssFeed.json"
+
+[path .api_local]
+open_file = "local_api\\"
+
+[path .log]
+save_data_set = "dataset\\"
+save_state = "saveState\\"
+log_file = "log\\"
+
+[path .prepare_data]
+file_model = "libCore\\input\\languageModel.json"
+file_stopword = "libCore\\input\\stopword.txt"
+
+[path .database]
+database_sqlite = "database\\database_don_t_touch\\db_Weak_Signal_Finder.db"
+
+
+[parameter]
+
+[parameter .frequency_one_word]
+filter_word = 1
+```
+
+**Section reference:**
+
+| Section | Key | Role |
+|---|---|---|
+| `[path .class_feed]` | `extract_feed_Path` | Path to the JSON list of RSS feeds. |
+| `[path .api_local]` | `open_file` | Folder where the dated `*.local_api.txt` output is written. |
+| `[path .log]` | `log_file` / `save_state` / `save_data_set` | Folders for the execution log, the legacy savestate file, and the legacy dataset file. |
+| `[path .prepare_data]` | `file_model` / `file_stopword` | Path to the spaCy language-model mapping and to the stopword list. |
+| `[path .database]` | `database_sqlite` | Path to the SQLite database file. |
+| `[parameter .frequency_one_word]` | `filter_word` | Minimum frequency floor, words with a count `<=` this value are dropped from the final output. Default: `1`. |
+
+> Paths use Windows-style backslashes (`\\`) but are normalized internally, so the file works the same on Windows, Linux, and macOS.
+
+A pristine copy of the configuration is shipped as **`archive_configuration/config_weakSignalFinder.toml.archive`**. If you ever break the active TOML during edits, you can restore the defaults by copying this archive back to `config_weakSignalFinder.toml` at the project root.
+
+### RSS Feeds, `libCore/input/rssFeed.json`
 
 Define the feeds to monitor. Each entry has a source name, a feed URL, and a country/language code:
 
@@ -143,7 +194,7 @@ Define the feeds to monitor. Each entry has a source name, a feed URL, and a cou
 ]
 ```
 
-### Language Models — `libCore/input/languageModel.json`
+### Language Models, `libCore/input/languageModel.json`
 
 Maps language codes to their spaCy model names. The `language` field is informational, `code_language` is the key actually used to dispatch articles:
 
@@ -154,9 +205,9 @@ Maps language codes to their spaCy model names. The `language` field is informat
 ]
 ```
 
-### Stopwords — `libCore/input/stopword.txt`
+### Stopwords, `libCore/input/stopword.txt`
 
-One word per line. The shipped file is **pre-populated** with a large default set: English/French structural words plus a thematic block tied to politics, media, and institutions (e.g. `parliament`, `commission`, `bbc`, `nytimes`, `monday`, `region`, `million`...). Edit it freely to fit your monitoring scope — anything listed here is excluded from analysis on top of the spaCy POS filter (only nouns, proper nouns, verbs, and adjectives are kept).
+One word per line. The shipped file is **pre-populated** with a large default set: English/French structural words plus a thematic block tied to politics, media, and institutions (e.g. `parliament`, `commission`, `bbc`, `nytimes`, `monday`, `region`, `million`...). Edit it freely to fit your monitoring scope, anything listed here is excluded from analysis on top of the spaCy POS filter (only nouns, proper nouns, verbs, and adjectives are kept).
 
 ---
 
@@ -169,10 +220,10 @@ Every run writes to several places, all tagged with the same `job_id`:
 | **SQLite DB** | `database/database_don_t_touch/db_Weak_Signal_Finder.db` | **Primary store.** Contains the `jobIdDateTime` table (one row per run) and the `saveData` table (raw and cleaned snapshots, intensity scores, neighborhoods). |
 | `YYYY_M_D.local_api.txt` | `local_api/` | Final consumable JSON output. |
 | `YYYY_M_D.log.txt` | `log/` | Execution trace with severity levels (`INFO`, `WARN`, `ERROR`, `CRITICAL`) and the calling function. |
-| `YYYY_M_D.savestate.txt` | `saveState/` | *Legacy file output* — kept for backward compatibility (see `LEGACY_FUNCTION.md`). The database is now the source of truth. |
-| `YYYY_M_D.dataset.txt` | `dataset/` | *Legacy file output* — same as above. |
+| `YYYY_M_D.savestate.txt` | `saveState/` | *Legacy file output*, kept for backward compatibility (see `LEGACY_FUNCTION.md`). The database is now the source of truth. |
+| `YYYY_M_D.dataset.txt` | `dataset/` | *Legacy file output*, same as above. |
 
-> ⚠️ Do **not** open `db_Weak_Signal_Finder.db` manually with another tool while the pipeline runs — risk of corruption.
+> ⚠️ Do **not** open `db_Weak_Signal_Finder.db` manually with another tool while the pipeline runs, risk of corruption.
 
 Each log entry is a JSON object:
 
@@ -190,7 +241,7 @@ Each log entry is a JSON object:
 ## ⚠️ Known Limitations
 
 - **Silent skips.** Single-word articles, unreachable feeds, and language codes missing from `languageModel.json` are skipped without raising an exception (a `WARN` is logged when relevant). If a run produces nothing, check the log file.
-- **Frequency floor.** Words appearing only once are filtered out by `delete_little_intensity`, so very rare signals never reach the final output.
+- **Frequency floor.** Words appearing only once are filtered out by `delete_little_intensity` (controlled by `filter_word` in the TOML), so very rare signals never reach the final output unless you lower the threshold.
 
 ---
 
@@ -199,6 +250,9 @@ Each log entry is a JSON object:
 ```
 weak-signal-finder/
 ├── main.py
+├── config_weakSignalFinder.toml
+├── archive_configuration/
+│   └── config_weakSignalFinder.toml.archive
 ├── libCore/
 │   ├── feed_class.py
 │   ├── prepare_data_class.py
@@ -206,6 +260,7 @@ weak-signal-finder/
 │   ├── contextual_neighborhood_class.py
 │   ├── api_local_class.py
 │   ├── log_class.py
+│   ├── config_tool_class.py
 │   ├── utils_class.py
 │   └── input/
 │       ├── rssFeed.json
@@ -231,9 +286,9 @@ weak-signal-finder/
 
 Contributions are welcome. Before opening a pull request, please review:
 
-- [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) — community standards.
-- [`CLA.md`](CLA.md) — the Individual Contributor License Agreement you implicitly accept by submitting a contribution.
-- [`SECURITY.md`](SECURITY.md) — how to responsibly disclose a vulnerability (do **not** open a public issue for security matters).
+- [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md), community standards.
+- [`CLA.md`](CLA.md), the Individual Contributor License Agreement you implicitly accept by submitting a contribution.
+- [`SECURITY.md`](SECURITY.md), how to responsibly disclose a vulnerability (do **not** open a public issue for security matters).
 
 ---
 
