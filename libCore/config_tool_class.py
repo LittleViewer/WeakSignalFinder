@@ -15,7 +15,7 @@ class config_toml_tool:
                 return False
             return self.config[table][sub_table][key]
 
-    def __init__(self, path = "input_configuration\\external_configuration.toml"):
+    def __init__(self, path = "config_weakSignalFinder.toml"):
         self.luC_ = luC.utils()
-        handle = open(self.luC_.absolute_link("config_weakSignalFinder.toml"),"rb")
+        handle = open(self.luC_.absolute_link(path),"rb")
         self.config = tomllib.load(handle)

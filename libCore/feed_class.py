@@ -52,10 +52,7 @@ class feed:
         dict_feed = self.extract_feed_link(self.utC_.absolute_link(self.ctC_.key_return("path", "extract_feed_Path","class_feed")))
         parsed_feed_list = await self.parse_rss(dict_feed)
         formated_feed = self.formated_result(parsed_feed_list)
-        total_article = 0
-        for one_index in formated_feed:
-            total_article =+ len(formated_feed[one_index])
-        self.lC_.pipe_log(f"{total_article} articles were aggregated via Feed RSS","INFO","feed() : pipe_extract_rss()")
+        self.lC_.pipe_log(f"All articles were aggregated via Feed RSS","INFO","feed() : pipe_extract_rss()")
         return formated_feed
 
 

@@ -58,6 +58,7 @@ class prepare_data:
             self.llC_.pipe_log(f"A model is not present in the database, the id : {id_model}", "prepare_data() : remove_no_essential_word()", "WARN")
             return False     
         new_dict[id_model] = []
+        self.llC_.pipe_log(f"The '{list_model_name_support[id_model]}' spacy model was called!","INFO","prepare_data.remove_no_essential_word()")
         nlp = spacy.load(list_model_name_support[id_model])
         for one_block in structured_data_sub_clean[id_model]:
             new_block = []

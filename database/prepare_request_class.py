@@ -1,5 +1,5 @@
-import libCore.utils_class as luC
 import libCore.config_tool_class as ctC
+import libCore.utils_class as luC
 import sqlite3
 
 class prepare_request:
@@ -40,7 +40,7 @@ class prepare_request:
 
     def insert_data_database(self, cursor, handle_database, table_name, column_name, values):
         if self.luC_.is_string(table_name) != True or self.luC_.is_list(column_name) != True:
-            self.luC_.error_with_reason("The expected formats are not provided as input in prepare_request.insert_data_database()#32!",True)
+            self.luC_.error_with_reason("The expected formats are not provided as input in prepare_request.insert_data_database()#45!",True)
         temp_values = []
         for one_array in values:
             sub_temp_values = []
@@ -68,7 +68,7 @@ class prepare_request:
             one_row_content = values[one_row_values]
             
             if self.luC_.is_list(one_row_content) != True:
-                self.luC_.error_with_reason("The expected formats are not provided as input in prepare_request.insert_data_database()#57!",True)
+                self.luC_.error_with_reason("The expected formats are not provided as input in prepare_request.insert_data_database()#74!",True)
             tick_all_one_row = len(values[one_row_values])
             prepare_one_row_insert = "("
 

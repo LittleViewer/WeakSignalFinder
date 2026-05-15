@@ -1,5 +1,5 @@
 import pathlib
-from pathlib import Path, PureWindowsPath
+from pathlib import Path
 import sys
 import os
 import datetime
