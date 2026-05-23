@@ -19,7 +19,7 @@ class enter_data_dictionnary:
             self.luC_.error_with_reason("An unexpected error occurs during the connection with the database in prepare_request.connect_dabase()!",True)
 
     def for_launch(self):
-        self.cursor_database_.execute("SELECT * FROM run ORDER BY date_ ASC LIMIT 1;")
+        self.cursor_database_.execute("SELECT * FROM run ORDER BY date_ DESC LIMIT 1;")
         date_db = self.cursor_database_.fetchall()[0][1].split("-")
         date_old = datetime.datetime(int(date_db[0]),int(date_db[1]),int(date_db[2]))
         date_now_complete = datetime.datetime.now()
