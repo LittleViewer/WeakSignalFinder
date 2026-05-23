@@ -1,0 +1,4 @@
+DELETE FROM dictionnary;
+DELETE FROM word;
+DELETE FROM run;
+INSERT INTO run VALUES ("0","1970-01-01");

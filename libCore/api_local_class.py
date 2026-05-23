@@ -1,4 +1,4 @@
-import database.prepare_request_class as prC
+import database_rss_run.prepare_request_class as prC
 import libCore.utils_class as luC
 import libCore.log_class as llC
 import libCore.config_tool_class as ctC

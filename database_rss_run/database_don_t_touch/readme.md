@@ -1,0 +1,1 @@
+*Don't open "**database\database_don_t_touch\db_Weak_Signal_Finder.db**" there is a risk of error that could render the database unusable.*

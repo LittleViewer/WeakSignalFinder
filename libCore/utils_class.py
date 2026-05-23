@@ -68,5 +68,21 @@ class utils :
             return True
         return False
     
+    def is_type(self, type_, variable_):
+        if type_ == type(variable_):
+            return True
+        return False
+    
+    def dict_to_two_list(self, dict_):
+        list_index = []
+        list_value = []
+        is_list = self.is_type(dict, dict_)
+        if is_list == False:
+            self.error_with_reason("Not dict", True)
+        for one_index in dict_:
+            list_index.append(one_index)
+            list_value.append(dict_[one_index])
+        return [list_index, list_value]
+
     def __init__(self):
         self.date_ = datetime.datetime.now()

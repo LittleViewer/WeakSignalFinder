@@ -1,4 +1,4 @@
-import database.prepare_request_class as prC
+import database_rss_run.prepare_request_class as prC
 import libCore.utils_class as luC
 import libCore.config_tool_class as ctC
 import datetime
@@ -59,7 +59,7 @@ class log:
     
     def pipe_jobId_session_generator(self, obj_database):
         date_sql = self.date.strftime('%Y-%m-%d %H:%M:%S')
-        self.hex_code = random.randbytes(4).hex()
+        self.hex_code = random.randbytes(16).hex()
         job_id = f"{self.hex_code}-{self.date.year}{self.date.month}{self.date.second}{self.date.microsecond}{self.date.day}"
         self.prC_.insert_data_database(obj_database[0], obj_database[1], "jobIdDateTime", ["jobId","dateTime"], [[job_id,date_sql]])
         return job_id
