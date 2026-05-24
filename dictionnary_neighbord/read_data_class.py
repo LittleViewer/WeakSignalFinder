@@ -1,5 +1,6 @@
 import libCore.config_tool_class as ctC
 import libCore.utils_class as luC
+import dictionnary_neighbord.enter_data_dictionnary_class as edC
 import os
 import json
 
@@ -10,23 +11,26 @@ class read_data :
 
         path = self.luC_.absolute_link(self.ctC_.key_return("path","dataset","read_data_dictionnary"))
         all_file_name = os.listdir(f"{path}")
-
+        already_read = self.edC_.is_file_read()
         dict_path = []
         for one_file_name in all_file_name:
-            if one_file_name not in exclude_file:
-                dict_path.append(self.luC_.absolute_link(f"{path}/{one_file_name}"))
+            if one_file_name not in already_read:
+                if one_file_name not in exclude_file:
+                    dict_path.append(self.luC_.absolute_link(f"{path}/{one_file_name}"))
 
         return dict_path
     
     def open_file(self, dict_all_path):
         all_data = []
+        all_filename_read = []
         for one_path in dict_all_path:
+            all_filename_read.append(str(one_path).split("\\")[7])
             with open(one_path, "r") as file:
                 for line in file:
                     line = line.strip()
                 if line:
                     all_data.append(json.loads(line))
-            
+        self.edC_.already_read(all_filename_read)
         return all_data             
 
     def read_data(self, all_data):
@@ -53,6 +57,7 @@ class read_data :
         all_data = self.open_file(all_path)
         return self.read_data(all_data)
 
-    def __init__(self):
+    def __init__(self, job_id):
         self.ctC_ = ctC.config_toml_tool()
         self.luC_ = luC.utils()
+        self.edC_ = edC.enter_data_dictionnary(job_id)

@@ -19,8 +19,7 @@ fowC_ = fowC.frequency_one_word()
 cnC_ = cnC.contextual_neighboord()
 alC_ = alC.api_local()
 prC_ = prC.prepare_request()
-rdC_ = rdC.read_data()
-edC_ = edC.enter_data_dictionnary()
+
 
 obj_database = prC_.connect_dabase()
 
@@ -34,12 +33,15 @@ contextual_neighborhood = neighboord_multiple_dict = cnC_.pipe_contextual_neighb
 word_central_neighborhood = cnC_.pipe_neighborhood_center_on_word(neighboord_multiple_dict,obj_database,job_id)
 alC_.pipe_api_local(obj_database,"'"+job_id+"'")
 
+rdC_ = rdC.read_data(job_id)
+edC_ = edC.enter_data_dictionnary(job_id)
+
 got_to_launch = edC_.for_launch()
 if got_to_launch == True:
     llC_.pipe_log(f"A run to complete the dictionary has just been automatically launched!","INFO","main")
     prepared_data = rdC_.pipe_read_data()
     edC_.pipe_enter_data(prepared_data)
-    edC_.enter_last_run(job_id)
+    edC_.enter_last_run()
     llC_.pipe_log(f"The dictionary completion run is over!","INFO","main")
 llC_.pipe_log("Stop execute program", "INFO","main")
 

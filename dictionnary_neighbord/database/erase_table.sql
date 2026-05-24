@@ -1,4 +1,5 @@
 DELETE FROM dictionnary;
 DELETE FROM word;
 DELETE FROM run;
+DELETE FROM know_folder;
 INSERT INTO run VALUES ("0","1970-01-01");

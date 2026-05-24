@@ -14,3 +14,7 @@ env/
 *.db
 *.db-shm
 *.db-wal
+*.local_api.txt
+*.savestate.txt
+*.log.txt
+*.dataset.txt
