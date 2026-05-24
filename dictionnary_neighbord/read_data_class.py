@@ -24,8 +24,7 @@ class read_data :
         all_data = []
         all_filename_read = []
         for one_path in dict_all_path:
-            array_filename = str(one_path).split("\\")
-            all_filename_read.append(array_filename[len(array_filename)-1])
+            all_filename_read.append(str(one_path))
             with open(one_path, "r") as file:
                 for line in file:
                     line = line.strip()
