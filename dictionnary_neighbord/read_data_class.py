@@ -37,7 +37,7 @@ class read_data :
         list_all_word = set([])
 
         for one_block in all_data:
-            one_block = json.loads(one_block["word_central_neighborhood"])
+            one_block = json.loads(one_block[self.ctC_.key_return("parameter","part_of_local_api","for_launch")])
 
             for one_line in one_block:
                 if one_line not in list_all_word :

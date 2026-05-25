@@ -31,3 +31,4 @@ filter_word = 1
 
 [parameter .for_launch]
 cooldown_day_launch_dictionnary = 1
+part_of_local_api = "word_central_neighborhood"
