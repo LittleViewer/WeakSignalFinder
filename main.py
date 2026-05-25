@@ -51,7 +51,7 @@ if got_to_launch == True:
     llC_.pipe_log(f"The dictionary completion run is over!","INFO","main")
 
 if ctC_.key_return("parameter","authorize_run","email_auto") == True:
-    esC_.sub_smtp_send(f"Weak Signal Finder is finished! \nTime : {date_time}\n Job ID : {job_id}\n Link Github Repository : https://github.com/LittleViewer/WeakSignalFinder\n Copyright (c) 2025-present LittleViewer & WeakSignalFinder Contributors" )
+    esC_.sub_smtp_send(f"Weak Signal Finder is finished! \nTime : {date_time}\n Job ID : {job_id}\n Link Github Repository : https://github.com/LittleViewer/WeakSignalFinder\n Copyright (c) 2025-present LittleViewer & WeakSignalFinder Contributors",f"Subject: Weak Signal Finder Notification : Execution completed successfully - {job_id} !")
 
 llC_.pipe_log("Stop execute program", "INFO","main")
 print(f"[{date_time}] Stop execute program!")
