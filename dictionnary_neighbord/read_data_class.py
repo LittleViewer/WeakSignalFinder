@@ -14,10 +14,9 @@ class read_data :
         already_read = self.edC_.is_file_read()
         dict_path = []
         for one_file_name in all_file_name:
-            if one_file_name not in already_read:
-                if one_file_name not in exclude_file:
+            if one_file_name not in exclude_file:
+                if one_file_name not in already_read:
                     dict_path.append(self.luC_.absolute_link(f"{path}/{one_file_name}"))
-
         return dict_path
     
     def open_file(self, dict_all_path):

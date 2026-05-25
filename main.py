@@ -10,6 +10,7 @@ import dictionnary_neighbord.read_data_class as rdC
 import dictionnary_neighbord.enter_data_dictionnary_class as edC
 
 import asyncio
+import datetime
 
 lfC_ = lfC.feed()
 llC_ = llC.log()
@@ -23,7 +24,7 @@ prC_ = prC.prepare_request()
 
 obj_database = prC_.connect_dabase()
 
-
+print(f"[{datetime.datetime.now()}] Start execute program!")
 llC_.pipe_log("Start execute program", "INFO","main")
 job_id = llC_.pipe_jobId_session_generator(obj_database)
 all_article = asyncio.run(lfC_.pipe_extract_rss())
@@ -44,5 +45,6 @@ if got_to_launch == True:
     edC_.enter_last_run()
     llC_.pipe_log(f"The dictionary completion run is over!","INFO","main")
 llC_.pipe_log("Stop execute program", "INFO","main")
+print(f"[{datetime.datetime.now()}] Stop execute program!")
 
 

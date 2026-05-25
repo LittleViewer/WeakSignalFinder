@@ -47,8 +47,13 @@ class enter_data_dictionnary:
     def is_file_read(self):
         all_file_name = []
         self.cursor_database_.execute("SELECT name_folder FROM know_folder;")
-        for one_filename in self.cursor_database_.fetchall():
-            all_file_name.append(one_filename[0])
+        data = self.cursor_database_.fetchall()
+        
+        for one_filename in data :
+            array_filename = one_filename[0].split("/")
+            array_filename = array_filename[len(array_filename)-1].split("\\")
+            all_file_name.append(array_filename[len(array_filename)-1])
+        
         return set(all_file_name)
     
     def detect_new_world(self, list_all_word_db,list_all_word):
@@ -73,7 +78,7 @@ class enter_data_dictionnary:
         self.cursor_database_.execute(prepare_request)
         self.handle_dabase_.commit()
         print(f"[{datetime.datetime.now()}] - {counter+1} new words enter in database")
-        self.llC_.pipe_log(f"{counter+1} new words enter in database!","INFO","enter_data_dictionnary() : new_word_enter_db()")
+        self.llC_.pipe_log(f"{counter+1} new words enter in the long-term dictionary!","INFO","enter_data_dictionnary() : new_word_enter_db()")
 
     def neighbor_enter_db(self, all_data):
         number_enter = 0
@@ -91,7 +96,7 @@ class enter_data_dictionnary:
             self.cursor_database_.execute(prepare_request)
             self.handle_dabase_.commit()
             print(f"[{datetime.datetime.now()}] - {number_enter+1} new neighbords enter in database")
-            self.llC_.pipe_log(f"{number_enter+1} new neighbords enter in database!","INFO","enter_data_dictionnary() : neighbor_enter_db()")
+            self.llC_.pipe_log(f"{number_enter+1} new neighbords enter in the long-term dictionary!","INFO","enter_data_dictionnary() : neighbor_enter_db()")
 
     def pipe_enter_data(self, all_data):
         self.cursor_database_.execute("SELECT word FROM word;")

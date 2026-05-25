@@ -30,4 +30,4 @@ database_dictionnary_sqlite = "dictionnary_neighbord\\database\\dictionnaryWord.
 filter_word = 1
 
 [parameter .for_launch]
-cooldown_day_launch_dictionnary = 1 #minimum : 1
+cooldown_day_launch_dictionnary = 1
