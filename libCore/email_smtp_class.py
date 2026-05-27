@@ -21,6 +21,9 @@ class email_smtp:
             server.sendmail(dict_email["sender"], dict_email["receiver"], dict_email["topic"] + "\n" + dict_email["message"])
 
     def sub_smtp_send(self, message = "No body text.", topic = "No topic."):
+        if self.ctC_.key_return("parameter","authorize_run","email_auto") == False:
+            return False
+
         try:
             dict_email = self.prepa_email(message, topic)
         except Exception as e:
