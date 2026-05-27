@@ -27,8 +27,8 @@ class read_data :
             with open(one_path, "r") as file:
                 for line in file:
                     line = line.strip()
-                if line:
-                    all_data.append(json.loads(line))
+                    if line:
+                        all_data.append(json.loads(line))
         self.edC_.already_read(all_filename_read)
         return all_data             
 
