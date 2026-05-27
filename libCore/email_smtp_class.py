@@ -1,5 +1,5 @@
 import libCore.config_tool_class as ctC
-import libCore.log_class as llC
+import libCore.utils_class as luC
 import smtplib
 import dotenv
 import os
@@ -27,14 +27,13 @@ class email_smtp:
         try:
             dict_email = self.prepa_email(message, topic)
         except Exception as e:
-            self.llC_.pipe_log(f"Email not prepared", "ERROR","email_smtp")
+            self.luC_.error_with_reason(f"Email not prepared", False)
             return False
         try:
             self.send_email(dict_email)
-            self.llC_.pipe_log(f"Email sent to {dict_email['receiver']} with topic {dict_email['topic']}", "INFO","email_smtp")
         except Exception as e:
-            self.llC_.pipe_log(f"Email not sent to {dict_email['receiver']} with topic {dict_email['topic']}", "ERROR","email_smtp")
+            self.luC_.error_with_reason(f"Email not sent to {dict_email['receiver']} with topic {dict_email['topic']}", False)
 
     def __init__(self):
         self.ctC_ = ctC.config_toml_tool()
-        self.llC_ = llC.log()
+        self.luC_ = luC.utils()
