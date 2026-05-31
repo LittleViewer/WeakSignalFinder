@@ -2,6 +2,7 @@ feedparser
 matplotlib
 asyncio
 dotenv
+io
 click
 spacy==3.8.11
 # model of spacy (to modify according to your needs)

@@ -1,8 +1,10 @@
+from datetime import datetime
 import libCore.utils_class as luC
 import libCore.config_tool_class as ctC
 import libCore.log_class as llC
 import sqlite3
 import datetime
+import io
 
 class enter_data_dictionnary:
     def connect_dabase(self):
@@ -55,15 +57,26 @@ class enter_data_dictionnary:
             all_file_name.append(array_filename[len(array_filename)-1])
         
         return set(all_file_name)
-    
+
+    def insert_io_file_in_db(self, exist_array,buff_file):
+        if len(exist_array) != 0:
+            self.cursor_database_.execute(f"INSERT INTO last_seen VALUES {buff_file.getvalue()[:-1]};")
+            buff_file.close()
+            self.handle_dabase_.commit()
+            print(f"[{datetime.datetime.now()}] - {len(exist_array)} save as already viewed in last seen.")
+            self.llC_.pipe_log(f"{len(exist_array)} save as already viewed in last seen.","INFO","enter_data_dictionnary() : insert_io_file_in_db()")
+
     def detect_new_world(self, list_all_word_db,list_all_word):
         word_is_not_db = []
         word_exist = []
+        buff_word_exist = io.StringIO()
         for one_word_possible in list_all_word:
             if one_word_possible not in list_all_word_db:
                 word_is_not_db.append(one_word_possible)
             else:
                 word_exist.append(one_word_possible)
+                buff_word_exist.write(f"('{datetime.datetime.now()}','{self.job_id}','central_word','{one_word_possible}'),")
+        self.insert_io_file_in_db(word_exist,buff_word_exist)
         return [word_is_not_db, word_exist]
     
     def new_word_enter_db(self, word_is_not_db):
@@ -81,6 +94,8 @@ class enter_data_dictionnary:
         self.llC_.pipe_log(f"{counter+1} new words enter in the long-term dictionary!","INFO","enter_data_dictionnary() : new_word_enter_db()")
 
     def neighbor_enter_db(self, all_data):
+        buff_exist = io.StringIO()
+        link_exist = []
         number_enter = 0
         prepare_request = "INSERT INTO dictionnary (central_word, position_, word_neighbor, run_added) VALUES "
         for one_line in all_data :
@@ -91,6 +106,10 @@ class enter_data_dictionnary:
                     if len(check_is_exist) == 0:
                         number_enter = number_enter + 1
                         prepare_request = prepare_request + f" ('{one_line}','{one_part}','{one_word}', '{self.job_id}'),"
+                    else:
+                        buff_exist.write(f"('{datetime.datetime.now()}','{self.job_id}','neighbord_word','{one_line}-{one_part}-{one_word}'),")
+                        link_exist.append(f"{one_line}-{one_part}-{one_word}")
+        self.insert_io_file_in_db(link_exist,buff_exist)
         prepare_request = prepare_request[:-1]+";"
         if number_enter != 0:
             self.cursor_database_.execute(prepare_request)

@@ -12,6 +12,14 @@ CREATE TABLE IF NOT EXISTS word(
    FOREIGN KEY(word) REFERENCES dictionnary(central_word)
 );
 
+CREATE TABLE IF NOT EXISTS last_seen(
+   date TEXT,
+   jobId TEXT,
+   type_seen TEXT,
+   data TEXT,
+   FOREIGN KEY (jobId) REFERENCES run(jobId)
+);
+
 CREATE TABLE IF NOT EXISTS run(
    jobId TEXT,
    date_ TEXT,
