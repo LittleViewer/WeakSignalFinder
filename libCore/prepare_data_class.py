@@ -59,14 +59,14 @@ class prepare_data:
             return False     
         new_dict[id_model] = []
         self.llC_.pipe_log(f"The '{list_model_name_support[id_model]}' spacy model was called!","INFO","prepare_data.remove_no_essential_word()")
-        nlp = spacy.load(list_model_name_support[id_model])
+        nlp = spacy.load(list_model_name_support[id_model], disable=["parser", "ner", "senter"])
         for one_block in structured_data_sub_clean[id_model]:
             new_block = []
-            for one_word in one_block :
-                one_word = nlp(one_word)
-                one_word_lemma = one_word[0].lemma_
+            one_block_doc = nlp(" ".join(one_block))
+            for one_word in one_block_doc:
+                one_word_lemma = one_word.lemma_
                 if one_word_lemma not in stop_word_set :
-                    if one_word[0].pos_ in list_type_word_accept:
+                    if one_word.pos_ in list_type_word_accept:
                         new_block.append(one_word_lemma)
             new_dict[id_model].append(new_block)
         return new_dict
