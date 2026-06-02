@@ -19,6 +19,7 @@ class enter_data_dictionnary:
         except:
             self.llC_.pipe_log(f"An unexpected error occurs during the connection with the database!","ERROR","enter_data_dictionnary() : connect_dabase()")
             self.luC_.error_with_reason("An unexpected error occurs during the connection with the database in prepare_request.connect_dabase()!",True)
+        return [self.handle_dabase_, self.cursor_database_]
 
     def for_launch(self):
         self.cursor_database_.execute("SELECT * FROM run ORDER BY date_ DESC LIMIT 1;")

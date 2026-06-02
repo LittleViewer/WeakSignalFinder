@@ -34,11 +34,12 @@ class read_data :
 
     def read_data(self, all_data):
         dict_with_all_word = {}
+        dict_with_word_intensity = {}
         list_all_word = set([])
 
         for one_block in all_data:
+            dict_with_word_intensity = self.read_intensity_word(one_block, dict_with_word_intensity)
             one_block = json.loads(one_block[self.ctC_.key_return("parameter","part_of_local_api","for_launch")])
-
             for one_line in one_block:
                 if one_line not in list_all_word :
                     list_all_word.add(one_line)
@@ -48,8 +49,12 @@ class read_data :
                     list_new = one_block[one_line][one_direction_word]
                     list_old = dict_with_all_word[one_line][one_direction_word]
                     dict_with_all_word[one_line][one_direction_word] = set(list_new+list(list_old)) 
+        return [dict_with_all_word, dict_with_word_intensity]
 
-        return dict_with_all_word
+    def read_intensity_word(self, one_block, dict_saver):
+        if len(json.loads(one_block["intensity_word"])) != 0:
+            dict_saver[one_block["time_jobid"].strip("[]'")] = json.loads(one_block["intensity_word"])
+        return dict_saver
 
     def pipe_read_data(self):
         all_path = self.prepare_sub_dict()

@@ -10,6 +10,7 @@ import libCore.email_smtp_class as esC
 import database_rss_run.prepare_request_class as prC
 import dictionnary_neighbord.read_data_class as rdC
 import dictionnary_neighbord.enter_data_dictionnary_class as edC
+import dictionnary_neighbord.pointwise_mutual_information_engine_class as pmiC
 
 import asyncio
 import datetime
@@ -40,13 +41,16 @@ alC_.pipe_api_local(obj_database,"'"+job_id+"'")
 rdC_ = rdC.read_data(job_id)
 edC_ = edC.enter_data_dictionnary(job_id)
 
+obj_database_dictionnary = edC_.connect_dabase()
+pmiC_ = pmiC.pointwise_mutual_information_engine_class(obj_database_dictionnary)
 
 date_time = datetime.datetime.now()
 got_to_launch = edC_.for_launch()
 if got_to_launch == True:
     llC_.pipe_log(f"A run to complete the dictionary has just been automatically launched!","INFO","main")
     prepared_data = rdC_.pipe_read_data()
-    edC_.pipe_enter_data(prepared_data)
+    edC_.pipe_enter_data(prepared_data[0])
+    pmiC_.pipe_main_engine(prepared_data[1])     
     edC_.enter_last_run()
     llC_.pipe_log(f"The dictionary completion run is over!","INFO","main")
 

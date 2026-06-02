@@ -32,4 +32,13 @@ CREATE TABLE IF NOT EXISTS know_folder(
    PRIMARY KEY(name_folder)
 );
 
-INSERT INTO run VALUES ("0","1970-01-01");
+CREATE TABLE IF NOT EXISTS intensity_word(
+   jobId TEXT,
+   word TEXT,
+   absolute_value INTEGER,
+   relative_value REAL,
+   FOREIGN KEY (jobId) REFERENCES run(jobId),
+   FOREIGN KEY (word) REFERENCES word(word)
+);
+
+INSERT OR IGNORE INTO run VALUES ('0','1970-01-01');
