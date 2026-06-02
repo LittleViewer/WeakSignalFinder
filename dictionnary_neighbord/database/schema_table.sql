@@ -37,8 +37,15 @@ CREATE TABLE IF NOT EXISTS intensity_word(
    word TEXT,
    absolute_value INTEGER,
    relative_value REAL,
-   FOREIGN KEY (jobId) REFERENCES run(jobId),
+   FOREIGN KEY (jobId) REFERENCES run_integrated_intensity_word(jobId),
    FOREIGN KEY (word) REFERENCES word(word)
 );
+
+CREATE TABLE IF NOT EXISTS run_integrated_intensity_word(
+   jobId TEXT,
+   date TEXT,
+   PRIMARY KEY(jobId)
+);
+
 
 INSERT OR IGNORE INTO run VALUES ('0','1970-01-01');

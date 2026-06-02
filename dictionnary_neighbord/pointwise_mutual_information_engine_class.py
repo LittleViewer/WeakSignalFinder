@@ -1,13 +1,16 @@
-import datetime
+from datetime import datetime
 import libCore.utils_class as luC
+import libCore.config_tool_class as ctC
 import datetime
 
 class pointwise_mutual_information_engine_class:
     def prepare_request(self, all_data):
         all_list_prepare_insert = []
         new_all_list_prepare_insert = []
+        list_job_id = []
         for one_job_id in all_data:
             total_word = 0
+            list_job_id.append(one_job_id)
             for one_word in all_data[one_job_id]:
                 absolute_value = all_data[one_job_id][one_word]
                 total_word += int(absolute_value)
@@ -16,24 +19,41 @@ class pointwise_mutual_information_engine_class:
             for one_list in all_list_prepare_insert:
                 one_list.append(one_list[2]/total_word)
                 new_all_list_prepare_insert.append(one_list.copy())
+        self.list_job_id_ = set(list_job_id)
         return new_all_list_prepare_insert
     
+    def insert_new_jobid_read(self, jobid_read):
+        prepare_request_read_jobid = "INSERT INTO run_integrated_intensity_word(jobId,date) VALUES "
+        for one_jobid in jobid_read:
+            prepare_request_read_jobid += f"('{one_jobid}','{datetime.datetime.now()}'),"
+        self.obj_db_[1].execute(prepare_request_read_jobid[:-1]+";")
+        self.obj_db_[0].commit()
+
+
     def sub_pipe_choice_request(self, all_list):
         know_word = []
+        all_job_id = []
+        self.obj_db_[1].execute(f"SELECT jobId FROM run_integrated_intensity_word;")
+        temp_jobid = (self.obj_db_[1].fetchall())
+        for one_jobid in temp_jobid:
+            know_word.append(one_jobid[0])
+        authorized_job_id = self.list_job_id_- set(know_word)
+        know_word = set(know_word)
         prepare_request = "INSERT INTO intensity_word VALUES "
         number_new_intensity = 0
+        total_possible_value = len(all_list)
+        last_possible_value = total_possible_value / self.ctC_.key_return("parameter","divize_long_list_in_foreach","optimize")
         for one_list in all_list:
-            if one_list[1] not in set(know_word):
-                self.obj_db_[1].execute(f"SELECT * FROM intensity_word WHERE word = '{one_list[1]}' and jobId = '{one_list[0]}'")
-                is_already_enter = self.obj_db_[1].fetchall()
-                if len(is_already_enter) == 0:
-                    prepare_request += f"('{one_list[0]}','{one_list[1]}',{one_list[2]},{one_list[3]}),"
-                    number_new_intensity += 1
+            if one_list[0] in authorized_job_id:
+                prepare_request += f"('{one_list[0]}','{one_list[1]}',{one_list[2]},{one_list[3]}),"
+                number_new_intensity += 1
+            if total_possible_value == number_new_intensity or last_possible_value == number_new_intensity:
+                if number_new_intensity != 0:
+                    self.obj_db_[1].execute(prepare_request[:-1]+";")
+                    self.obj_db_[0].commit()
+                    self.insert_new_jobid_read(authorized_job_id)
         if number_new_intensity != 0:
-            self.obj_db_[1].execute(prepare_request[:-1]+";")
-            self.obj_db_[0].commit()
-            print(f"[{datetime.datetime.now()} {number_new_intensity} intensity saved in database]")
-
+            print(f"[{datetime.datetime.now()}] {number_new_intensity} intensity saved in database")
                 
     def pipe_main_engine(self, all_data):
         all_list_prepare_request = self.prepare_request(all_data)
@@ -42,3 +62,4 @@ class pointwise_mutual_information_engine_class:
     def __init__(self, obj_db):
         self.obj_db_ = obj_db
         self.luC_ = luC.utils()
+        self.ctC_ = ctC.config_toml_tool()

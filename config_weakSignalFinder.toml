@@ -40,3 +40,6 @@ port = 587
 sender = "[EMAIL_ADDRESS]"
 password_file = "password_app.env"
 receiver = "[EMAIL_ADDRESS]"
+
+[parameter .optimize]
+divize_long_list_in_foreach = 20 #2,4,6,8,10,12,14,16,18,20... : number of divize for optimize the run.
