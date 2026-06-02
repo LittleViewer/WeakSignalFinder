@@ -29,9 +29,10 @@ class pointwise_mutual_information_engine_class:
                 if len(is_already_enter) == 0:
                     prepare_request += f"('{one_list[0]}','{one_list[1]}',{one_list[2]},{one_list[3]}),"
                     number_new_intensity += 1
-        self.obj_db_[1].execute(prepare_request[:-1]+";")
-        self.obj_db_[0].commit()
-        print(f"[{datetime.datetime.now()} {number_new_intensity} intensity saved in database]")
+        if len(prepare_request) != 0:
+            self.obj_db_[1].execute(prepare_request[:-1]+";")
+            self.obj_db_[0].commit()
+            print(f"[{datetime.datetime.now()} {number_new_intensity} intensity saved in database]")
 
                 
     def pipe_main_engine(self, all_data):
