@@ -32,6 +32,7 @@ filter_word = 1
 [parameter .for_launch]
 cooldown_day_launch_dictionnary = 1
 part_of_local_api = "word_central_neighborhood"
+authorize_run_pointwise_engine = true
 
 [parameter .email_auto]
 authorize_run = true
@@ -42,4 +43,4 @@ password_file = "password_app.env"
 receiver = "[EMAIL_ADDRESS]"
 
 [parameter .optimize]
-divize_long_list_in_foreach = 20 #2,4,6,8,10,12,14,16,18,20... : number of divize for optimize the run.
+batch_longer_list = 5000 #2,4,6,8,10,12,14,16,18,20... : number of divize for optimize the run.

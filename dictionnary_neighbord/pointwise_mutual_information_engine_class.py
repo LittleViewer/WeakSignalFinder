@@ -39,20 +39,24 @@ class pointwise_mutual_information_engine_class:
             know_word.append(one_jobid[0])
         authorized_job_id = self.list_job_id_- set(know_word)
         know_word = set(know_word)
-        prepare_request = "INSERT INTO intensity_word VALUES "
+        start = "INSERT INTO intensity_word VALUES "
+        prepare_request = start
         number_new_intensity = 0
+        tick_batch = 0
         total_possible_value = len(all_list)
-        last_possible_value = total_possible_value / self.ctC_.key_return("parameter","divize_long_list_in_foreach","optimize")
         for one_list in all_list:
             if one_list[0] in authorized_job_id:
                 prepare_request += f"('{one_list[0]}','{one_list[1]}',{one_list[2]},{one_list[3]}),"
                 number_new_intensity += 1
-            if total_possible_value == number_new_intensity or last_possible_value == number_new_intensity:
+                tick_batch += 1
+            if self.ctC_.key_return("parameter","batch_longer_list","optimize") == tick_batch or total_possible_value == number_new_intensity:
                 if number_new_intensity != 0:
                     self.obj_db_[1].execute(prepare_request[:-1]+";")
                     self.obj_db_[0].commit()
-                    self.insert_new_jobid_read(authorized_job_id)
+                    prepare_request = start
+                    tick_batch = 0
         if number_new_intensity != 0:
+            self.insert_new_jobid_read(set(authorized_job_id))
             print(f"[{datetime.datetime.now()}] {number_new_intensity} intensity saved in database")
                 
     def pipe_main_engine(self, all_data):

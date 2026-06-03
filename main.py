@@ -50,7 +50,8 @@ if got_to_launch == True:
     llC_.pipe_log(f"A run to complete the dictionary has just been automatically launched!","INFO","main")
     prepared_data = rdC_.pipe_read_data()
     edC_.pipe_enter_data(prepared_data[0])
-    pmiC_.pipe_main_engine(prepared_data[1])     
+    if ctC_.key_return("parameter","authorize_run_pointwise_engine","for_launch") == True:
+        pmiC_.pipe_main_engine(prepared_data[1])
     edC_.enter_last_run()
     llC_.pipe_log(f"The dictionary completion run is over!","INFO","main")
 
