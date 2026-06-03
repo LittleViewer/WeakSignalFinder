@@ -1,4 +1,3 @@
-from datetime import datetime
 import libCore.utils_class as luC
 import libCore.config_tool_class as ctC
 import datetime
@@ -17,11 +16,13 @@ class pointwise_mutual_information_engine_class:
                 total_word += int(absolute_value)
                 all_list_prepare_insert.append([one_job_id, one_word, absolute_value])
         
-            for one_list in all_list_prepare_insert:
-                one_list.append(one_list[2]/total_word)
-                new_all_list_prepare_insert.append(one_list.copy())
+        index_list = 0
+        for one_list in all_list_prepare_insert:
+            all_list_prepare_insert[index_list].append(one_list[2]/total_word)
+            index_list += 1
+                
         self.list_job_id_ = set(list_job_id)
-        return new_all_list_prepare_insert
+        return all_list_prepare_insert
     
     def insert_new_jobid_read(self, jobid_read):
         prepare_request_read_jobid = "INSERT INTO run_integrated_intensity_word(jobId,date) VALUES "
@@ -60,7 +61,7 @@ class pointwise_mutual_information_engine_class:
                     tick_batch = 0
         if number_new_intensity != 0:
             self.insert_new_jobid_read(set(authorized_job_id))
-            print(f"[{datetime.datetime.now()}] {number_new_intensity} intensity saved in database")
+            print(f"[{datetime.datetime.now()}] - {number_new_intensity} intensity saved in database")
                 
     def pipe_main_engine(self, all_data):
         all_list_prepare_request = self.prepare_request(all_data)

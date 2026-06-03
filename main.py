@@ -41,7 +41,6 @@ alC_.pipe_api_local(obj_database,"'"+job_id+"'")
 
 del all_article,data_clean_for_analyse,intensity_word,contextual_neighborhood,word_central_neighborhood,obj_database
 gc.collect()
-
 rdC_ = rdC.read_data(job_id)
 edC_ = edC.enter_data_dictionnary(job_id)
 
