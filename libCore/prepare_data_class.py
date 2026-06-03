@@ -6,6 +6,7 @@ import spacy
 import json
 import datetime
 import re
+import gc
 
 class prepare_data:
 
@@ -69,6 +70,8 @@ class prepare_data:
                     if one_word.pos_ in list_type_word_accept:
                         new_block.append(one_word_lemma)
             new_dict[id_model].append(new_block)
+        del nlp
+        gc.collect()
         return new_dict
             
 
@@ -91,7 +94,6 @@ class prepare_data:
             structured_data_clean_ = self.remove_no_essential_word(structured_data_sub_clean, one_index_lang, structured_data_clean_)
         self.llC_.save_state(structured_data_clean_,"Clean")
         self.prC_.insert_data_database(obj_database[0],obj_database[1],"saveData",["jobId","dateTime","type","data"],[[job_id,datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),"saveStateClean",str(structured_data_clean_).replace("'",'"')]])
-
 
         return structured_data_clean_
 

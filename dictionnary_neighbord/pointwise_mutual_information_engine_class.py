@@ -2,6 +2,7 @@ from datetime import datetime
 import libCore.utils_class as luC
 import libCore.config_tool_class as ctC
 import datetime
+import gc
 
 class pointwise_mutual_information_engine_class:
     def prepare_request(self, all_data):
@@ -53,6 +54,8 @@ class pointwise_mutual_information_engine_class:
                 if number_new_intensity != 0:
                     self.obj_db_[1].execute(prepare_request[:-1]+";")
                     self.obj_db_[0].commit()
+                    del prepare_request
+                    gc.collect()
                     prepare_request = start
                     tick_batch = 0
         if number_new_intensity != 0:

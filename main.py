@@ -14,6 +14,7 @@ import dictionnary_neighbord.pointwise_mutual_information_engine_class as pmiC
 
 import asyncio
 import datetime
+import gc
 
 lfC_ = lfC.feed()
 llC_ = llC.log()
@@ -37,6 +38,9 @@ intensity_word = fowC_.pipe_frequency_one_word(data_clean_for_analyse,obj_databa
 contextual_neighborhood = neighboord_multiple_dict = cnC_.pipe_contextual_neighboord(data_clean_for_analyse,obj_database,job_id)
 word_central_neighborhood = cnC_.pipe_neighborhood_center_on_word(neighboord_multiple_dict,obj_database,job_id)
 alC_.pipe_api_local(obj_database,"'"+job_id+"'")
+
+del all_article,data_clean_for_analyse,intensity_word,contextual_neighborhood,word_central_neighborhood,obj_database
+gc.collect()
 
 rdC_ = rdC.read_data(job_id)
 edC_ = edC.enter_data_dictionnary(job_id)
