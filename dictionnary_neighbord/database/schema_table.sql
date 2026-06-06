@@ -51,9 +51,8 @@ CREATE TABLE IF NOT EXISTS  multiple_intensity_word(
    jobId TEXT,
    word TEXT,
    absolute_value INTEGER,
-   total_relative_value REAL,
-   number_corpus INTEGER,
    relative_value REAL,
+   calcul TEXT,
    FOREIGN KEY (jobId) REFERENCES run_integrated_intensity_word(jobId),
    FOREIGN KEY (word) REFERENCES word(word)
 );

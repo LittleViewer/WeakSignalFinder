@@ -89,13 +89,16 @@ class intensity_db_word_engine_class:
         for one_line in all_data :
             if one_line[1] not in set(list_word):
                 list_word.append(one_line[1])
-                dict_word[one_line[1]] = {"total_occurence" : one_line[2], "total_relative_value" : one_line[3], "number_corpus" : 1, "total_relative_value_weighted" : 0}
+                dict_word[one_line[1]] = {"total_occurence" : one_line[2], "total_relative_value_weighted" : 0}
             else :
                 dict_word[one_line[1]]["total_occurence"] += one_line[2]
-                dict_word[one_line[1]]["total_relative_value"] += one_line[3]
-                dict_word[one_line[1]]["number_corpus"] += 1
+        total_word_run = 0
+        for one_line in list_word:
+            total_word_run += dict_word[one_line]["total_occurence"]
+
         for one_line in list_word :
-            dict_word[one_line]["total_relative_value_weighted"] = dict_word[one_line]["total_relative_value"] / dict_word[one_line]["number_corpus"]
+            dict_word[one_line]["total_relative_value_weighted"] = dict_word[one_line]["total_occurence"] / total_word_run
+            dict_word[one_line]["calcul"] = f"'result({dict_word[one_line]['total_relative_value_weighted']}) = total_occurence({dict_word[one_line]['total_occurence']}) / total_word({total_word_run})'"
         return dict_word
     
     def enter_in_db_multiple_intensity(self, dict_data,job_id):
@@ -103,7 +106,7 @@ class intensity_db_word_engine_class:
         prepare_request = "INSERT INTO multiple_intensity_word VALUES "
         for one_line in dict_data:
             number_enter += 1
-            prepare_request += f"('{job_id}','{one_line}',{dict_data[one_line]['total_occurence']},{dict_data[one_line]['total_relative_value']},{dict_data[one_line]['number_corpus']},{dict_data[one_line]['total_relative_value_weighted']}),"
+            prepare_request += f"('{job_id}','{one_line}',{dict_data[one_line]['total_occurence']},{dict_data[one_line]['total_relative_value_weighted']},{dict_data[one_line]['calcul']}),"
         self.obj_db_[1].execute(prepare_request[:-1]+';')
         self.obj_db_[0].commit()
         print(f"[{datetime.datetime.now()}] - {number_enter} multiple intensity saved in database")
