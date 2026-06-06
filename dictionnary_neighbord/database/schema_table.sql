@@ -47,5 +47,23 @@ CREATE TABLE IF NOT EXISTS run_integrated_intensity_word(
    PRIMARY KEY(jobId)
 );
 
+CREATE TABLE IF NOT EXISTS  multiple_intensity_word(
+   jobId TEXT,
+   word TEXT,
+   absolute_value INTEGER,
+   total_relative_value REAL,
+   number_corpus INTEGER,
+   relative_value REAL,
+   FOREIGN KEY (jobId) REFERENCES run_integrated_intensity_word(jobId),
+   FOREIGN KEY (word) REFERENCES word(word)
+);
+
+CREATE TABLE IF NOT EXISTS run_global_calcul_intensity(
+   jobId TEXT,
+   date_ TEXT,
+   PRIMARY KEY(jobId)
+);
 
 INSERT OR IGNORE INTO run VALUES ('0','1970-01-01');
+INSERT OR IGNORE INTO run_global_calcul_intensity VALUES ('0','1970-01-01');
+INSERT OR IGNORE INTO run_integrated_intensity_word VALUES ('0','1970-01-01');

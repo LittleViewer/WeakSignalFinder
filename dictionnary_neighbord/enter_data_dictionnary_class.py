@@ -20,23 +20,6 @@ class enter_data_dictionnary:
             self.llC_.pipe_log(f"An unexpected error occurs during the connection with the database!","ERROR","enter_data_dictionnary() : connect_dabase()")
             self.luC_.error_with_reason("An unexpected error occurs during the connection with the database in prepare_request.connect_dabase()!",True)
         return [self.handle_dabase_, self.cursor_database_]
-
-    def for_launch(self):
-        self.cursor_database_.execute("SELECT * FROM run ORDER BY date_ DESC LIMIT 1;")
-        date_db = self.cursor_database_.fetchall()[0][1].split("-")
-        date_old = datetime.datetime(int(date_db[0]),int(date_db[1]),int(date_db[2]))
-        date_now_complete = datetime.datetime.now()
-        self.date_now = str(date_now_complete).split(" ")[0]
-            
-        diff_date = date_now_complete - date_old
-        if diff_date.days >= self.ctC_.key_return("parameter","cooldown_day_launch_dictionnary","for_launch"):
-            return True
-        else :
-            return False
-
-    def enter_last_run(self):
-        self.cursor_database_.execute(f"INSERT INTO run VALUES ('{self.job_id}','{self.date_now}');")
-        self.handle_dabase_.commit()
     
     def already_read(self, all_filename_read):
         prepare_request = "INSERT INTO know_folder VALUES "

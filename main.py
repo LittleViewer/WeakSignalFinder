@@ -7,6 +7,7 @@ import libCore.frequency_one_word_class as fowC
 import libCore.contextual_neighborhood_class as cnC
 import libCore.api_local_class as alC
 import libCore.email_smtp_class as esC
+import libCore.date_utils_tool_class as dtC
 import database_rss_run.prepare_request_class as prC
 import dictionnary_neighbord.read_data_class as rdC
 import dictionnary_neighbord.enter_data_dictionnary_class as edC
@@ -24,8 +25,10 @@ fowC_ = fowC.frequency_one_word()
 cnC_ = cnC.contextual_neighboord()
 alC_ = alC.api_local()
 esC_ = esC.email_smtp()
+dtC_ = dtC.date_utils_tool()
 prC_ = prC.prepare_request()
 ctC_ = ctC.config_toml_tool()
+
 
 obj_database = prC_.connect_dabase()
 
@@ -48,14 +51,14 @@ obj_database_dictionnary = edC_.connect_dabase()
 idweC_ = idweC.intensity_db_word_engine_class(obj_database_dictionnary)
 
 date_time = datetime.datetime.now()
-got_to_launch = edC_.for_launch()
+got_to_launch = dtC_.is_ready_date_to_run(obj_database_dictionnary, "run", "cooldown_day_launch_dictionnary")
 if got_to_launch == True:
     llC_.pipe_log(f"A run to complete the dictionary has just been automatically launched!","INFO","main")
     prepared_data = rdC_.pipe_read_data()
     edC_.pipe_enter_data(prepared_data[0])
-    if ctC_.key_return("parameter","authorize_run_pointwise_engine","for_launch") == True:
-        idweC_.pipe_main_engine(prepared_data[1])
-    edC_.enter_last_run()
+    if ctC_.key_return("parameter","authorize_run_intensity_engine","for_launch") == True:
+        idweC_.pipe_main_engine(prepared_data[1],job_id)
+    dtC_.enter_last_run(obj_database_dictionnary,"run",job_id)
     llC_.pipe_log(f"The dictionary completion run is over!","INFO","main")
 
 esC_.sub_smtp_send(f"Weak Signal Finder is finished! \nTime : {date_time}\n Job ID : {job_id}\n Link Github Repository : https://github.com/LittleViewer/WeakSignalFinder\n Copyright (c) 2025-present LittleViewer & WeakSignalFinder Contributors",f"Subject: Weak Signal Finder Notification : Execution completed successfully - {job_id} !")

@@ -31,8 +31,10 @@ filter_word = 1
 
 [parameter .for_launch]
 cooldown_day_launch_dictionnary = 1
+cooldown_day_launch_inter_calcul_intensit_word = 7
 part_of_local_api = "word_central_neighborhood"
-authorize_run_pointwise_engine = true
+authorize_run_intensity_engine = true
+single_multiple_intensity_save = false # Enable 'true' if you have little memory resource available.
 
 [parameter .email_auto]
 authorize_run = true
