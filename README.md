@@ -111,7 +111,7 @@ Then add the corresponding entry to `languageModel.json`:
 
 ### 3. Create the two SQLite databases
 
-> ⚠️ **The repository does not ship with prebuilt `.db` files.** You must create both databases yourself and apply the schemas before the first run. This step is **mandatory** — the pipeline will not start without them.
+> ⚠️ **The repository does not ship with prebuilt `.db` files.** You must create both databases yourself and apply the schemas before the first run. This step is **mandatory**, the pipeline will not start without them.
 
 The project uses **two** independent SQLite databases:
 
@@ -144,7 +144,7 @@ Get-Content dictionnary_neighbord\database\schema_table.sql |
   sqlite3 dictionnary_neighbord\database\dictionnaryWord.db
 ```
 
-**Alternative — pure Python (works everywhere, no `sqlite3` CLI required):**
+**Alternative, pure Python (works everywhere, no `sqlite3` CLI required):**
 
 ```bash
 python -c "
@@ -256,7 +256,7 @@ When an update is triggered:
    - Consumed file names are recorded in `know_folder` to avoid re-reading.
    - The current `job_id` and date are recorded in the `run` table for cooldown enforcement.
 
-### Database schema — `dictionnaryWord.db`
+### Database schema, `dictionnaryWord.db`
 
 The dictionary database contains **nine** tables:
 
@@ -372,10 +372,10 @@ The intensity engine (`intensity_db_word_engine_class`) adds a **quantitative di
 1. **Per-corpus storage.** For every `local_api/` snapshot consumed, the engine extracts each word's absolute count and computes its relative frequency within that corpus (`absolute / total_words`). These values are stored in `intensity_word`, one row per `(jobId, word)`.
 
 2. **Multi-corpus aggregation.** When the intensity cooldown (`cooldown_day_launch_inter_calcul_intensit_word`) is met, the engine reads all rows from `intensity_word`, groups them by word, and computes:
-   - `total_occurence` — sum of absolute values across all corpora.
-   - `total_relative_value` — sum of relative frequencies.
-   - `number_corpus` — number of corpora in which the word appeared.
-   - `total_relative_value_weighted` — `total_relative_value / number_corpus`.
+   - `total_occurence`, sum of absolute values across all corpora.
+   - `total_relative_value`, sum of relative frequencies.
+   - `number_corpus`, number of corpora in which the word appeared.
+   - `total_relative_value_weighted`, `total_relative_value / number_corpus`.
 
    The result is stored in `multiple_intensity_word`.
 
@@ -406,7 +406,7 @@ The pipeline can send a **notification email at the end of every run**. It is op
 
 When enabled, the end-of-run email contains the run's timestamp, the `job_id`, a link to the project repository, and a copyright line. If an `ERROR` or `CRITICAL` log event occurs during the run, a separate error notification is also sent with the severity, function name, and message.
 
-If the email cannot be prepared or sent, the pipeline does **not** fail — it logs an `ERROR` and finishes normally.
+If the email cannot be prepared or sent, the pipeline does **not** fail, it logs an `ERROR` and finishes normally.
 
 ### Configuration
 
@@ -432,7 +432,7 @@ receiver      = "[EMAIL_ADDRESS]"
 ### Setup (Gmail example)
 
 1. **Enable 2-Step Verification** on your Google account.
-2. **Generate a Google App Password** at <https://myaccount.google.com/apppasswords> — pick "Mail". You'll get a 16-character code.
+2. **Generate a Google App Password** at <https://myaccount.google.com/apppasswords>, pick "Mail". You'll get a 16-character code.
 3. **Create the password file** from the shipped template:
    ```bash
    cp archive_configuration/password_app.env.archive password_app.env
@@ -459,7 +459,7 @@ For other providers, adjust `server`, `port`, `sender`, and `PASSWORD_EMAIL`. Th
 
 All runtime configuration lives in a single TOML file at the project root, alongside the input files used by the NLP pipeline.
 
-### Main configuration — `config_weakSignalFinder.toml`
+### Main configuration, `config_weakSignalFinder.toml`
 
 Loaded once at startup by `libCore/config_tool_class.py` and consumed by every module via `key_return(table, key, sub_table)`.
 
@@ -535,11 +535,11 @@ batch_longer_list = 5000
 | `[parameter .email_auto]` | `server` / `port` / `sender` / `receiver` / `password_file` | SMTP connection details (see Email section). |
 | `[parameter .optimize]` | `batch_longer_list` | Rows per batch INSERT commit for the intensity engine. Default: `5000`. |
 
-> Paths use Windows-style backslashes (`\\`) but are normalized internally — the file works on Windows, Linux, and macOS.
+> Paths use Windows-style backslashes (`\\`) but are normalized internally, the file works on Windows, Linux, and macOS.
 
 A pristine copy is shipped as `archive_configuration/config_weakSignalFinder.toml.archive`. A `.env` template is at `archive_configuration/password_app.env.archive`.
 
-### RSS Feeds — `libCore/input/rssFeed.json`
+### RSS Feeds, `libCore/input/rssFeed.json`
 
 Each entry has a source name, a feed URL, and a country/language code:
 
@@ -558,7 +558,7 @@ Each entry has a source name, a feed URL, and a country/language code:
 ]
 ```
 
-### Language Models — `libCore/input/languageModel.json`
+### Language Models, `libCore/input/languageModel.json`
 
 Maps language codes to spaCy model names. The shipped file supports four languages:
 
@@ -573,11 +573,11 @@ Maps language codes to spaCy model names. The shipped file supports four languag
 
 > **Note.** `requirements.txt` also installs the Russian model (`ru_core_news_md`). To use it, add a corresponding entry here with `"code_language": "ru"`.
 
-### Stopwords — `libCore/input/stopword.txt`
+### Stopwords, `libCore/input/stopword.txt`
 
-One word per line. Pre-populated with English/French structural words plus a thematic block tied to politics, media, and institutions. Edit freely to fit your monitoring scope — anything listed here is excluded from analysis on top of the spaCy POS filter.
+One word per line. Pre-populated with English/French structural words plus a thematic block tied to politics, media, and institutions. Edit freely to fit your monitoring scope, anything listed here is excluded from analysis on top of the spaCy POS filter.
 
-### Dictionary exclusions — `dictionnary_neighbord/exclude_file.txt`
+### Dictionary exclusions, `dictionnary_neighbord/exclude_file.txt`
 
 One file name per line. Any file in `local_api/` whose name appears here is skipped during dictionary enrichment. Defaults: `test`, `placeholder`.
 
@@ -597,7 +597,7 @@ Every run writes to several places, all tagged with the same `job_id`:
 | `YYYY_M_D.dataset.txt` | `dataset/` | *Legacy file output*, same as above. |
 | End-of-run email | `receiver` mailbox | *Optional.* Sent only if `authorize_run = true`. |
 
-> ⚠️ Do **not** open either `.db` file with another tool while the pipeline runs — risk of corruption.
+> ⚠️ Do **not** open either `.db` file with another tool while the pipeline runs, risk of corruption.
 
 Each log entry is a JSON object:
 
@@ -616,7 +616,7 @@ Each log entry is a JSON object:
 
 - **Silent skips.** Single-word articles, unreachable feeds, and language codes missing from `languageModel.json` are skipped without raising an exception (a `WARN` is logged when relevant). If a run produces nothing, check the log file.
 - **Frequency floor.** Words appearing only once are filtered out by `delete_little_intensity` (controlled by `filter_word`), so very rare signals never reach the final output unless you lower the threshold.
-- **Dictionary growth.** The `dictionnary` table is append-only with deduplication on `(central_word, neighbor)`. Over long monitoring periods it can grow large — plan accordingly if you set a low cooldown on a heavily configured feed list.
+- **Dictionary growth.** The `dictionnary` table is append-only with deduplication on `(central_word, neighbor)`. Over long monitoring periods it can grow large, plan accordingly if you set a low cooldown on a heavily configured feed list.
 - **Intensity table growth.** The `intensity_word` table grows with every corpus. When `single_multiple_intensity_save = false`, `multiple_intensity_word` also accumulates across aggregation runs. Monitor database size on long-lived deployments.
 - **Missing databases.** If either `.db` file is missing or uninitialized, the pipeline fails at startup. Re-run the commands from **Installation, step 3**.
 - **Email failures are non-fatal.** If the SMTP step fails, the pipeline only logs an `ERROR` and exits normally.
@@ -680,17 +680,17 @@ weak-signal-finder/
 
 Contributions are welcome. Before opening a pull request, please review:
 
-- [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) — community standards.
-- [`CLA.md`](CLA.md) — the Individual Contributor License Agreement you implicitly accept by submitting a contribution.
-- [`SECURITY.md`](SECURITY.md) — how to responsibly disclose a vulnerability (do **not** open a public issue for security matters).
+- [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md), community standards.
+- [`CLA.md`](CLA.md), the Individual Contributor License Agreement you implicitly accept by submitting a contribution.
+- [`SECURITY.md`](SECURITY.md), how to responsibly disclose a vulnerability (do **not** open a public issue for security matters).
 
 ---
 
 ## Disclaimer
 
-This tool is designed as an analytical aid to support **media monitoring and weak signal analysis**. The outputs are not definitive conclusions but data points intended to guide human interpretation. The quality of the analysis depends on the RSS feeds provided as input — the tool does not verify source accuracy, it solely counts and groups words without interpreting meaning.
+This tool is designed as an analytical aid to support **media monitoring and weak signal analysis**. The outputs are not definitive conclusions but data points intended to guide human interpretation. The quality of the analysis depends on the RSS feeds provided as input, the tool does not verify source accuracy, it solely counts and groups words without interpreting meaning.
 
-**A high frequency score does not imply importance.** A word appearing frequently may simply be overrepresented in the selected sources. Interpret intensity scores in light of the feeds you have configured. Lemmatization quality depends on the spaCy model used — an unsuitable model may produce incorrect lemmas.
+**A high frequency score does not imply importance.** A word appearing frequently may simply be overrepresented in the selected sources. Interpret intensity scores in light of the feeds you have configured. Lemmatization quality depends on the spaCy model used, an unsuitable model may produce incorrect lemmas.
 
 All processing is performed locally. The tool does not collect, transmit, or store personal data. **The outputs are not anonymized.** If configured feeds contain proper nouns, names, or places, these appear as-is in the results and accumulate in the persistent dictionary over time.
 
