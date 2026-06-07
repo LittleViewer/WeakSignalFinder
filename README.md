@@ -1,8 +1,8 @@
 # 🔍 Weak Signal Finder
 
-Weak Signal Finder is a Python pipeline that **detects emerging themes and weak signals** from RSS news feeds. It aggregates articles by language/country, cleans and lemmatizes the text using NLP, computes word frequency scores, builds contextual semantic neighborhoods, persists every run in a local SQLite database, and exposes the final results as a dated JSON file.
+Weak Signal Finder is a Python pipeline that **detects emerging themes and weak signals** from RSS news feeds. It aggregates articles by language and country, cleans and lemmatizes the text using NLP, computes word frequency scores, builds contextual semantic neighborhoods, persists every run in a local SQLite database, and exposes the final results as a dated JSON file.
 
-It also maintains a **persistent neighborhood dictionary** in a second SQLite database, which is enriched automatically across runs and lets you observe how each word's semantic neighborhood evolves over time. A **cross-run intensity engine** computes absolute and relative word frequencies over time, with optional weighted aggregation. An optional **SMTP email notification** can be sent at the end of every run.
+It also maintains a **persistent neighborhood dictionary** in a dedicated SQLite database, enriched automatically across runs, letting you observe how each word's semantic neighborhood evolves over time. A **cross-run intensity engine** computes absolute and relative word frequencies with optional weighted aggregation. An optional **SMTP email notification** can be sent at the end of every run.
 
 ---
 
@@ -39,15 +39,18 @@ It also maintains a **persistent neighborhood dictionary** in a second SQLite da
                      │
                      ▼
               email_smtp_class          ← Optional end-of-run SMTP notification
+```
 
-   ─────────────────────────────────────────────────────────────
+```
    Support modules:
      • config_tool_class        → TOML configuration loader
      • log_class                → Logging, job ID generation, legacy outputs
      • utils_class              → File I/O, path normalization, type checks
      • date_utils_tool_class    → Date comparisons, cooldown enforcement
      • prepare_request_class    → SQLite helper (connect, insert, delete, query)
-   ─────────────────────────────────────────────────────────────
+```
+
+```
    Two SQLite databases, tagged with a per-run job_id:
 
      • db_Weak_Signal_Finder.db
@@ -59,7 +62,6 @@ It also maintains a **persistent neighborhood dictionary** in a second SQLite da
                  run_integrated_intensity_word,
                  multiple_intensity_word,
                  run_global_calcul_intensity
-   ─────────────────────────────────────────────────────────────
 ```
 
 ![UML plan of WeakSignalFinder](docs/ulmvone.png)
@@ -83,8 +85,8 @@ It also maintains a **persistent neighborhood dictionary** in a second SQLite da
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/weak-signal-finder.git
-cd weak-signal-finder
+git clone https://github.com/LittleViewer/WeakSignalFinder.git
+cd WeakSignalFinder
 ```
 
 ### 2. Install the dependencies
@@ -97,13 +99,13 @@ pip install -r requirements.txt
 
 > **Note on package names.** The `requirements.txt` ships `dotenv`; depending on your environment you may need to replace it with `python-dotenv`. Both refer to the same library but some package managers only recognize the latter.
 
-*(Optional)* Download an additional spaCy model if you want to support a language beyond the preinstalled set. The mapping is defined in `libCore/input/languageModel.json`. Example:
+To support an additional language beyond the preinstalled set, download the corresponding spaCy model. The mapping is defined in `libCore/input/languageModel.json`. For example:
 
 ```bash
 python -m spacy download it_core_news_md
 ```
 
-Then add the corresponding entry to `languageModel.json`:
+Then add the entry to `languageModel.json`:
 
 ```json
 { "language": "Italian", "code_language": "it", "model_name": "it_core_news_md" }
@@ -111,18 +113,18 @@ Then add the corresponding entry to `languageModel.json`:
 
 ### 3. Create the two SQLite databases
 
-> ⚠️ **The repository does not ship with prebuilt `.db` files.** You must create both databases yourself and apply the schemas before the first run. This step is **mandatory**, the pipeline will not start without them.
+> ⚠️ **The repository does not ship with prebuilt `.db` files.** You must create both databases and apply the schemas before the first run. This step is **mandatory**, the pipeline will not start without them.
 
 The project uses **two** independent SQLite databases:
 
 | Database file | Role | Schema |
 |---|---|---|
-| `database_rss_run/database_don_t_touch/db_Weak_Signal_Finder.db` | Per-run pipeline state (job IDs, raw snapshots, intensity scores, neighborhoods, feed metadata). | `database_rss_run/request/schema_db.sql` |
-| `dictionnary_neighbord/database/dictionnaryWord.db` | Persistent cross-run dictionary, intensity aggregation, and tracking tables. | `dictionnary_neighbord/database/schema_table.sql` |
+| `database_rss_run/database_don_t_touch/db_Weak_Signal_Finder.db` | Per-run pipeline state (job IDs, raw snapshots, intensity scores, neighborhoods, feed metadata) | `database_rss_run/request/schema_db.sql` |
+| `dictionnary_neighbord/database/dictionnaryWord.db` | Persistent cross-run dictionary, intensity aggregation, and tracking tables | `dictionnary_neighbord/database/schema_table.sql` |
 
-Create them both and load the schemas. Run all commands from the project root.
+Create them both and load the schemas from the project root.
 
-**On Linux / macOS:**
+**Linux / macOS:**
 
 ```bash
 # Main run database
@@ -134,7 +136,7 @@ sqlite3 dictionnary_neighbord/database/dictionnaryWord.db \
   < dictionnary_neighbord/database/schema_table.sql
 ```
 
-**On Windows (PowerShell):**
+**Windows (PowerShell):**
 
 ```powershell
 Get-Content database_rss_run\request\schema_db.sql |
@@ -144,7 +146,7 @@ Get-Content dictionnary_neighbord\database\schema_table.sql |
   sqlite3 dictionnary_neighbord\database\dictionnaryWord.db
 ```
 
-**Alternative, pure Python (works everywhere, no `sqlite3` CLI required):**
+**Pure Python (works everywhere, no `sqlite3` CLI required):**
 
 ```bash
 python -c "
@@ -179,15 +181,24 @@ See the [📧 Email Notifications (SMTP)](#-email-notifications-smtp) section be
 
 ## 🚀 Usage
 
-Once the databases are in place, run the main script from the project root:
+Once the databases are in place, launch the engine from the project root:
 
 ```bash
-python main.py
+python main.py --engine_run
 ```
 
-> **Run from the project root.** Paths declared in `config_weakSignalFinder.toml` are resolved relative to the current working directory. Running `python /some/other/path/main.py` from a different directory will not find the input files or the databases.
+> **Run from the project root.** Paths declared in `config_weakSignalFinder.toml` are resolved relative to the current working directory. Running from another directory will not find the input files or the databases.
 
-### What happens during a run
+### Available launch modes
+
+| Flag | Status | Description |
+|---|---|---|
+| `--engine_run` | ✅ Stable | Runs the full NLP pipeline (feed aggregation → analysis → dictionary → email). |
+| `--endpoint_user` | 🚧 Work in progress | Interactive terminal interface for querying the dictionary and computing word concentration scores. Not yet feature-complete. |
+
+If no flag is provided, the program prints the available options and exits.
+
+### What happens during a run (`--engine_run`)
 
 1. A unique `job_id` is generated and registered in the run database.
 2. The RSS feed list is read from `libCore/input/rssFeed.json`.
@@ -225,15 +236,69 @@ The output is a newline-delimited JSON file. Each line is a full dated snapshot:
 }
 ```
 
-**Field reference:**
-
 | Field | Type | Description |
 |---|---|---|
 | `time` | string | Human-readable timestamp of the run. |
 | `time_jobid` | string | Unique job identifier for the run. |
 | `intensity_word` | object | Words appearing more than once, with their frequency score. |
-| `contextual_neighborhood` | object | All word pairs/triplets found in `before`, `beetween`, `after` positions. |
+| `contextual_neighborhood` | object | All word pairs/triplets found in `before`, `beetween`, and `after` positions. |
 | `word_central_neighborhood` | object | For each word: its unique direct neighbors (left and right). |
+
+---
+
+## 🧑‍💻 Interactive Terminal, `--endpoint_user` (Work in Progress)
+
+> 🚧 **This mode is functional but still under active development.** The menu structure and available calculations may change between versions.
+
+The `--endpoint_user` flag launches an interactive terminal interface that lets you **query the dictionary database directly** and run analytical calculations on accumulated data, without triggering a new pipeline run.
+
+```bash
+python main.py --endpoint_user
+```
+
+### Main menu
+
+Once launched, you are presented with a navigation menu offering four options:
+
+| Option | Description |
+|---|---|
+| **calcul** | Run analytical calculations on the dictionary data (see below). |
+| **help** | Browse built-in documentation explaining each calculation and its output. |
+| **about** | Display session metadata: current date, time, job ID, license, and repository link. |
+| **exit** | Close the program. |
+
+After any action, a sub-menu lets you return to the main menu or exit.
+
+### Word concentration score
+
+The only calculation currently available is **concentration**, accessible from the `calcul` menu. It computes a **saliency score** for a given word by combining its intensity at a specific point in time with its presence across all historical corpora.
+
+**Step-by-step workflow:**
+
+1. You select a **date** from the list of past multi-corpus intensity runs (`run_global_calcul_intensity`).
+2. You select a **job ID** associated with that date.
+3. You pick a **word** from the `multiple_intensity_word` table for that run (or type `w` to list all available words).
+4. The tool retrieves every `relative_value` entry for that word across all corpora stored in `intensity_word`.
+5. Each per-corpus relative value is divided by the word's aggregated intensity from the selected run.
+6. The final score is: `average(all_ratios) / number_of_corpora`.
+
+**Interpreting the score:**
+
+| Score range | Signal type | Example |
+|---|---|---|
+| Very low (e.g. `0.002`) | **Recurring signal**, the word appears consistently and broadly across many corpora. | *war*, Average: 1.91 on 755 inputs → score ≈ 0.0025 |
+| Medium (e.g. `0.74`) | **Rare signal**, the word appears in few corpora but with notable intensity. | *moon*, Average: 32.69 on 44 inputs → score ≈ 0.74 |
+| High (e.g. `89.9`) | **Weak signal**, the word is concentrated in very few corpora with high relative weight, warranting further investigation. | *write*, Average: 359.63 on 4 inputs → score ≈ 89.91 |
+
+A high saliency score does not mean the word is important in absolute terms, it means the word's distribution across corpora is highly uneven, which is precisely the signature of an emerging or niche topic that hasn't yet reached mainstream coverage.
+
+### Prerequisites
+
+The `--endpoint_user` mode reads from the **dictionary database** (`dictionnaryWord.db`). It requires that at least one full `--engine_run` has completed with the intensity engine enabled, and that at least one multi-corpus aggregation has been computed (controlled by `cooldown_day_launch_inter_calcul_intensit_word`). If the `multiple_intensity_word` or `intensity_word` tables are empty, the concentration calculation will have no data to work with.
+
+### Planned improvements
+
+This mode is intended to grow into a full local query interface for the dictionary. Future additions may include neighborhood exploration, word trajectory visualization, and custom filtering by date range or corpus.
 
 ---
 
@@ -256,12 +321,11 @@ When an update is triggered:
    - Consumed file names are recorded in `know_folder` to avoid re-reading.
    - The current `job_id` and date are recorded in the `run` table for cooldown enforcement.
 
-### Database schema, `dictionnaryWord.db`
+### Database schema (`dictionnaryWord.db`)
 
 The dictionary database contains **nine** tables:
 
 ```sql
--- Core dictionary tables
 CREATE TABLE IF NOT EXISTS dictionnary(
    central_word TEXT,
    position_     TEXT,        -- "before" or "after"
@@ -276,7 +340,6 @@ CREATE TABLE IF NOT EXISTS word(
    FOREIGN KEY(word) REFERENCES dictionnary(central_word)
 );
 
--- Run tracking
 CREATE TABLE IF NOT EXISTS run(
    jobId TEXT,
    date_ TEXT,
@@ -289,7 +352,6 @@ CREATE TABLE IF NOT EXISTS know_folder(
    PRIMARY KEY(name_folder)
 );
 
--- Observation tracking
 CREATE TABLE IF NOT EXISTS last_seen(
    date      TEXT,
    jobId     TEXT,
@@ -298,7 +360,6 @@ CREATE TABLE IF NOT EXISTS last_seen(
    FOREIGN KEY (jobId) REFERENCES run(jobId)
 );
 
--- Per-corpus intensity
 CREATE TABLE IF NOT EXISTS intensity_word(
    jobId          TEXT,
    word           TEXT,
@@ -314,14 +375,12 @@ CREATE TABLE IF NOT EXISTS run_integrated_intensity_word(
    PRIMARY KEY(jobId)
 );
 
--- Cross-corpus weighted intensity
 CREATE TABLE IF NOT EXISTS multiple_intensity_word(
    jobId                TEXT,
    word                 TEXT,
    absolute_value       INTEGER,
-   total_relative_value REAL,
-   number_corpus        INTEGER,
-   relative_value       REAL,     -- weighted: total_relative_value / number_corpus
+   relative_value       REAL,
+   calcul               TEXT,
    FOREIGN KEY (jobId) REFERENCES run_integrated_intensity_word(jobId),
    FOREIGN KEY (word)  REFERENCES word(word)
 );
@@ -489,7 +548,6 @@ dataset      = "local_api\\"
 database_run_sqlite         = "database_rss_run\\database_don_t_touch\\db_Weak_Signal_Finder.db"
 database_dictionnary_sqlite = "dictionnary_neighbord\\database\\dictionnaryWord.db"
 
-
 [parameter]
 
 [parameter .frequency_one_word]
@@ -619,7 +677,6 @@ Each log entry is a JSON object:
 - **Dictionary growth.** The `dictionnary` table is append-only with deduplication on `(central_word, neighbor)`. Over long monitoring periods it can grow large, plan accordingly if you set a low cooldown on a heavily configured feed list.
 - **Intensity table growth.** The `intensity_word` table grows with every corpus. When `single_multiple_intensity_save = false`, `multiple_intensity_word` also accumulates across aggregation runs. Monitor database size on long-lived deployments.
 - **Missing databases.** If either `.db` file is missing or uninitialized, the pipeline fails at startup. Re-run the commands from **Installation, step 3**.
-- **Email failures are non-fatal.** If the SMTP step fails, the pipeline only logs an `ERROR` and exits normally.
 
 ---
 
@@ -627,10 +684,12 @@ Each log entry is a JSON object:
 
 ```
 weak-signal-finder/
-├── main.py
+├── main.py                                           ← Entry point (--engine_run)
+├── core_engine_pipe.py                               ← Full NLP pipeline orchestration
+├── endpoint_user_pipe.py                             ← Interactive terminal (--endpoint_user, WIP)
 ├── config_weakSignalFinder.toml
 ├── requirements.txt
-├── password_app.env                                  ← created by you, NOT committed
+├── password_app.env                                  ← Created by you, NOT committed
 ├── archive_configuration/
 │   ├── config_weakSignalFinder.toml.archive
 │   └── password_app.env.archive
@@ -643,6 +702,7 @@ weak-signal-finder/
 │   ├── email_smtp_class.py                           ← SMTP notification
 │   ├── log_class.py                                  ← Logging, job ID generation
 │   ├── config_tool_class.py                          ← TOML configuration loader
+│   ├── argument_start_class.py                       ← CLI argument parser
 │   ├── utils_class.py                                ← File I/O, path, type utilities
 │   ├── date_utils_tool_class.py                      ← Date comparison, cooldown logic
 │   └── input/
@@ -652,20 +712,26 @@ weak-signal-finder/
 ├── database_rss_run/
 │   ├── prepare_request_class.py                      ← SQLite helper (connect, query, insert)
 │   ├── database_don_t_touch/
-│   │   └── db_Weak_Signal_Finder.db                  ← created by you
+│   │   └── db_Weak_Signal_Finder.db                  ← Created by you
 │   └── request/
 │       ├── schema_db.sql
 │       └── erase_all_table.sql
 ├── dictionnary_neighbord/
 │   ├── read_data_class.py                            ← Reads local_api/ snapshots
 │   ├── enter_data_dictionnary_class.py               ← Inserts words & neighbors into dictionary
-│   ├── intensity_db_word_engine_class.py              ← Cross-run intensity computation
-│   ├── pointwise_mutual_information_engine_class.py   ← PMI engine (experimental)
+│   ├── intensity_db_word_engine_class.py             ← Cross-run intensity computation
 │   ├── exclude_file.txt
 │   └── database/
-│       ├── dictionnaryWord.db                        ← created by you
+│       ├── dictionnaryWord.db                        ← Created by you
 │       ├── schema_table.sql
 │       └── erase_table.sql
+├── endpoint_user_core/                               ← Interactive terminal modules (WIP)
+│   ├── interaction_user_class.py
+│   ├── calcul_class.py
+│   ├── utils_interaction_terminal_class.py
+│   └── template/
+│       ├── prepared_request.json
+│       └── help_prepared.json
 ├── docs/
 │   └── ulmvone.png                                   ← Architecture diagram
 ├── log/
@@ -683,6 +749,14 @@ Contributions are welcome. Before opening a pull request, please review:
 - [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md), community standards.
 - [`CLA.md`](CLA.md), the Individual Contributor License Agreement you implicitly accept by submitting a contribution.
 - [`SECURITY.md`](SECURITY.md), how to responsibly disclose a vulnerability (do **not** open a public issue for security matters).
+
+---
+
+## 📄 License
+
+This project is distributed under the [MIT License](LICENSE).
+
+Copyright (c) 2025-present LittleViewer & WeakSignalFinder Contributors.
 
 ---
 
