@@ -45,7 +45,6 @@ class calcul_class:
 
         
         choose_word = self.check_word_exist(list_word)
-        print(dict_word_intensity[choose_word])
         absolute_multiple_value = float(dict_word_intensity[choose_word])
         
         obj_db[1].execute(prepare_request["template_request"]["select_word_with_where"].replace("word_replace", choose_word))
