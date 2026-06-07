@@ -26,6 +26,17 @@ database_dictionnary_sqlite = "dictionnary_neighbord\\database\\dictionnaryWord.
 
 [parameter]
 
+[parameter .global_program]
+argument_run = ["--endpoint_user","--install","--engine_run"]
+
+[parameter .endpoint_user]
+initial_menu = {calcul = "calcul_parameter", help = "help_parameter", about = "about_parameter", exit = "exit_parameter"}
+authorize_exit = "exit_parameter"
+authorize_about = "about_parameter"
+authorize_calcul = "calcul_parameter"
+authorize_help = "help_parameter"
+list_calcul = {concentration = "concentration_word_calcul"}
+
 [parameter .frequency_one_word]
 filter_word = 1
 

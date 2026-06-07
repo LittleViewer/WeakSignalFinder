@@ -1,0 +1,5 @@
+{
+    "calcul explanation": {
+        "concentration" : "This tool allows you to perform a calculation which takes the concentration of a word at a time T, and the intensity of these words in all the runs.\nThen divide it by two values ​​before multiplying it across all the corpora where the words are present: thus obtaining a saliency score.\nExample:\nThe concentration of war is Average: 1.905347931711538 on 755 input therefore obtains a score of 0.0025236396446510437 => a recurring signal\nThe concentration of moon is Average: 32.694038373686624 on 44 input therefore obtains a score of 0.743046326674696 => a rare signal\nThe concentration of write is Average: 359.6344221105528 on 4 input therefore obtains a score of 89.9086055276382 => A weak signal requiring further investigation"
+    }
+}

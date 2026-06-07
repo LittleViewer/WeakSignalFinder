@@ -1,0 +1,9 @@
+{
+    "completed_request": {
+        "select_multiple_intensity_run": "SELECT * FROM run_global_calcul_intensity;"
+    },
+    "template_request": {
+        "select_with_where": "SELECT * FROM table WHERE column = value;",
+        "select_word_with_where": "SELECT relative_value FROM intensity_word WHERE word = 'word_replace';"
+    }
+}

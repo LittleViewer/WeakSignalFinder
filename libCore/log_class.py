@@ -70,6 +70,9 @@ class log:
         self.pipe_log(f"Job ID generated: {self.job_id}", "INFO", "log() : pipe_jobId_session_generator()")
         return self.job_id
     
+    def insert_job_id(self, job_id):
+        self.job_id = job_id
+
     def __init__(self):
         self.luC_ = luC.utils()
         self.date = datetime.datetime.now()
