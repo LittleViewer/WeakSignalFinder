@@ -1,6 +1,8 @@
 {
     "completed_request": {
-        "select_multiple_intensity_run": "SELECT * FROM run_global_calcul_intensity;"
+        "select_multiple_intensity_run": "SELECT * FROM run_global_calcul_intensity;",
+        "select_all_word": "SELECT word FROM word;",
+        "select_all_neighbord": "SELECT central_word,position_,word_neighbor FROM dictionnary;"
     },
     "template_request": {
         "select_with_where": "SELECT * FROM table WHERE column = value;",

@@ -1,4 +1,3 @@
-from ast import While
 import libCore.log_class as llC
 import libCore.config_tool_class as ctC
 import libCore.utils_class as luC
@@ -41,9 +40,32 @@ class interaction_user:
             self.calcul_parameter()
         elif self.ctC_.key_return("parameter","authorize_help","endpoint_user") == choose_value:
             self.help_parameter()
+        elif self.ctC_.key_return("parameter","authorize_request","endpoint_user") == choose_value:
+            self.request_parameter()
         else:
             self.central_menu()
-        
+   
+    def obtain_all_data_table(self, table, sub_table):
+        self.obj_db[1].execute(self.prepare_request[table][sub_table])
+        all_tuple = self.obj_db[1].fetchall()
+        return all_tuple
+
+    def request_parameter(self):
+        all_word_tuple = self.obtain_all_data_table("completed_request","select_all_word")
+        all_neighbord_tuple = self.obtain_all_data_table("completed_request","select_all_neighbord")
+
+        all_word = set([one_elem[0] for one_elem in all_word_tuple])
+        all_neighbord = set([f"[{one_elem[0]}, {one_elem[1]}, {one_elem[2]}]" for one_elem in all_neighbord_tuple])
+
+
+        print("Request Parameter :")
+        print(f"Total unique word in database : {len(all_word)}")
+        print(f"Total unique neighbord in database : {len(all_neighbord)}")
+        print(f"Number of neighbors per word on average : {round(len(all_neighbord)/len(all_word),2)}")
+
+        del all_word, all_neighbord, all_word_tuple, all_neighbord_tuple
+        self.last_sub_menu()
+
     def help_parameter(self, link = "endpoint_user_core\\template\\help_prepared.json"):
         print("Help Parameter :")
         handle = self.luC_.file_open(self.luC_.absolute_link(link))
@@ -65,22 +87,31 @@ class interaction_user:
         choose_accept = self.uitC_.input_user_check("Choose (e.g: 0,1..) : ", int, list_accept)
         self.llC_.pipe_log(f"The user requests the calculation of {list_accept[choose_accept]}.","INFO","interaction_user() : choose_accept()")
         if choose_accept == 0:
-            self.ecC_.concentration_word_calcul(self.obj_db, self.prepare_request)
+            self.ecC_.concentration_word_calcul(self.obj_db, self.prepare_request,list_accept[choose_accept])
         else:
             print(choose_accept)
         self.last_sub_menu()
 
     def about_parameter(self):
+        all_word_tuple = self.obtain_all_data_table("completed_request","select_all_word")
+        all_neighbord_tuple = self.obtain_all_data_table("completed_request","select_all_neighbord")
+        all_word = set([one_elem[0] for one_elem in all_word_tuple])
+        all_neighbord = set([f"[{one_elem[0]}, {one_elem[1]}, {one_elem[2]}]" for one_elem in all_neighbord_tuple])
+
         print(f"""
         Weak Signal Finder
 
         Date : {datetime.datetime.today().date()}
         Time : {str(datetime.datetime.today().time()).split(".")[0]}
         Job Id of this Session : {self.job_id}
+        Number unique word in db: {len(all_word)}
+        Number unique neighbord in db: {len(all_neighbord)}
+        Number average per word : {round(len(all_neighbord)/len(all_word),2)}
         Licence : MIT
         Credit : Copyright (c) 2025-present LittleViewer & WeakSignalFinder Contributors
         Repo Link : https://github.com/LittleViewer/WeakSignalFinder
         """)
+        del all_word, all_neighbord, all_word_tuple, all_neighbord_tuple
         self.last_sub_menu()
 
 

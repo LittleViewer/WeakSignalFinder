@@ -1,4 +1,9 @@
 import endpoint_user_core.utils_interaction_terminal_class as uiC
+import libCore.utils_class as luC
+import libCore.config_tool_class as ctC
+import libCore.log_class as llC
+import datetime
+import json
 from numpy import average
 
 
@@ -16,7 +21,7 @@ class calcul_class:
                 continue
             return word_choose
 
-    def concentration_word_calcul(self, obj_db, prepare_request):
+    def concentration_word_calcul(self, obj_db, prepare_request,name_calcul):
         list_date = []
         dict_multiple_intensity_run = {}
         obj_db[1].execute(prepare_request["completed_request"]["select_multiple_intensity_run"])
@@ -51,11 +56,50 @@ class calcul_class:
         all_word_multiple_intensity = obj_db[1].fetchall()
         all_calculate = []
         all_calcul = []
+        all_line = {"concentration_value" : "concentration_value = word_frequency/word_with_total_frequency & deduplicate"}
         for one_word_multiple_intensity in all_word_multiple_intensity:
-            all_calculate.append(float(one_word_multiple_intensity[0])/absolute_multiple_value)
-            all_calcul.append(f"{float(one_word_multiple_intensity[0])/absolute_multiple_value} = {one_word_multiple_intensity[0]}/{absolute_multiple_value}")
-        print(f"The density of {choose_word} is Average : {average(all_calculate)} on {len(all_calculate)} input therefore obtains a score of {average(all_calculate)/len(all_calculate)}")
+            result_sub = float(one_word_multiple_intensity[0])/absolute_multiple_value
+            calcul_sub = f"{float(one_word_multiple_intensity[0])/absolute_multiple_value} = {one_word_multiple_intensity[0]}/{absolute_multiple_value}"
+            all_calculate.append(result_sub)
+            all_calcul.append(calcul_sub)
+            all_line[result_sub] = calcul_sub
+        calcul_for_result_point = f"salience_score({average(all_calculate)/len(all_calculate)}) = average(density({average(all_calculate)}))/number_corpus_word_in({len(all_calculate)})"
+        result = f"The density of {choose_word} is Average : {average(all_calculate)} on {len(all_calculate)} input therefore obtains a score of {average(all_calculate)/len(all_calculate)}"
+        print(result)
+        output_data = {"global_result" :{"word" : choose_word, "result":result,"explicated_calcul" : calcul_for_result_point},"sub_result (one_line_per_one_value)":all_line}
+        self.output_file(name_calcul,output_data)
 
+    def output_file(self,name, list_dict_data, dir_path = "endpoint_user_core\\output"):
+        if len(list_dict_data) == 0:
+            print("No data for output!")
+            return False
+        type_file_accept = self.ctC_.key_return("parameter","type_output_file","endpoint_user")
+        want_save_data = self.uiC_.create_list_number_by_list(["Yes","No"])
+        accept_save = self.uiC_.input_user_check("Do you want to save the data? (e.g: 0,1..) : ", int, want_save_data)
+        if accept_save == 0:
+            list_purpose_choose = self.uiC_.create_list_number_by_list(type_file_accept)
+            choose_user_type = self.uiC_.input_user_check("Choose file type (e.g: 0,1..) : ", int, list_purpose_choose)
+            type_choose = list_purpose_choose[choose_user_type]
+            prepare_name_file = f"{datetime.datetime.now().strftime('%y%m%d%H%M%S')}_{name}.{type_choose}"
+            handle=self.luC_.file_open(self.luC_.absolute_link(f"{dir_path}\\{prepare_name_file}"),"a+")
+            if type_choose == "json":
+                json.dump(list_dict_data,handle,indent=4)
+            elif type_choose == "txt":
+                for one_title in list_dict_data:
+                    handle.write(f"==={one_title}===\n")
+                    sub_dict = list_dict_data[one_title]
+                    for one_line in sub_dict:
+                        handle.write("- ")
+                        if len(str(one_line)) == 0:
+                            handle.write("[Error: No Data]\n")
+                        else:
+                            handle.write(f"{one_line} : {sub_dict[one_line]}\n")
+            handle.close()
+            print(f"Successufly save data in {dir_path}\\{prepare_name_file}")
+            self.llC_.pipe_log(f"Successufly save data in {dir_path}\\{prepare_name_file}","INFO","calcul_class() : output_file()")
 
     def __init__(self):
         self.uiC_ = uiC.utils_interaction_terminal()
+        self.ctC_ = ctC.config_toml_tool()
+        self.luC_ = luC.utils()
+        self.llC_ = llC.log()
