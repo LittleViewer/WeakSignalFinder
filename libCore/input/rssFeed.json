@@ -1,9 +1,17 @@
 [
     {"name_organization" : "exemple",
      "rss_link" : "https://liviewer.tv",
-     "country" : "en"
+     "country" : "en",
+     "type" : "rss"
     },
     {"name_organization" : "exemple",
       "rss_link" :  "https://liviewer.tv",
-      "country" : "fr"}
+      "country" : "fr",
+      "type" : "rss"
+    },
+    {"name_organization" : "exemple_telegram",
+      "telegram_link" : "https://t.me/s/exemple_channel",
+      "country" : "fr",
+      "type" : "telegram"
+    }
 ]
