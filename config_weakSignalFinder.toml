@@ -37,6 +37,8 @@ authorize_calcul = "calcul_parameter"
 authorize_help = "help_parameter"
 authorize_request = "request_parameter"
 list_calcul = {concentration = "concentration_word_calcul"}
+list_request = {find_by_pattern = "find_word_pattern"}
+find_by_pattern_request = "find_word_pattern"
 type_output_file = ["json","txt"]
 
 [parameter .frequency_one_word]

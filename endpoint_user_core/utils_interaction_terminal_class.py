@@ -1,4 +1,3 @@
-from ast import While
 class utils_interaction_terminal:
 
     def create_list_number_by_list(self, list):
@@ -28,6 +27,10 @@ class utils_interaction_terminal:
                     else:
                         break
         return choose_user
+
+    def pipe_question_for_user(self, list_choose):
+        dict_purpose = self.create_list_number_by_list(list_choose)
+        return dict_purpose[self.input_user_check("Choose (e.g: 0,1..) : ",int,dict_purpose)]
 
     def __init__(self):
         pass

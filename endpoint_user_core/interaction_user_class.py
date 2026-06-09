@@ -3,6 +3,7 @@ import libCore.config_tool_class as ctC
 import libCore.utils_class as luC
 import dictionnary_neighbord.enter_data_dictionnary_class as edC
 import endpoint_user_core.calcul_class as ecC_
+import endpoint_user_core.request_class as crC_
 import endpoint_user_core.utils_interaction_terminal_class as uitC_
 import datetime
 import json
@@ -62,6 +63,14 @@ class interaction_user:
         print(f"Total unique word in database : {len(all_word)}")
         print(f"Total unique neighbord in database : {len(all_neighbord)}")
         print(f"Number of neighbors per word on average : {round(len(all_neighbord)/len(all_word),2)}")
+
+        list_request = self.ctC_.key_return("parameter","list_request","endpoint_user")
+        list_accept = self.uitC_.create_list_number_by_list(list_request.keys())
+        choose_accept = self.uitC_.input_user_check("Choose (e.g: 0,1..) : ", int, list_accept)
+        result = list_request[list_accept[choose_accept]]
+        print(result)
+        if result == self.ctC_.key_return("parameter","find_by_pattern_request","endpoint_user"):
+            self.crC_.find_by_pattern()
 
         del all_word, all_neighbord, all_word_tuple, all_neighbord_tuple
         self.last_sub_menu()
@@ -141,3 +150,4 @@ class interaction_user:
         self.llC_.insert_job_id(job_id)
         self.ecC_ = ecC_.calcul_class()
         self.uitC_ = uitC_.utils_interaction_terminal()
+        self.crC_ = crC_.request_class(self.obj_db, self.prepare_request)

@@ -6,6 +6,7 @@
     },
     "template_request": {
         "select_with_where": "SELECT * FROM table WHERE column = value;",
-        "select_word_with_where": "SELECT relative_value FROM intensity_word WHERE word = 'word_replace';"
+        "select_word_with_where": "SELECT relative_value FROM intensity_word WHERE word = 'word_replace';",
+        "find_word_by_pattern": "SELECT word FROM word WHERE word LIKE 'pattern%';"
     }
 }
