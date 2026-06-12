@@ -4,6 +4,7 @@ import sys
 import os
 import datetime
 import unicodedata
+import time
 
 class utils :
     def check_file_exist(self, link):
@@ -83,6 +84,12 @@ class utils :
             list_index.append(one_index)
             list_value.append(dict_[one_index])
         return [list_index, list_value]
+    
+    def rewrite_in_console_line(self):
+        time.sleep(0.5)
+        print("\033[F\033[K", end="", flush=True)
+        time.sleep(0.5)
+
 
     def __init__(self):
         self.date_ = datetime.datetime.now()

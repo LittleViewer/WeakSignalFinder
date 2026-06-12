@@ -3,20 +3,29 @@ import endpoint_user_pipe as euP
 import database_rss_run.prepare_request_class as prC
 import libCore.argument_start_class as asC
 import libCore.log_class as llC
+import verbose_initialize_wsf as viW
 
 asC_ = asC.argument_start()
-prC_ = prC.prepare_request()
-llC_ = llC.log()
+viW_ = viW.verbose_initialize()
 
+silent_mode = False
 obj_args = asC_.pipe_argument_start()
 args = obj_args[0]
 argument_run = obj_args[1]
+
+if not args.silent_mode :
+    viW_.pipe_verbose_initialize()
+
+
+llC_ = llC.log()
+prC_ = prC.prepare_request()
 
 llC_.pipe_log("Start execute program", "INFO","main")
 obj_database = prC_.connect_dabase()
 job_id = llC_.pipe_jobId_session_generator(obj_database)
 def log_mode(mode):
     llC_.pipe_log(f"Enter in the program mode : {mode}","INFO","main")
+
 
 if args.endpoint_user:
     log_mode("endpoint_user")
