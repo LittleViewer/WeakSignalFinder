@@ -13,9 +13,10 @@ obj_args = asC_.pipe_argument_start()
 args = obj_args[0]
 argument_run = obj_args[1]
 
-if not args.silent_mode :
-    viW_.pipe_verbose_initialize()
-
+verbose = True
+if args.silent_mode :
+   verbose = False
+viW_.pipe_verbose_initialize(verbose)
 
 llC_ = llC.log()
 prC_ = prC.prepare_request()
