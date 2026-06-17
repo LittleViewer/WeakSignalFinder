@@ -1,10 +1,10 @@
-from socket import socket
 import libCore.utils_class as luC
 import libCore.config_tool_class as ctC
 import datetime
 import socket
 import time
 import sys
+import os
 
 class verbose_initialize:
 
@@ -15,16 +15,22 @@ class verbose_initialize:
             print(prepare_message)
         for one_list_path in list_path:
             is_exist = self.luC_.check_file_exist(one_list_path)
+            datetime_ = str(datetime.datetime.now()).split('.')[0]
             if is_exist == True:
                 old_number = str(number_initialize)
                 number_initialize += 1
+                
                 if self.accept_verbose_ == True:
                     prepare_message = prepare_message.replace(old_number, str(number_initialize))
                     self.luC_.rewrite_in_console_line()
                     print(prepare_message)
+                size_object = os.path.getsize(one_list_path)
+                if size_object/1073741824 >= 2.1:
+                    print(f"[{datetime_}] - Warning you're object in {str(one_list_path)} is extremly heavy (more 2 gigabytes)!") 
             else:
-                print(f"[{str(datetime.datetime.now()).split('.')[0]} - One of the {type_} does not exist!]")
+                print(f"[{datetime_} - One of the {type_} does not exist!]")
                 sys.exit()
+
 
 
     def check_db(self):
