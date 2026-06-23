@@ -24,13 +24,13 @@ class verbose_initialize:
                     prepare_message = prepare_message.replace(old_number, str(number_initialize))
                     self.luC_.rewrite_in_console_line()
                     print(prepare_message)
-                size_object = os.path.getsize(one_list_path)
-                if size_object/1073741824 >= 2.1:
-                    print(f"[{datetime_}] - Warning you're object in {str(one_list_path)} is extremly heavy (more 2 gigabytes)!") 
+                size_object = os.path.getsize(one_list_path)/1073741824
+                size_warning = self.ctC_.key_return("parameter","warning_size_object","global_program")
+                if size_object >= size_warning:
+                    print(f"[{datetime_}] - Warning you're object in '{str(one_list_path)}' is extremly heavy with {round(size_object,2)} gb (more {size_warning} gb)!") 
             else:
                 print(f"[{datetime_} - One of the {type_} does not exist!]")
-                sys.exit()
-
+                sys.exit()                
 
 
     def check_db(self):
