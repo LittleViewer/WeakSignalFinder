@@ -14,7 +14,7 @@ class install_class:
         cursor_obj.close()
         connect_obj.close()
 
-    def pipe_install(self,job_id=0):
+    def pipe_install(self):
         dict_path = {"db":[self.ctC_.key_return("path","database_run_sqlite","database"),self.ctC_.key_return("path","database_dictionnary_sqlite","database")]}
         dict_schema_db = self.ctC_.key_return("parameter","initial_schema","install")
         for one_type_path in dict_path:
@@ -28,7 +28,7 @@ class install_class:
                         separator = ""
                     else:
                         separator = "\\"
-                    
+
                     part += one_part+separator
                     
                     if self.luC_.check_file_exist(self.luC_.absolute_link(part)) ==  False:
@@ -42,12 +42,12 @@ class install_class:
                                 self.database_read_script(path, handle)
                                 
                         else:
-                            self.luC_.create_dir([0])
+                            self.luC_.create_dir(path)
 
                     tick +=1
-
-        print(f"[{str(datetime.datetime.now()).split(".")[0]}] - Weak Signal Finder installation is complete: Please restart the program.")
+        print(f"[{self.date_}] - Weak Signal Finder installation is complete: Please restart the program.")
 
     def __init__(self):
         self.ctC_ = ctC.config_toml_tool()
         self.luC_ = luC.utils()
+        self.date_ = str(datetime.datetime.now()).split(".")[0]

@@ -17,26 +17,32 @@ args = obj_args[0]
 argument_run = obj_args[1]
 llC_ = llC.log()
 
+prC_ = prC.prepare_request()
+
+if args.install:
+    print("[INFO] - You're session is not logged because the installation occurs in a degraded system situation!")
+    ipC_.pipe_install()
+    sys.exit()
+
+
+try:
+    obj_database = prC_.connect_dabase()
+    job_id = llC_.pipe_jobId_session_generator(obj_database)
+except Exception as e:
+    print("Error with launch system : Please launch 'main.py --install'")
+    sys.exit()
+
 llC_.pipe_log("Start execute program", "INFO","main")
 def log_mode(mode):
     llC_.pipe_log(f"Enter in the program mode : {mode}","INFO","main")
 
-
-if args.install:
-    log_mode("install")
-    ipC_.pipe_install()
-    llC_.pipe_log("Stop execute program", "INFO","main")
-    sys.exit()
 
 verbose = True
 if args.silent_mode :
    verbose = False
 viW_.pipe_verbose_initialize(verbose)
 
-prC_ = prC.prepare_request()
 
-obj_database = prC_.connect_dabase()
-job_id = llC_.pipe_jobId_session_generator(obj_database)
 
 
 
