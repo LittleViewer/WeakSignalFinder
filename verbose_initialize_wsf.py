@@ -55,7 +55,7 @@ class verbose_initialize:
             sys.exit()
 
     def welcome_message(self):
-        print(f"Welcome to Weak Signal Finder !\n{str(datetime.datetime.today()).split(' ')[0]} - {str(datetime.datetime.now().time()).split('.')[0]}\nCopyright (c) 2025-present LittleViewer & WeakSignalFinder Contributors")
+        print(f"Welcome to Weak Signal Finder !\n{str(datetime.datetime.today()).split(' ')[0]} - {str(datetime.datetime.now().time()).split('.')[0]}")
         if self.accept_verbose_ == True:
             time.sleep(1)
 

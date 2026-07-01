@@ -18,6 +18,18 @@ argument_run = obj_args[1]
 llC_ = llC.log()
 
 prC_ = prC.prepare_request()
+licence_text = "\x1b]8;;https://github.com/LittleViewer/WeakSignalFinder?tab=License-1-ov-file\x1b\\Copyright (c) 2025-present LittleViewer & WeakSignalFinder Contributors\x1b]8;;\x1b\\"
+print(f"""
+ _    _            _      _____ _                   _  ______ _           _           
+| |  | |          | |    /  ___(_)                 | | |  ___(_)         | |          
+| |  | | ___  __ _| | __ \ `--. _  __ _ _ __   __ _| | | |_   _ _ __   __| | ___ _ __ 
+| |/\| |/ _ \/ _` | |/ /  `--. \ |/ _` | '_ \ / _` | | |  _| | | '_ \ / _` |/ _ \ '__|
+\  /\  /  __/ (_| |   <  /\__/ / | (_| | | | | (_| | | | |   | | | | | (_| |  __/ |   
+ \/  \/ \___|\__,_|_|\_\ \____/|_|\__, |_| |_|\__,_|_| \_|   |_|_| |_|\__,_|\___|_|   
+                                   __/ |                                              
+                                  |___/                                                                                                                 
+    {licence_text.center(60)}\n""")
+
 
 if args.install:
     print("[INFO] - You're session is not logged because the installation occurs in a degraded system situation!")
