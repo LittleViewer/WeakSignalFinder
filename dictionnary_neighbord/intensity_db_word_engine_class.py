@@ -1,15 +1,10 @@
-import libCore.utils_class as luC
-import libCore.config_tool_class as ctC
-import libCore.log_class as llC
-import libCore.date_utils_tool_class as duC
-import database_rss_run.prepare_request_class as prC
+import routerClassPackage
 import datetime
 import gc
 
 class intensity_db_word_engine_class:
     def prepare_request(self, all_data):
         all_list_prepare_insert = []
-        new_all_list_prepare_insert = []
         list_job_id = []
         for one_job_id in all_data:
             total_word = 0
@@ -38,7 +33,6 @@ class intensity_db_word_engine_class:
 
     def sub_pipe_choice_request(self, all_list):
         know_word = []
-        all_job_id = []
         self.obj_db_[1].execute(f"SELECT jobId FROM run_integrated_intensity_word;")
         temp_jobid = (self.obj_db_[1].fetchall())
         for one_jobid in temp_jobid:
@@ -55,7 +49,7 @@ class intensity_db_word_engine_class:
                 prepare_request += f"('{one_list[0]}','{one_list[1]}',{one_list[2]},{one_list[3]}),"
                 number_new_intensity += 1
                 tick_batch += 1
-            if self.ctC_.key_return("parameter","batch_longer_list","optimize") == tick_batch or total_possible_value == number_new_intensity:
+            if self.obj_class_router["config_toml_tool"]().key_return("parameter","batch_longer_list","optimize") == tick_batch or total_possible_value == number_new_intensity:
                 if number_new_intensity != 0:
                     self.obj_db_[1].execute(prepare_request[:-1]+";")
                     self.obj_db_[0].commit()
@@ -66,7 +60,7 @@ class intensity_db_word_engine_class:
         if number_new_intensity != 0:
             self.insert_new_jobid_read(set(authorized_job_id))
             print(f"[{datetime.datetime.now()}] - {number_new_intensity} intensity saved in database")
-            self.llC_.pipe_log(f"Intensity saved in database : {number_new_intensity}", "INFO", "intensity_db_word_engine_class")
+            self.obj_class_router["log"]().pipe_log(f"Intensity saved in database : {number_new_intensity}", "INFO", "intensity_db_word_engine_class")
     
     def select_with_multiple_where(self,cursor_db,table,column_name, column_where, array_where):
         prepare_request = f"SELECT {column_name} FROM {table} WHERE"
@@ -83,7 +77,7 @@ class intensity_db_word_engine_class:
         all_data = self.obj_db_[1].fetchall()
             
         if len(all_data) == 0 :
-            self.llC_.pipe_log(f"No data found in database", "WARN", "intensity_db_word_engine_class() : select_with_multiple_where()")
+            self.obj_class_router["log"]().pipe_log(f"No data found in database", "WARN", "intensity_db_word_engine_class() : select_with_multiple_where()")
             return False
         
         for one_line in all_data :
@@ -110,37 +104,34 @@ class intensity_db_word_engine_class:
         self.obj_db_[1].execute(prepare_request[:-1]+';')
         self.obj_db_[0].commit()
         print(f"[{datetime.datetime.now()}] - {number_enter} multiple intensity saved in database")
-        self.llC_.pipe_log(f"Multiple intensity saved in database : {number_enter}", "INFO", "intensity_db_word_engine_class() : enter_in_db_multiple_intensity()")
+        self.obj_class_router["log"]().pipe_log(f"Multiple intensity saved in database : {number_enter}", "INFO", "intensity_db_word_engine_class() : enter_in_db_multiple_intensity()")
 
     def pipe_main_engine(self, all_data,job_id):
         try:
             all_list_prepare_request = self.prepare_request(all_data)
             self.sub_pipe_choice_request(all_list_prepare_request)
         except:
-            self.llC_.pipe_log(f"Error to save intensity in database", "ERROR", "intensity_db_word_engine_class")
-        for_launch = self.duC_.is_ready_date_to_run(self.obj_db_,"run_global_calcul_intensity","cooldown_day_launch_inter_calcul_intensit_word")
+            self.obj_class_router["log"]().pipe_log(f"Error to save intensity in database", "ERROR", "intensity_db_word_engine_class")
+        for_launch = self.obj_class_router["date_utils_tool"]().is_ready_date_to_run(self.obj_db_,"run_global_calcul_intensity","cooldown_day_launch_inter_calcul_intensit_word")
         if for_launch == True:
-            list_data_available = self.duC_.time_delta_list(self.ctC_.key_return("parameter","cooldown_day_launch_inter_calcul_intensit_word","for_launch"))            
+            list_data_available = self.obj_class_router["date_utils_tool"]().time_delta_list(self.obj_class_router["config_toml_tool"]().key_return("parameter","cooldown_day_launch_inter_calcul_intensit_word","for_launch"))            
             if list_data_available == False:
                 return False
-            if self.ctC_.key_return("parameter","single_multiple_intensity_save","for_launch") == True:
+            if self.obj_class_router["config_toml_tool"]().key_return("parameter","single_multiple_intensity_save","for_launch") == True:
                 self.obj_db_[1].execute("SELECT COUNT(*) FROM multiple_intensity_word;")
                 number_word_erase = self.obj_db_[1].fetchall()[0][0]
                 self.obj_db_[1].execute("DELETE FROM multiple_intensity_word;")
                 self.obj_db_[0].commit()
-                self.llC_.pipe_log(f"Intensity table dropped in DB with {number_word_erase} words.", "INFO", "intensity_db_word_engine_class() : pipe_main_engine()")
+                self.obj_class_router["log"]().pipe_log(f"Intensity table dropped in DB with {number_word_erase} words.", "INFO", "intensity_db_word_engine_class() : pipe_main_engine()")
 
             dict_data = self.calcul_multiple_intensity("intensity_word")
             
             if dict_data == False:
                 return False
             self.enter_in_db_multiple_intensity(dict_data,job_id)
-            self.duC_.enter_last_run(self.obj_db_,"run_global_calcul_intensity",job_id)
+            
+            self.obj_class_router["date_utils_tool"]().enter_last_run(self.obj_db_,"run_global_calcul_intensity",job_id)
 
     def __init__(self, obj_db):
+        import libCore.config_tool_class as ctC;self.obj_class_router = routerClassPackage.routerFunctionPipe(ctC.config_toml_tool().key_return("parameter","start_file","global_program"))
         self.obj_db_ = obj_db
-        self.luC_ = luC.utils()
-        self.ctC_ = ctC.config_toml_tool()
-        self.llC_ = llC.log()
-        self.duC_ = duC.date_utils_tool()
-        self.prC_ = prC.prepare_request()

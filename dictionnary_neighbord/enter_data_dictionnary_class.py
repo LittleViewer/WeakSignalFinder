@@ -1,7 +1,5 @@
 from datetime import datetime
-import libCore.utils_class as luC
-import libCore.config_tool_class as ctC
-import libCore.log_class as llC
+import routerClassPackage
 import sqlite3
 import datetime
 import io
@@ -9,16 +7,17 @@ import io
 class enter_data_dictionnary:
     def connect_dabase(self):
         try :
-            link_to_database = self.ctC_.key_return("path","database_dictionnary_sqlite","database")
-            if self.luC_.is_type(str,link_to_database) == True:
-                self.handle_dabase_ = sqlite3.connect(self.luC_.absolute_link(link_to_database))
+            link_to_database = self.obj_class_router["config_toml_tool"]().key_return("path","database_dictionnary_sqlite","database")
+            if self.obj_class_router["utils"]().is_type(str,link_to_database) == True:
+                self.handle_dabase_ = sqlite3.connect(self.obj_class_router["utils"]().absolute_link(link_to_database))
                 self.cursor_database_ = self.handle_dabase_.cursor()
             else :
-                self.llC_.pipe_log(f"The expected formats are not provided as input!","ERROR","enter_data_dictionnary() : connect_dabase()")
-                self.luC_.error_with_reason("The expected formats are not provided as input in enter_data_dictionnary.connect_dabase()!",True)
+                
+                self.obj_class_router["log"]().pipe_log(f"The expected formats are not provided as input!","ERROR","enter_data_dictionnary() : connect_dabase()")
+                self.obj_class_router["utils"]().error_with_reason("The expected formats are not provided as input in enter_data_dictionnary.connect_dabase()!",True)
         except:
-            self.llC_.pipe_log(f"An unexpected error occurs during the connection with the database!","ERROR","enter_data_dictionnary() : connect_dabase()")
-            self.luC_.error_with_reason("An unexpected error occurs during the connection with the database in prepare_request.connect_dabase()!",True)
+            self.obj_class_router["log"]().pipe_log(f"An unexpected error occurs during the connection with the database!","ERROR","enter_data_dictionnary() : connect_dabase()")
+            self.obj_class_router["utils"]().error_with_reason("An unexpected error occurs during the connection with the database in prepare_request.connect_dabase()!",True)
         return [self.handle_dabase_, self.cursor_database_]
     
     def already_read(self, all_filename_read):
@@ -48,7 +47,7 @@ class enter_data_dictionnary:
             buff_file.close()
             self.handle_dabase_.commit()
             print(f"[{datetime.datetime.now()}] - {len(exist_array)} save as already viewed in last seen.")
-            self.llC_.pipe_log(f"{len(exist_array)} save as already viewed in last seen.","INFO","enter_data_dictionnary() : insert_io_file_in_db()")
+            self.obj_class_router["log"]().pipe_log(f"{len(exist_array)} save as already viewed in last seen.","INFO","enter_data_dictionnary() : insert_io_file_in_db()")
 
     def detect_new_world(self, list_all_word_db,list_all_word):
         word_is_not_db = []
@@ -75,7 +74,7 @@ class enter_data_dictionnary:
         self.cursor_database_.execute(prepare_request)
         self.handle_dabase_.commit()
         print(f"[{datetime.datetime.now()}] - {counter+1} new words enter in database")
-        self.llC_.pipe_log(f"{counter+1} new words enter in the long-term dictionary!","INFO","enter_data_dictionnary() : new_word_enter_db()")
+        self.obj_class_router["log"]().pipe_log(f"{counter+1} new words enter in the long-term dictionary!","INFO","enter_data_dictionnary() : new_word_enter_db()")
 
     def neighbor_enter_db(self, all_data):
         buff_exist = io.StringIO()
@@ -99,7 +98,7 @@ class enter_data_dictionnary:
             self.cursor_database_.execute(prepare_request)
             self.handle_dabase_.commit()
             print(f"[{datetime.datetime.now()}] - {number_enter+1} new neighbords enter in database")
-            self.llC_.pipe_log(f"{number_enter+1} new neighbords enter in the long-term dictionary!","INFO","enter_data_dictionnary() : neighbor_enter_db()")
+            self.obj_class_router["log"]().pipe_log(f"{number_enter+1} new neighbords enter in the long-term dictionary!","INFO","enter_data_dictionnary() : neighbor_enter_db()")
 
     def pipe_enter_data(self, all_data):
         self.cursor_database_.execute("SELECT word FROM word;")
@@ -107,7 +106,8 @@ class enter_data_dictionnary:
         word_list_in_db = []
         for one_line in list_all_word_db :
             word_list_in_db.append(one_line[0])
-        list_all_word = self.luC_.dict_to_two_list(all_data)
+        
+        list_all_word = self.obj_class_router["utils"]().dict_to_two_list(all_data)
         all_word_classify = self.detect_new_world(set(word_list_in_db), list_all_word[0])
         
         if len(all_word_classify[0]) >= 1:
@@ -117,8 +117,6 @@ class enter_data_dictionnary:
 
 
     def __init__(self, job_id):
-        self.luC_ = luC.utils()
-        self.ctC_ = ctC.config_toml_tool()
-        self.llC_ = llC.log()
+        import libCore.config_tool_class as ctC;self.obj_class_router = routerClassPackage.routerFunctionPipe(ctC.config_toml_tool().key_return("parameter","start_file","global_program"))
         self.connect_dabase()
         self.job_id = job_id

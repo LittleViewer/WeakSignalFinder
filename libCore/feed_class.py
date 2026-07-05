@@ -1,6 +1,4 @@
-import libCore.utils_class as utils
-import libCore.log_class as log
-import libCore.config_tool_class as ctC
+import routerClassPackage
 import feedparser
 import json
 import asyncio
@@ -9,16 +7,16 @@ class feed:
 
     def extract_feed_link(self, link):
         dict_feed = {}
-        if self.utC_.check_file_exist(link):
-            handle = self.utC_.file_open(link)
+        if self.obj_class_router["utils"]().check_file_exist(link):
+            handle = self.obj_class_router["utils"]().file_open(link)
             content = json.load(handle)
             tick = 0
             for only_one_content in content:
-                dict_feed = self.utC_.order_dict(only_one_content["rss_link"], only_one_content["country"], dict_feed, tick)
+                dict_feed = self.obj_class_router["utils"]().order_dict(only_one_content["rss_link"], only_one_content["country"], dict_feed, tick)
                 tick += 1
             return dict_feed                
         else:
-            self.utC_.error_with_reason("Bad File Path of RSS Feed", True)
+            self.obj_class_router["utils"]().error_with_reason("Bad File Path of RSS Feed", True)
 
     async def parse_rss(self, dict_feed):
         list_key = list(dict_feed.keys())
@@ -49,14 +47,13 @@ class feed:
         return formated_feed_list
     
     async def pipe_extract_rss(self):
-        dict_feed = self.extract_feed_link(self.utC_.absolute_link(self.ctC_.key_return("path", "extract_feed_Path","class_feed")))
+        dict_feed = self.extract_feed_link(self.obj_class_router["utils"]().absolute_link(self.obj_class_router["config_toml_tool"]().key_return("path", "extract_feed_Path","class_feed")))
         parsed_feed_list = await self.parse_rss(dict_feed)
         formated_feed = self.formated_result(parsed_feed_list)
-        self.lC_.pipe_log(f"All articles were aggregated via Feed RSS","INFO","feed() : pipe_extract_rss()")
+        self.obj_class_router["log"]().pipe_log(f"All articles were aggregated via Feed RSS","INFO","feed() : pipe_extract_rss()")
         return formated_feed
 
 
     def __init__(self):
-        self.utC_ = utils.utils()
-        self.lC_ = log.log()
-        self.ctC_ = ctC.config_toml_tool()
+        import libCore.config_tool_class as ctC;self.obj_class_router = routerClassPackage.routerFunctionPipe(ctC.config_toml_tool().key_return("parameter","start_file","global_program"))
+        

@@ -1,3 +1,5 @@
+import routerClassPackage
+
 import libCore.utils_class as luC
 import libCore.config_tool_class as ctC
 import datetime
@@ -14,7 +16,7 @@ class verbose_initialize:
             prepare_message = f"{type_} initialize (0/{len(list_path)})"
             print(prepare_message)
         for one_list_path in list_path:
-            is_exist = self.luC_.check_file_exist(one_list_path)
+            is_exist = self.obj_class_router["utils"]().check_file_exist(one_list_path)
             datetime_ = str(datetime.datetime.now()).split('.')[0]
             if is_exist == True:
                 old_number = str(number_initialize)
@@ -22,10 +24,10 @@ class verbose_initialize:
                 
                 if self.accept_verbose_ == True:
                     prepare_message = prepare_message.replace(old_number, str(number_initialize))
-                    self.luC_.rewrite_in_console_line()
+                    is_exist = self.obj_class_router["utils"]().rewrite_in_console_line()
                     print(prepare_message)
                 size_object = os.path.getsize(one_list_path)/1073741824
-                size_warning = self.ctC_.key_return("parameter","warning_size_object","global_program")
+                size_warning = self.obj_class_router["config_toml_tool"]().key_return("parameter","warning_size_object","global_program")
                 if size_object >= size_warning:
                     print(f"[{datetime_}] - Warning you're object in '{str(one_list_path)}' is extremly heavy with {round(size_object,2)} gb (more {size_warning} gb)!") 
             else:
@@ -34,11 +36,11 @@ class verbose_initialize:
 
 
     def check_db(self):
-        list_path_db = [self.luC_.absolute_link(self.ctC_.key_return("path","database_run_sqlite","database")),self.luC_.absolute_link(self.ctC_.key_return("path","database_dictionnary_sqlite","database"))]
+        list_path_db = [self.obj_class_router["utils"]().absolute_link(self.obj_class_router["config_toml_tool"]().key_return("path","database_run_sqlite","database")),self.obj_class_router["utils"]().absolute_link(self.obj_class_router["config_toml_tool"]().key_return("path","database_dictionnary_sqlite","database"))]
         self.template_sub_pipe(list_path_db, "Database")
 
     def check_file(self):
-        list_path_file = [self.luC_.absolute_link(self.ctC_.key_return("path","extract_feed_Path","class_feed")), self.luC_.absolute_link(self.ctC_.key_return("path","file_model","prepare_data")), self.luC_.absolute_link(self.ctC_.key_return("path","file_stopword","prepare_data")), self.luC_.absolute_link(self.ctC_.key_return("path","exclude_file","read_data_dictionnary"))]
+        list_path_file = [self.obj_class_router["utils"]().absolute_link(self.obj_class_router["config_toml_tool"]().key_return("path","extract_feed_Path","class_feed")),self.obj_class_router["utils"]().absolute_link(self.obj_class_router["config_toml_tool"]().key_return("path","file_model","prepare_data")),self.obj_class_router["utils"]().absolute_link(self.obj_class_router["config_toml_tool"]().key_return("path","file_stopword","prepare_data")),self.obj_class_router["utils"]().absolute_link(self.obj_class_router["config_toml_tool"]().key_return("path","exclude_file","read_data_dictionnary"))]
         self.template_sub_pipe(list_path_file, "File")
 
     def check_internet(self, timeout = 3):
@@ -67,5 +69,4 @@ class verbose_initialize:
         self.welcome_message()
 
     def __init__(self):
-        self.luC_ = luC.utils()
-        self.ctC_ = ctC.config_toml_tool()
+        import libCore.config_tool_class as ctC;self.obj_class_router = routerClassPackage.routerFunctionPipe(ctC.config_toml_tool().key_return("parameter","start_file","global_program"))

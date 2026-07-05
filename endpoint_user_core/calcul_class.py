@@ -1,7 +1,4 @@
-import endpoint_user_core.utils_interaction_terminal_class as uiC
-import libCore.utils_class as luC
-import libCore.config_tool_class as ctC
-import libCore.log_class as llC
+import routerClassPackage
 import datetime
 import json
 from numpy import average
@@ -14,7 +11,7 @@ class calcul_class:
         while True:
             word_choose = input("Please enter a word (e.g. word, sentence..) or 'w' to voir tous les mots: ")
             if word_choose.lower() == "w":
-                self.uiC_.create_list_number_by_list(list_word)
+                self.obj_class_router["utils_interaction_terminal"]().create_list_number_by_list(list_word)
                 continue
             if word_choose not in word_set:
                 print(f"'{word_choose}' not exist in list.")
@@ -33,12 +30,12 @@ class calcul_class:
             else:
                 dict_multiple_intensity_run[one_run[1]].append(one_run[0])
         print("Please select date of run :")
-        dict_list_number = self.uiC_.create_list_number_by_list(list_date)
-        choose_date = self.uiC_.input_user_check("Choose (e.g: 0,1..) : ", int, dict_list_number)
+        dict_list_number = self.obj_class_router["utils_interaction_terminal"]().create_list_number_by_list(list_date)
+        choose_date = self.obj_class_router["utils_interaction_terminal"]().input_user_check("Choose (e.g: 0,1..) : ", int, dict_list_number)
         print(dict_list_number[choose_date])
         print(f"Please select a jobId from a run of the {dict_list_number[choose_date]} :")
-        list_job_id = self.uiC_.create_list_number_by_list(dict_multiple_intensity_run[dict_list_number[choose_date]])
-        choose_job_id = list_job_id[self.uiC_.input_user_check("Choose (e.g: 0,1..) : ", int, list_job_id)]
+        list_job_id = self.obj_class_router["utils_interaction_terminal"]().create_list_number_by_list(dict_multiple_intensity_run[dict_list_number[choose_date]])
+        choose_job_id = list_job_id[self.obj_class_router["utils_interaction_terminal"]().input_user_check("Choose (e.g: 0,1..) : ", int, list_job_id)]
 
         obj_db[1].execute(prepare_request["template_request"]["select_with_where"].replace("table", "multiple_intensity_word").replace("column", "jobId").replace("value", "'"+choose_job_id+"'"))
         all_multiple_intensity_word = obj_db[1].fetchall()
@@ -73,15 +70,15 @@ class calcul_class:
         if len(list_dict_data) == 0:
             print("No data for output!")
             return False
-        type_file_accept = self.ctC_.key_return("parameter","type_output_file","endpoint_user")
-        want_save_data = self.uiC_.create_list_number_by_list(["Yes","No"])
-        accept_save = self.uiC_.input_user_check("Do you want to save the data? (e.g: 0,1..) : ", int, want_save_data)
+        type_file_accept =  self.obj_class_router["config_toml_tool"]().key_return("parameter","type_output_file","endpoint_user")
+        want_save_data = self.obj_class_router["utils_interaction_terminal"]().create_list_number_by_list(["Yes","No"])
+        accept_save = self.obj_class_router["utils_interaction_terminal"]().input_user_check("Do you want to save the data? (e.g: 0,1..) : ", int, want_save_data)
         if accept_save == 0:
-            list_purpose_choose = self.uiC_.create_list_number_by_list(type_file_accept)
-            choose_user_type = self.uiC_.input_user_check("Choose file type (e.g: 0,1..) : ", int, list_purpose_choose)
+            list_purpose_choose = self.obj_class_router["utils_interaction_terminal"]().create_list_number_by_list(type_file_accept)
+            choose_user_type = self.obj_class_router["utils_interaction_terminal"]().input_user_check("Choose file type (e.g: 0,1..) : ", int, list_purpose_choose)
             type_choose = list_purpose_choose[choose_user_type]
             prepare_name_file = f"{datetime.datetime.now().strftime('%y%m%d%H%M%S')}_{name}.{type_choose}"
-            handle=self.luC_.file_open(self.luC_.absolute_link(f"{dir_path}\\{prepare_name_file}"),"a+")
+            handle=self.obj_class_router["utils"]().file_open(self.obj_class_router["utils"]().absolute_link(f"{dir_path}\\{prepare_name_file}"),"a+")
             if type_choose == "json":
                 json.dump(list_dict_data,handle,indent=4)
             elif type_choose == "txt":
@@ -96,10 +93,8 @@ class calcul_class:
                             handle.write(f"{one_line} : {sub_dict[one_line]}\n")
             handle.close()
             print(f"Successufly save data in {dir_path}\\{prepare_name_file}")
-            self.llC_.pipe_log(f"Successufly save data in {dir_path}\\{prepare_name_file}","INFO","calcul_class() : output_file()")
+            self.obj_class_router["log"]().pipe_log(f"Successufly save data in {dir_path}\\{prepare_name_file}","INFO","calcul_class() : output_file()")
 
     def __init__(self):
-        self.uiC_ = uiC.utils_interaction_terminal()
-        self.ctC_ = ctC.config_toml_tool()
-        self.luC_ = luC.utils()
-        self.llC_ = llC.log()
+        import libCore.config_tool_class as ctC;self.obj_class_router = routerClassPackage.routerFunctionPipe(ctC.config_toml_tool().key_return("parameter","start_file","global_program"))
+        

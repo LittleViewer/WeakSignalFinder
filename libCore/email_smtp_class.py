@@ -1,5 +1,4 @@
-import libCore.config_tool_class as ctC
-import libCore.utils_class as luC
+import routerClassPackage
 import smtplib
 import dotenv
 import os
@@ -8,7 +7,7 @@ class email_smtp:
     def prepa_email(self, message, topic, list_part = ["sender","receiver","password_file","port","server"]):
         dict_email = {"message":message,"topic":topic}
         for one_part in list_part:
-            dict_email[one_part] = self.ctC_.key_return("parameter",one_part,"email_auto")
+            dict_email[one_part] = self.obj_class_router["config_toml_tool"]().key_return("parameter",one_part,"email_auto")
         return dict_email
 
     def send_email(self, dict_email):
@@ -21,19 +20,18 @@ class email_smtp:
             server.sendmail(dict_email["sender"], dict_email["receiver"], dict_email["topic"] + "\n" + dict_email["message"])
 
     def sub_smtp_send(self, message = "No body text.", topic = "No topic."):
-        if self.ctC_.key_return("parameter","authorize_run","email_auto") == False:
+        if self.obj_class_router["config_toml_tool"]().key_return("parameter","authorize_run","email_auto") == False:
             return False
 
         try:
             dict_email = self.prepa_email(message, topic)
         except Exception as e:
-            self.luC_.error_with_reason(f"Email not prepared", False)
+            self.obj_class_router["utils"]().error_with_reason(f"Email not prepared", False)
             return False
         try:
             self.send_email(dict_email)
         except Exception as e:
-            self.luC_.error_with_reason(f"Email not sent to {dict_email['receiver']} with topic {dict_email['topic']}", False)
+            self.obj_class_router["utils"]().error_with_reason(f"Email not sent to {dict_email['receiver']} with topic {dict_email['topic']}", False)
 
     def __init__(self):
-        self.ctC_ = ctC.config_toml_tool()
-        self.luC_ = luC.utils()
+        import libCore.config_tool_class as ctC;self.obj_class_router = routerClassPackage.routerFunctionPipe(ctC.config_toml_tool().key_return("parameter","start_file","global_program"))

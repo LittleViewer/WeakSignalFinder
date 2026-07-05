@@ -1,6 +1,4 @@
-import libCore.config_tool_class as ctC
-import libCore.log_class as llC
-import libCore.utils_class as luC
+import routerClassPackage
 import datetime
 
 class date_utils_tool:
@@ -14,7 +12,7 @@ class date_utils_tool:
         date_now_complete = datetime.datetime.now()
             
         diff_date = date_now_complete - date_old
-        if diff_date.days >= self.ctC_.key_return("parameter",name_parameter,"for_launch"):
+        if diff_date.days >= self.obj_class_router["config_toml_tool"]().key_return("parameter",name_parameter,"for_launch"):
             return True
         else :
             return False
@@ -25,17 +23,15 @@ class date_utils_tool:
 
     def time_delta_list(self, days_int):
         array_old_date = [str(self.date_today)]
-        is_int = self.luC_.is_type(int, days_int)
+        is_int = self.obj_class_router["utils"]().is_type(int, days_int)
         if is_int == False:
-            self.luC_.error_with_reason(f"[{datetime.datetime.now()}] - This variable is not interger!",False)
-            self.llC_.pipe_log("This variable is not integer!","WARN","date_utils_tool() : time_delta_list()")
+            self.obj_class_router["utils"]().error_with_reason(f"[{datetime.datetime.now()}] - This variable is not interger!",False)
+            self.obj_class_router["log"]().pipe_log("This variable is not integer!","WARN","date_utils_tool() : time_delta_list()")
             return False
         for one_day in range(days_int):
             array_old_date.append(str(self.date_today - datetime.timedelta(days=(one_day+1))))
         return array_old_date
 
     def __init__(self):
-        self.ctC_ = ctC.config_toml_tool()
-        self.llC_ = llC.log()
-        self.luC_ = luC.utils()
+        import libCore.config_tool_class as ctC;self.obj_class_router = routerClassPackage.routerFunctionPipe(ctC.config_toml_tool().key_return("parameter","start_file","global_program"))
         self.date_today = datetime.date.today()

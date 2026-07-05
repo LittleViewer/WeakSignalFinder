@@ -1,7 +1,4 @@
-import database_rss_run.prepare_request_class as prC
-import libCore.utils_class as luC
-import libCore.log_class as llC
-import libCore.config_tool_class as ctC
+import routerClassPackage
 import datetime
 
 class frequency_one_word:
@@ -32,14 +29,11 @@ class frequency_one_word:
             for one_bloc in data[one_index]:
                 for one_word in one_bloc:
                     word_intensity = self.word_claimer(one_word, word_claim, word_intensity)
-        word_intensity_clean = self.delete_little_intensity(word_intensity, self.ctC_.key_return("parameter","filter_word","frequency_one_word"))
-        self.llC_.save_data_set((word_intensity_clean), word_intensity_clean, "word_intensity")
-        self.prC_.insert_data_database(obj_database[0],obj_database[1],"saveData",["jobId","dateTime","type","data"],[[job_id,datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),"saveStateWordIntensity",str(word_intensity_clean).replace("'",'"')]])
-        self.llC_.pipe_log("The word intensity is calculated as well as saved in the dataset.","INFO","frequency_one_word() : pipe_frequency_one_word()")
+        word_intensity_clean = self.delete_little_intensity(word_intensity, self.obj_class_router["config_toml_tool"]().key_return("parameter","filter_word","frequency_one_word"))
+        self.obj_class_router["log"]().save_data_set((word_intensity_clean), word_intensity_clean, "word_intensity")
+        self.obj_class_router["prepare_request"]().insert_data_database(obj_database[0],obj_database[1],"saveData",["jobId","dateTime","type","data"],[[job_id,datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),"saveStateWordIntensity",str(word_intensity_clean).replace("'",'"')]])
+        self.obj_class_router["log"]().pipe_log("The word intensity is calculated as well as saved in the dataset.","INFO","frequency_one_word() : pipe_frequency_one_word()")
         return word_intensity_clean
 
     def __init__(self):
-        self.luC_ = luC.utils()
-        self.llC_ =  llC.log()
-        self.prC_ = prC.prepare_request()
-        self.ctC_ = ctC.config_toml_tool()
+        import libCore.config_tool_class as ctC;self.obj_class_router = routerClassPackage.routerFunctionPipe(ctC.config_toml_tool().key_return("parameter","start_file","global_program"))

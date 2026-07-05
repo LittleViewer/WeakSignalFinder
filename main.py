@@ -1,25 +1,16 @@
+import routerClassPackage
 import core_engine_pipe as ceP
 import endpoint_user_pipe as euP
-import install.install_pipe_class as ipC
-import database_rss_run.prepare_request_class as prC
-import libCore.argument_start_class as asC
-import libCore.log_class as llC
-import verbose_initialize_wsf as viW
 import sys
 
-asC_ = asC.argument_start()
-viW_ = viW.verbose_initialize()
-ipC_ = ipC.install_class()
-
+import libCore.config_tool_class as ctC;obj_class_router = routerClassPackage.routerFunctionPipe(ctC.config_toml_tool().key_return("parameter","start_file","global_program"))
 silent_mode = False
-obj_args = asC_.pipe_argument_start()
+obj_args = obj_class_router["argument_start"]().pipe_argument_start()
 args = obj_args[0]
 argument_run = obj_args[1]
-llC_ = llC.log()
 
-prC_ = prC.prepare_request()
 licence_text = "\x1b]8;;https://github.com/LittleViewer/WeakSignalFinder?tab=License-1-ov-file\x1b\\Copyright (c) 2025-present LittleViewer & WeakSignalFinder Contributors\x1b]8;;\x1b\\"
-print(f"""
+print(fr"""
  _    _            _      _____ _                   _  ______ _           _           
 | |  | |          | |    /  ___(_)                 | | |  ___(_)         | |          
 | |  | | ___  __ _| | __ \ `--. _  __ _ _ __   __ _| | | |_   _ _ __   __| | ___ _ __ 
@@ -33,26 +24,26 @@ print(f"""
 
 if args.install:
     print("[INFO] - You're session is not logged because the installation occurs in a degraded system situation!")
-    ipC_.pipe_install()
+    obj_class_router["install_class"]().pipe_install()
     sys.exit()
 
 
 try:
-    obj_database = prC_.connect_dabase()
-    job_id = llC_.pipe_jobId_session_generator(obj_database)
+    obj_database = obj_class_router["prepare_request"]().connect_dabase()
+    job_id = obj_class_router["log"]().pipe_jobId_session_generator(obj_database)
 except Exception as e:
     print("Error with launch system : Please launch 'main.py --install'")
     sys.exit()
 
-llC_.pipe_log("Start execute program", "INFO","main")
+obj_class_router["log"]().pipe_log("Start execute program", "INFO","main")
 def log_mode(mode):
-    llC_.pipe_log(f"Enter in the program mode : {mode}","INFO","main")
+    obj_class_router["log"]().pipe_log(f"Enter in the program mode : {mode}","INFO","main")
 
 
 verbose = True
 if args.silent_mode :
    verbose = False
-viW_.pipe_verbose_initialize(verbose)
+obj_class_router["verbose_initialize"]().pipe_verbose_initialize(verbose)
 
 
 
@@ -68,5 +59,5 @@ else:
     print("Not argument provided")
     print(f"You can use : {argument_run}")
 
-llC_.pipe_log("Stop execute program", "INFO","main")
+obj_class_router["log"]().pipe_log("Stop execute program", "INFO","main")
 

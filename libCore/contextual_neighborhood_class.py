@@ -1,8 +1,5 @@
-import libCore.utils_class as luC
-import libCore.log_class as llC
-import database_rss_run.prepare_request_class as prC
+import routerClassPackage
 import datetime
-import json
 
 class contextual_neighboord:
 
@@ -34,9 +31,9 @@ class contextual_neighboord:
             for one_block in data[one_index]:
                neighboord_multiple_dict = self.create_neigbhoor(one_block, neighboord_multiple_dict)
         stat_neighboord = self.number_total_neighboord(neighboord_multiple_dict)
-        self.llC_.save_data_set(neighboord_multiple_dict, stat_neighboord["all"],"contextual_neighboord")
-        self.prC_.insert_data_database(obj_database[0],obj_database[1],"saveData",["jobId","dateTime","type","data"],[[job_id,datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),"dataSetContextualNeighboords",str(neighboord_multiple_dict).replace("'",'"')]])
-        self.llC_.pipe_log(f"A dictionary of all semantic neighborhoods is created with {stat_neighboord['all']} neighboord.","INFO","contextual_neighboord() : pipe_contextual_neighboord()")
+        self.obj_class_router["log"]().save_data_set(neighboord_multiple_dict, stat_neighboord["all"],"contextual_neighboord")
+        self.obj_class_router["prepare_request"]().insert_data_database(obj_database[0],obj_database[1],"saveData",["jobId","dateTime","type","data"],[[job_id,datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),"dataSetContextualNeighboords",str(neighboord_multiple_dict).replace("'",'"')]])
+        self.obj_class_router["log"]().pipe_log(f"A dictionary of all semantic neighborhoods is created with {stat_neighboord['all']} neighboord.","INFO","contextual_neighboord() : pipe_contextual_neighboord()")
         return neighboord_multiple_dict
 
     def obtain_word(self, central_word, sentence, dictionnary_all_word):
@@ -78,14 +75,12 @@ class contextual_neighboord:
                     if bool(result) != False:
                         dictionnary_all_word = result.copy()
         dictionnary_all_word = self.optimize_block_neighborhood(dictionnary_all_word)
-        self.llC_.save_data_set(dictionnary_all_word, len(dictionnary_all_word),"central_word_neighboord")
-        self.prC_.insert_data_database(obj_database[0],obj_database[1],"saveData",["jobId","dateTime","type","data"],[[job_id,datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),"dataSetcentralWordNeighboord",str(dictionnary_all_word).replace("'",'"')]])
-        self.llC_.pipe_log(f"A dictionary of semantic neighborhoods center in central word is created with {len(dictionnary_all_word)} neighboord.","INFO","contextual_neighboord() : pipe_neighborhood_center_on_word()")
+        self.obj_class_router["log"]().save_data_set(dictionnary_all_word, len(dictionnary_all_word),"central_word_neighboord")
+        self.obj_class_router["prepare_request"]().insert_data_database(obj_database[0],obj_database[1],"saveData",["jobId","dateTime","type","data"],[[job_id,datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),"dataSetcentralWordNeighboord",str(dictionnary_all_word).replace("'",'"')]])
+        self.obj_class_router["log"]().pipe_log(f"A dictionary of semantic neighborhoods center in central word is created with {len(dictionnary_all_word)} neighboord.","INFO","contextual_neighboord() : pipe_neighborhood_center_on_word()")
         return dictionnary_all_word
 
        
         
     def __init__(self):
-        self.luC_ = luC.utils()
-        self.llC_ = llC.log()
-        self.prC_ = prC.prepare_request()
+        import libCore.config_tool_class as ctC;self.obj_class_router = routerClassPackage.routerFunctionPipe(ctC.config_toml_tool().key_return("parameter","start_file","global_program"))

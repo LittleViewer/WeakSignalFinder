@@ -1,4 +1,4 @@
-import endpoint_user_core.utils_interaction_terminal_class as uitC
+import routerClassPackage
 
 class request_class:
 
@@ -19,7 +19,7 @@ class request_class:
                 print(f"No word for {pattern_user}.")
             
             
-            response = self.uitC_.pipe_question_for_user(["continue","return"])
+            response = self.obj_class_router["utils_interaction_terminal"]().pipe_question_for_user(["continue","return"])
             if response == "return":
                 return False
             else:
@@ -28,6 +28,6 @@ class request_class:
         
 
     def __init__(self, obj_db, prepare_request):
-        self.uitC_ = uitC.utils_interaction_terminal()
+        import libCore.config_tool_class as ctC;self.obj_class_router = routerClassPackage.routerFunctionPipe(ctC.config_toml_tool().key_return("parameter","start_file","global_program"))
         self.obj_db = obj_db
         self.prepare_request = prepare_request
