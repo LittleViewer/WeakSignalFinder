@@ -19,7 +19,7 @@ print(fr"""
  \/  \/ \___|\__,_|_|\_\ \____/|_|\__, |_| |_|\__,_|_| \_|   |_|_| |_|\__,_|\___|_|   
                                    __/ |                                              
                                   |___/                                                                                                                 
-    {licence_text.center(60)}\n""")
+    {licence_text.center(60)}""")
 
 
 if args.install:

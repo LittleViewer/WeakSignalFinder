@@ -1,24 +1,26 @@
 from functools import cache
 import importlib
+import ast
 import os
 
 class routerClass_:
 
-    def file_class(self, list_py_file):
+    def file_class(self, list_py_file, exclude_list, exclude_argument = ["eval","exec","compile","os.system","os.popen","subprocess.run","pickle.load()","pickle.loads()","yaml.load()","marshal.load()","marshal.loads()","shelve.open"]):
         file_with_class = []
         sub_file = []
         for one_py_file in list_py_file:
+            authorize = True
             handle = open(one_py_file,encoding="utf-8")
-            for one_line in (handle.read()).splitlines():
-                for one_word in one_line.split(" "):
-                    if len(sub_file) == 1:
-                        one_word = one_word.split(":")
-                        sub_file.append(one_word[0])
-                    if one_word == "class":
-                        sub_file.append(one_py_file)
-                    if len(sub_file) == 2:
-                        file_with_class.append(sub_file)
-                        sub_file = []
+            tree_file = ast.parse(handle.read())
+            for node in ast.walk(tree_file):
+                    if isinstance(node, ast.ClassDef):
+                        sub_file = [one_py_file, node.name]
+                    if isinstance(node, ast.Call):
+                        if isinstance(node.func, ast.Name):
+                            if node.func.id  in set(exclude_argument):
+                                authorize = False
+            if authorize == True and len(sub_file) == 2:
+                file_with_class.append(sub_file)
             handle.close()
         return file_with_class
 
@@ -49,7 +51,7 @@ class routerClass_:
         return dict_class
 
     @cache
-    def pipe_router_class(self, start_dir = "routerClass", start_file =  os.getcwd(), exclude_list = [".git","__pycache__","venv"], depth = 10):
+    def pipe_router_class(self, start_dir = "routerClass", start_file =  os.getcwd(), exclude_list = [".git","__pycache__","venv", ".venv"], depth = 10):
         dict_stack = {"file_python" : [], "dir" : [start_file]}
         already_seen = []
         tick = 0
@@ -61,7 +63,7 @@ class routerClass_:
                     dict_stack = self.scandir_and_sort(dict_stack,start_file,set(exclude_list)).copy()
                     already_seen.append(one_path_dir)
         
-        file_py_with_class = self.file_class(dict_stack["file_python"])
+        file_py_with_class = self.file_class(dict_stack["file_python"],exclude_list)
         return self.configure_class(file_py_with_class, start_dir)
         
 
