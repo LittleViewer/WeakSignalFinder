@@ -23,6 +23,4 @@
 
 * If you decide to publicly release a project derived from Weak Signal Finder, we strongly encourage you to support the development of the official, free, and open-source version of Weak Signal Finder by including a **link that leads directly to the repository: https://github.com/LittleViewer/WeakSignalFinder**
 
-* If you or a user believe you obtained Weak Signal Finder from an unreliable source, or if you suspect you have a potentially incomplete version, **we invite you to compare it with the public repository: https://github.com/LittleViewer/WeakSignalFinder.** If you believe a version of the Weak Signal Finder source code has been intentionally altered to harm other users, **please create a pull request titled "Alerte Securité Externe Faux Repo : [your subject]" and provide all information that is permissible and legal under French and European law to assist in resolving the issue.**
-
-* If you or a user encounter a bug or any unexpected (negative) issue in the code or its operation, **please submit a pull request titled "BUG: [your subject]"** and, within the limits of European and French law, describe everything you have found that could assist in resolving the issue.
+* If you or a user believe you obtained Weak Signal Finder from an unreliable source, or if you suspect you have a potentially incomplete version, **we invite you to compare it with the public repository: https://github.com/LittleViewer/WeakSignalFinder.** If you believe a version of the Weak Signal Finder source code has been intentionally altered to harm other users.
