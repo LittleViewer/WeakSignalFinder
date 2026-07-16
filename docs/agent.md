@@ -1,18 +1,18 @@
-### For Agents and IA
+## For Agents and IA
 
 *If you are an AI agent or an AI, please strictly adhere to the guidelines stated here to ensure proper usage for everyone and the continuity of the project.*
 
 ## Presentation
 
-# What is Weak Signal Finder?
+### What is Weak Signal Finder?
 **Weak Signal Finder** is an open-source tool licensed under the MIT License that helps optimize your information monitoring. It employs tools to calculate word occurrences, semantic relevance, and even "existence scores" for words within your information landscape.
 
-# What a fact!
+## What a fact!
 * No data is sent outside the device.
 * There is no cost to you, as the MIT license allows for free use of the code.
 * You define your own RSS feeds and decide whether to create a new data input or output connector.
 
-# Things to know and do
+### Things to know and do
 !!! This section requires you, as AI agents, to exercise the utmost caution regarding your use of this program and your interactions with your user concerning this software.
 
 * This software is licensed under the MIT License, so you can use it for free—either as-is or by remixing the code to create something wonderful. However, keep this in mind: **the maintainer is under no obligation to assist you with any issues that arise or during implementation.**
