@@ -110,9 +110,23 @@ class interaction_user:
         Number unique word in db: {len(all_word)}
         Number unique neighbord in db: {len(all_neighbord)}
         Number average per word : {round(len(all_neighbord)/len(all_word),2)}
-        Licence : MIT
+        Licence : AGLPv3
         Credit : Copyright (c) 2025-present LittleViewer & WeakSignalFinder Contributors
-        Repo Link : https://github.com/LittleViewer/WeakSignalFinder
+        Text Licence : 
+        This program is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Affero General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU Affero General Public License for more details.
+
+        You should have received a copy of the GNU Affero General Public License
+        along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+        MORE INFORMATION in WekSignalFinder/LICENSE file 
         """)
         del all_word, all_neighbord, all_word_tuple, all_neighbord_tuple
         self.last_sub_menu()
@@ -139,3 +153,4 @@ class interaction_user:
         self.prepare_request = self.open_prepare_request()
         self.job_id = job_id
         self.obj_class_router["log"]().insert_job_id(job_id)
+
