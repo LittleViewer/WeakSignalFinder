@@ -9,7 +9,7 @@ obj_args = obj_class_router["argument_start"]().pipe_argument_start()
 args = obj_args[0]
 argument_run = obj_args[1]
 
-licence_text = "\x1b]8;;https://github.com/LittleViewer/WeakSignalFinder?tab=License-1-ov-file\x1b\\Copyright (c) 2025-present LittleViewer & WeakSignalFinder Contributors\x1b]8;;\x1b\\"
+licence_text = ["\x1b]8;;https://github.com/LittleViewer/WeakSignalFinder?tab=License-1-ov-file\x1b\\Copyright (c) 2025-present LittleViewer & WeakSignalFinder Contributors\x1b]8;;\x1b\\","This program comes with ABSOLUTELY NO WARRANTY;","This is free software, and you are welcome to redistribute itn/under certain conditions"]
 print(fr"""
  _    _            _      _____ _                   _  ______ _           _           
 | |  | |          | |    /  ___(_)                 | | |  ___(_)         | |          
@@ -19,7 +19,9 @@ print(fr"""
  \/  \/ \___|\__,_|_|\_\ \____/|_|\__, |_| |_|\__,_|_| \_|   |_|_| |_|\__,_|\___|_|   
                                    __/ |                                              
                                   |___/                                                                                                                 
-    {licence_text.center(60)}""")
+    {licence_text[0].center(60)}
+    {licence_text[1].center(30)}
+    {licence_text[2].center(60)}""")
 
 
 if args.install:

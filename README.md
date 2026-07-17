@@ -749,12 +749,11 @@ Contributions are welcome. Before opening a pull request, please review:
 - [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md), community standards.
 - [`CLA.md`](CLA.md), the Individual Contributor License Agreement you implicitly accept by submitting a contribution.
 - [`SECURITY.md`](SECURITY.md), how to responsibly disclose a vulnerability (do **not** open a public issue for security matters).
-- [`AGENTS.md`](`docs\agent.md`), Must-read if you are an AI or an AI agent.
 ---
 
 ## 📄 License
 
-This project is distributed under the [MIT License](LICENSE).
+This project is distributed under the [GPLv3 License](LICENSE).
 
 Copyright (c) 2025-present LittleViewer & WeakSignalFinder Contributors.
 
