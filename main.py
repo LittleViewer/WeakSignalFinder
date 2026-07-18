@@ -1,14 +1,15 @@
 import routerClassPackage
+import exit_programs
 import core_engine_pipe as ceP
 import endpoint_user_pipe as euP
 import sys
 
+exit_programs.call_exit_all_time()
 import libCore.config_tool_class as ctC;obj_class_router = routerClassPackage.routerFunctionPipe(ctC.config_toml_tool().key_return("parameter","start_file","global_program"))
 silent_mode = False
 obj_args = obj_class_router["argument_start"]().pipe_argument_start()
 args = obj_args[0]
 argument_run = obj_args[1]
-
 licence_text = ["\x1b]8;;https://github.com/LittleViewer/WeakSignalFinder?tab=License-1-ov-file\x1b\\Copyright (c) 2025-present LittleViewer & WeakSignalFinder Contributors\x1b]8;;\x1b\\","This program comes with ABSOLUTELY NO WARRANTY;","This is free software, and you are welcome to redistribute itn/under certain conditions"]
 print(fr"""
  _    _            _      _____ _                   _  ______ _           _           
@@ -62,4 +63,3 @@ else:
     print(f"You can use : {argument_run}")
 
 obj_class_router["log"]().pipe_log("Stop execute program", "INFO","main")
-
