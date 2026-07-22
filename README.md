@@ -4,6 +4,8 @@ Weak Signal Finder is a Python pipeline that **detects emerging themes and weak 
 
 It also maintains a **persistent neighborhood dictionary** in a dedicated SQLite database, enriched automatically across runs, letting you observe how each word's semantic neighborhood evolves over time. A **cross-run intensity engine** computes absolute and relative word frequencies with optional weighted aggregation. An optional **SMTP email notification** can be sent at the end of every run.
 
+> ⭐ **Enjoying Weak Signal Finder?** Give the repo a star, [open an issue](https://github.com/LittleViewer/WeakSignalFinder/issues) if something's off, or submit a pull request, every bit of feedback helps the project move forward. See the [🤝 Contributing](#-contributing) section below to get started.
+
 ---
 
 ## 📐 Architecture
@@ -48,6 +50,16 @@ It also maintains a **persistent neighborhood dictionary** in a dedicated SQLite
      • utils_class              → File I/O, path normalization, type checks
      • date_utils_tool_class    → Date comparisons, cooldown enforcement
      • prepare_request_class    → SQLite helper (connect, insert, delete, query)
+     • routerClass              → Dynamic class router: scans the project tree, auto-discovers
+                                   every class (AST-based), and blocks any file that calls a
+                                   denylisted function (eval, exec, os.system, pickle.load, ...)
+                                   before it can be wired in
+     • verbose_initialize       → Startup diagnostics: checks both databases and every input
+                                   file exist, warns on oversized files, checks connectivity,
+                                   prints the welcome banner (skippable with --silent_mode)
+     • install_class            → Powers `main.py --install`, recreates missing folders and
+                                   both SQLite databases from their schema files automatically
+     • exit_programs            → Registers a graceful shutdown message on program exit
 ```
 
 ```
@@ -114,6 +126,12 @@ Then add the entry to `languageModel.json`:
 ### 3. Create the two SQLite databases
 
 > ⚠️ **The repository does not ship with prebuilt `.db` files.** You must create both databases and apply the schemas before the first run. This step is **mandatory**, the pipeline will not start without them.
+
+> ✨ **New: automatic setup.** Instead of the manual steps below, you can simply run:
+> ```bash
+> python main.py --install
+> ```
+> This recreates every missing folder and both `.db` files straight from their schema files (`initial_schema` in the TOML), then asks you to restart the program. It's the fastest path for a first install or for repairing a broken environment. The manual method below is still fully supported and useful if you want more control over the process.
 
 The project uses **two** independent SQLite databases:
 
@@ -195,8 +213,22 @@ python main.py --engine_run
 |---|---|---|
 | `--engine_run` | ✅ Stable | Runs the full NLP pipeline (feed aggregation → analysis → dictionary → email). |
 | `--endpoint_user` | 🚧 Work in progress | Interactive terminal interface for querying the dictionary and computing word concentration scores. Not yet feature-complete. |
+| `--install` | ✨ New | Automatically (re)creates missing folders and both SQLite databases from their schema files. Exits after completion, no session is logged for this run. |
+| `--silent_mode` | ✨ New | Skips the startup diagnostics banner (database/file/internet checks and welcome message) for a quieter, script-friendly launch. Combine with any other flag, e.g. `python main.py --engine_run --silent_mode`. |
 
 If no flag is provided, the program prints the available options and exits.
+
+### ✨ Startup diagnostics
+
+Every launch (except `--install`) now runs a quick pre-flight check before the pipeline starts:
+
+1. **Database check**, confirms both `.db` files exist; exits with a clear message if either is missing (pointing you to `--install`).
+2. **Input file check**, confirms `rssFeed.json`, `languageModel.json`, `stopword.txt`, and `exclude_file.txt` are all present.
+3. **Oversized file warning**, flags any of the above files heavier than `warning_size_object` GB (default: `2`) in the TOML.
+4. **Internet check**, verifies connectivity with a short socket probe; exits if unreachable, since RSS aggregation needs it.
+5. **Welcome banner**, prints the current date/time as a friendly session start marker.
+
+Pass `--silent_mode` to skip the printed feedback for steps 1–3 and 5 (the checks themselves still run). A graceful "Goodbye" message is also now printed automatically whenever the program exits, success or failure.
 
 ### What happens during a run (`--engine_run`)
 
@@ -263,11 +295,19 @@ Once launched, you are presented with a navigation menu offering four options:
 | Option | Description |
 |---|---|
 | **calcul** | Run analytical calculations on the dictionary data (see below). |
+| **request** ✨ New | Query the dictionary directly: get quick stats (unique words, unique neighbors, average neighbors per word) and search for words matching a pattern (`find_by_pattern`). |
 | **help** | Browse built-in documentation explaining each calculation and its output. |
 | **about** | Display session metadata: current date, time, job ID, license, and repository link. |
 | **exit** | Close the program. |
 
 After any action, a sub-menu lets you return to the main menu or exit.
+
+#### `request` → quick stats and pattern search
+
+The **request** option surfaces two things without leaving the terminal:
+
+- An instant summary: total unique words in the dictionary, total unique neighbor triplets, and the average number of neighbors per word.
+- **find_by_pattern**: type a prefix (e.g. `w`, `wa`, `war`) to list every distinct word in the dictionary starting with it. You can keep searching new patterns in a loop until you choose to return to the main menu.
 
 ### Word concentration score
 
@@ -550,6 +590,19 @@ database_dictionnary_sqlite = "dictionnary_neighbord\\database\\dictionnaryWord.
 
 [parameter]
 
+[parameter .global_program]
+start_file = "WeakSignalFinder"
+argument_run = ["--silent_mode", "--endpoint_user", "--install", "--engine_run"]
+warning_size_object = 2
+
+[parameter .install]
+initial_schema = {db_Weak_Signal_Finder = "database_rss_run\\request\\schema_db.sql", dictionnaryWord = "dictionnary_neighbord\\database\\schema_table.sql"}
+
+[parameter .endpoint_user]
+initial_menu = {calcul = "calcul_parameter", request = "request_parameter", help = "help_parameter", about = "about_parameter", exit = "exit_parameter"}
+list_calcul = {concentration = "concentration_word_calcul"}
+list_request = {find_by_pattern = "find_word_pattern"}
+
 [parameter .frequency_one_word]
 filter_word = 1
 
@@ -583,6 +636,11 @@ batch_longer_list = 5000
 | `[path .read_data_dictionnary]` | `exclude_file` / `dataset` | Dictionary exclusion list and the folder it reads from. |
 | `[path .database]` | `database_run_sqlite` | Path to the per-run pipeline SQLite database. |
 | `[path .database]` | `database_dictionnary_sqlite` | Path to the persistent dictionary SQLite database. |
+| `[parameter .global_program]` ✨ New | `start_file` | Root package name used by the dynamic class router to resolve module imports. |
+| `[parameter .global_program]` ✨ New | `argument_run` | List of accepted CLI flags (`--silent_mode`, `--endpoint_user`, `--install`, `--engine_run`). |
+| `[parameter .global_program]` ✨ New | `warning_size_object` | Size threshold, in GB, above which the startup check warns about an oversized input/database file. Default: `2`. |
+| `[parameter .install]` ✨ New | `initial_schema` | Maps each database name to the `.sql` schema file used by `--install` to (re)build it. |
+| `[parameter .endpoint_user]` ✨ New | `initial_menu` / `list_calcul` / `list_request` | Menu labels and available calculations/requests for the `--endpoint_user` terminal. |
 | `[parameter .frequency_one_word]` | `filter_word` | Minimum frequency floor. Words with count ≤ this value are dropped. Default: `1`. |
 | `[parameter .for_launch]` | `cooldown_day_launch_dictionnary` | Days between dictionary updates. Default: `1`. |
 | `[parameter .for_launch]` | `cooldown_day_launch_inter_calcul_intensit_word` | Days between cross-corpus intensity aggregations. Default: `7`. |
@@ -672,11 +730,7 @@ Each log entry is a JSON object:
 
 ## ⚠️ Known Limitations
 
-- **Silent skips.** Single-word articles, unreachable feeds, and language codes missing from `languageModel.json` are skipped without raising an exception (a `WARN` is logged when relevant). If a run produces nothing, check the log file.
-- **Frequency floor.** Words appearing only once are filtered out by `delete_little_intensity` (controlled by `filter_word`), so very rare signals never reach the final output unless you lower the threshold.
-- **Dictionary growth.** The `dictionnary` table is append-only with deduplication on `(central_word, neighbor)`. Over long monitoring periods it can grow large, plan accordingly if you set a low cooldown on a heavily configured feed list.
-- **Intensity table growth.** The `intensity_word` table grows with every corpus. When `single_multiple_intensity_save = false`, `multiple_intensity_word` also accumulates across aggregation runs. Monitor database size on long-lived deployments.
-- **Missing databases.** If either `.db` file is missing or uninitialized, the pipeline fails at startup. Re-run the commands from **Installation, step 3**.
+Silent skips on bad input, a frequency floor on rare words, unbounded growth of the dictionary/intensity tables over long periods, and a hard requirement for both databases to exist (now easily fixed with `--install`). Nothing blocking, just plan your storage and cooldowns accordingly.
 
 ---
 
@@ -684,12 +738,18 @@ Each log entry is a JSON object:
 
 ```
 weak-signal-finder/
-├── main.py                                           ← Entry point (--engine_run)
+├── main.py                                           ← Entry point (--engine_run, --endpoint_user, --install, --silent_mode)
 ├── core_engine_pipe.py                               ← Full NLP pipeline orchestration
 ├── endpoint_user_pipe.py                             ← Interactive terminal (--endpoint_user, WIP)
+├── verbose_initialize_wsf.py                         ← ✨ New: startup diagnostics (DB/file/internet checks, banner)
+├── exit_programs.py                                  ← ✨ New: graceful shutdown message on exit
 ├── config_weakSignalFinder.toml
 ├── requirements.txt
 ├── password_app.env                                  ← Created by you, NOT committed
+├── routerClassPackage/
+│   └── routerClass.py                                ← ✨ New: dynamic class auto-discovery & security denylist
+├── install/
+│   └── install_pipe_class.py                         ← ✨ New: powers `--install` (auto DB/folder creation)
 ├── archive_configuration/
 │   ├── config_weakSignalFinder.toml.archive
 │   └── password_app.env.archive
@@ -728,6 +788,7 @@ weak-signal-finder/
 ├── endpoint_user_core/                               ← Interactive terminal modules (WIP)
 │   ├── interaction_user_class.py
 │   ├── calcul_class.py
+│   ├── request_class.py                              ← ✨ New: dictionary stats & find_by_pattern search
 │   ├── utils_interaction_terminal_class.py
 │   └── template/
 │       ├── prepared_request.json
@@ -768,3 +829,16 @@ This tool is designed as an analytical aid to support **media monitoring and wea
 All processing is performed locally. The tool does not collect, transmit, or store personal data. **The outputs are not anonymized.** If configured feeds contain proper nouns, names, or places, these appear as-is in the results and accumulate in the persistent dictionary over time.
 
 **Users are solely responsible for ensuring compliance with the terms of service of each RSS feed they configure.** Some publishers prohibit automated aggregation or redistribution. This tool provides no guarantee of legal compliance.
+
+---
+
+## 🚀 Get Involved
+
+If Weak Signal Finder is useful to you, consider:
+
+- ⭐ **Starring the repository** so more people discover it.
+- 🐛 **Reporting bugs or ideas** via [GitHub Issues](https://github.com/LittleViewer/WeakSignalFinder/issues).
+- 🔀 **Opening a pull request**, see [`CLA.md`](CLA.md) and [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) first.
+- 🔒 **Reporting vulnerabilities privately**, per [`SECURITY.md`](SECURITY.md), never in a public issue.
+
+Every star, issue, and PR helps keep the project moving. Thanks for checking it out!

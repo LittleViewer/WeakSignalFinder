@@ -1,46 +1,79 @@
-# Security Policy
+# 🔒 Security Policy
 
-## Our Commitment
+Weak Signal Finder touches things worth taking seriously: SMTP credentials, two local SQLite databases, RSS feed parsing, and a dynamic class router that auto-discovers Python classes across the project. This policy explains how to report a problem safely.
 
-The WeakSignalFinder project team is committed to ensuring the security of our software. We take the security of our users' data and the integrity of our codebase seriously. We appreciate the efforts of security researchers and the community to help us maintain a high standard of security.
+---
 
-## Supported Versions
+## ✅ Supported Versions
 
-Our security support policy is simple: we provide security updates for the **most recent major version** only. We encourage all users to stay on the latest version of the software to receive security patches and new features.
+| Version | Supported |
+|---|---|
+| `main` (latest) | ✅ Yes |
+| Older tags / forks | ❌ No |
 
-| Version | Supported          |
-| ------- | ------------------ |
-| `1.x.x` | :white_check_mark: |
-| `< 1.0.0` | :x:                |
+Only the latest state of the `main` branch receives security fixes. If you're running an older clone, please update before reporting.
 
-## Reporting a Vulnerability
+---
 
-We value the responsible disclosure of security vulnerabilities. We will not take legal action against individuals who discover and report security vulnerabilities in accordance with this policy.
+## 📣 Reporting a Vulnerability
 
-**Please do not report security vulnerabilities through public GitHub issues.**
+> ⚠️ **Do not open a public GitHub issue for a security vulnerability.** Public issues are for bugs and feature requests only, disclosing a vulnerability there puts every user at risk before a fix exists.
 
-Instead, please report them directly to us via email at:
-**contactmardukcore@gmail.com**
+Instead, report privately by email:
 
-Please include "Security Vulnerability Report" in the subject line.
+**📧 littleviewer@proton.me**
 
-### What to Include in Your Report
+Please include, as far as you're able:
 
-To help us investigate and resolve the issue as quickly as possible, please provide a detailed report including:
+- A clear description of the issue and its potential impact.
+- Steps to reproduce (a minimal config, feed list, or input file helps a lot).
+- The commit hash or date of the clone you tested against.
+- Whether you believe the issue is exploitable remotely, locally, or only in a misconfigured deployment.
 
-*   **A clear description** of the vulnerability and its potential impact.
-*   **The version of the software** you were using.
-*   **Steps to reproduce the vulnerability**, including any proof-of-concept code, scripts, or screenshots.
-*   Any **mitigation or remediation suggestions**, if you have them.
+### What happens next
 
-### Our Process
+| Step | Target timeframe |
+|---|---|
+| Acknowledgment of your report | Within **72 hours** |
+| Initial assessment (severity, scope) | Within **7 days** |
+| Fix or mitigation, depending on severity | Best effort, prioritized by impact |
 
-When you report a vulnerability to us, here is what you can expect:
+You'll be kept in the loop throughout. If a fix requires more time, you'll be told why and given a revised estimate rather than left waiting silently.
 
-1.  **Acknowledgement:** We will acknowledge receipt of your report within **48 hours**.
-2.  **Initial Assessment:** We will conduct an initial assessment of the vulnerability to determine its validity and severity. We aim to complete this within **5 business days**.
-3.  **Communication:** We will maintain an open line of communication with you throughout the process, providing updates on our progress as we work on a fix.
-4.  **Resolution:** We will work to develop and release a patch as quickly as possible. The timeline for a fix will depend on the complexity of the vulnerability.
-5.  **Public Disclosure & Credit:** Once a fix is released, we will publicly disclose the vulnerability. We believe in recognizing the work of security researchers and will gladly provide public credit for your discovery if you wish. We will coordinate the disclosure timeline with you.
+---
 
-We are incredibly grateful for your help in keeping WeakSignalFinder and its users safe.
+## 🎯 Scope
+
+**In scope:**
+
+- Anything in `main.py`, `core_engine_pipe.py`, `libCore/`, `database_rss_run/`, `dictionnary_neighbord/`, `endpoint_user_core/`, `routerClassPackage/`, and `install/`.
+- SQL injection or unsafe query construction against either SQLite database.
+- Ways to bypass the `routerClass` denylist (the check that blocks files calling `eval`, `exec`, `os.system`, `pickle.load(s)`, `yaml.load()`, `marshal.load(s)`, `shelve.open`, and similar) so that a scanned file still gets wired in.
+- Credential handling issues around `password_app.env` / SMTP (e.g., leaking the password to logs, emails, or error output).
+- Path traversal or unsafe file handling triggered by a crafted `rssFeed.json`, `languageModel.json`, or feed response.
+- Any way for a malicious RSS feed to trigger code execution rather than just being parsed as text.
+
+**Out of scope:**
+
+- Vulnerabilities in third-party dependencies (spaCy, feedparser, click, etc.) that are already public, please report those to the upstream project instead.
+- Issues that require an attacker to already have local shell access to the machine running the pipeline.
+- The content of RSS feeds you personally choose to configure (this tool trusts the feeds you give it; it does not vet news sources).
+- Denial-of-service through simply configuring an enormous number of feeds or an oversized dictionary, that's a capacity-planning concern, not a vulnerability (see the `warning_size_object` setting).
+
+---
+
+## 🙏 Responsible Disclosure
+
+- Please give us a reasonable window to investigate and ship a fix before disclosing publicly.
+- We're happy to credit you (by name, handle, or anonymously, your choice) once a fix is out, if you'd like.
+- Good-faith security research that stays within this scope and doesn't degrade the experience of other users won't be met with legal action from this project.
+
+---
+
+## 🔑 A note on secrets
+
+`password_app.env` should never be committed, it's already excluded via `.gitignore`. If you believe a credential has leaked (yours or a maintainer's), say so explicitly in your report so it can be rotated immediately, independent of any code fix.
+
+---
+
+Thanks for helping keep Weak Signal Finder and the people running it safe. 🙌
