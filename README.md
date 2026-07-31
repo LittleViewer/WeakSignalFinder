@@ -59,7 +59,11 @@ It also maintains a **persistent neighborhood dictionary** in a dedicated SQLite
                                    prints the welcome banner (skippable with --silent_mode)
      • install_class            → Powers `main.py --install`, recreates missing folders and
                                    both SQLite databases from their schema files automatically
-     • exit_programs            → Registers a graceful shutdown message on program exit
+     • exit_programs            → Registers a graceful shutdown message on program exit,
+                                   and wipes the runtime cache folder on the way out
+     • cache_gestion            → Per-run cache buffer: every module reports a one-line stat
+                                   during the run, later stitched together into the
+                                   end-of-run recap email
 ```
 
 ```
@@ -127,7 +131,7 @@ Then add the entry to `languageModel.json`:
 
 > ⚠️ **The repository does not ship with prebuilt `.db` files.** You must create both databases and apply the schemas before the first run. This step is **mandatory**, the pipeline will not start without them.
 
-> ✨ **New: automatic setup.** Instead of the manual steps below, you can simply run:
+> 💡 **Automatic setup.** Instead of the manual steps below, you can simply run:
 > ```bash
 > python main.py --install
 > ```
@@ -213,12 +217,12 @@ python main.py --engine_run
 |---|---|---|
 | `--engine_run` | ✅ Stable | Runs the full NLP pipeline (feed aggregation → analysis → dictionary → email). |
 | `--endpoint_user` | 🚧 Work in progress | Interactive terminal interface for querying the dictionary and computing word concentration scores. Not yet feature-complete. |
-| `--install` | ✨ New | Automatically (re)creates missing folders and both SQLite databases from their schema files. Exits after completion, no session is logged for this run. |
-| `--silent_mode` | ✨ New | Skips the startup diagnostics banner (database/file/internet checks and welcome message) for a quieter, script-friendly launch. Combine with any other flag, e.g. `python main.py --engine_run --silent_mode`. |
+| `--install` | ✅ Stable | Automatically (re)creates missing folders and both SQLite databases from their schema files. Exits after completion, no session is logged for this run. |
+| `--silent_mode` | ✅ Stable | Skips the startup diagnostics banner (database/file/internet checks and welcome message) for a quieter, script-friendly launch. Combine with any other flag, e.g. `python main.py --engine_run --silent_mode`. |
 
 If no flag is provided, the program prints the available options and exits.
 
-### ✨ Startup diagnostics
+### Startup diagnostics
 
 Every launch (except `--install`) now runs a quick pre-flight check before the pipeline starts:
 
@@ -295,7 +299,7 @@ Once launched, you are presented with a navigation menu offering four options:
 | Option | Description |
 |---|---|
 | **calcul** | Run analytical calculations on the dictionary data (see below). |
-| **request** ✨ New | Query the dictionary directly: get quick stats (unique words, unique neighbors, average neighbors per word) and search for words matching a pattern (`find_by_pattern`). |
+| **request** | Query the dictionary directly: get quick stats (unique words, unique neighbors, average neighbors per word) and search for words matching a pattern (`find_by_pattern`). |
 | **help** | Browse built-in documentation explaining each calculation and its output. |
 | **about** | Display session metadata: current date, time, job ID, license, and repository link. |
 | **exit** | Close the program. |
@@ -497,13 +501,47 @@ batch_longer_list = 5000
 
 ---
 
+## 🗄️ Run Cache (Email Digest Buffer)
+
+`libCore/cache_gestion.py` ✨ New is the small mechanism that collects, over the course of a single run, the one-line stats you see in the final notification email under "Stat of Run". It is not a performance cache (nothing is read back to skip work), it's a scratch buffer scoped to a single `job_id`.
+
+### What it means for you (user)
+
+You don't need to configure or touch this yourself, it's fully automatic and only kicks in if you actually want the recap email:
+
+- If `[parameter .email_auto] authorize_run = true`, a small file is created at the very start of the run in `libCore/cache_service_wsf/`, named after the current `job_id`.
+- As the pipeline progresses, each stage (word frequency, contextual neighborhood, dictionary enrichment, intensity aggregation) drops a short human-readable line into that file, e.g. *"Intensity Word: 128 intensity words counter."*
+- At the end of the run, all the collected lines are read back, formatted as a bullet list, and inserted into the success email you receive (see [📧 Email Notifications](#-email-notifications-smtp) below).
+- The file itself never lingers, `exit_programs.py` deletes the whole `cache_service_wsf/` folder automatically whenever the program exits, success or failure. Nothing accumulates between runs, and there is nothing for you to clean up manually.
+- If `authorize_run = false`, most of these calls are skipped entirely (via `wrapper_add_data_in_file`), so disabling email also avoids the small amount of extra disk I/O.
+
+### Why it matters for contributors (dev)
+
+The current use case is intentionally narrow, one buffer, one consumer (the end-of-run email), populated by a handful of hardcoded call sites (`frequency_one_word_class`, `contextual_neighborhood_class`, `enter_data_dictionnary_class`, `intensity_db_word_engine_class`). That narrowness is where the potential lies for anyone looking to contribute:
+
+- **Generic per-run scratch space.** The API (`pipe_create_cache_file`, `pipe_add_data_content_file`, `get_content_cache_file`, `wrapper_add_data_in_file`) is already file-name and `job_id`-agnostic, it could back other per-run artifacts beyond the email digest (e.g. a run summary written to disk, a webhook payload, a `--endpoint_user` "last run" view) without touching the core pipeline.
+- **Structured content instead of plain lines.** Cache entries are currently free-form strings joined with `\n`. Moving to a structured format (JSON lines, for instance) would make the recap machine-readable, useful for a future dashboard, a Slack/Discord notifier, or richer HTML emails.
+- **More granular gating.** Today the whole mechanism is tied to `email_auto.authorize_run`. A dedicated flag would let the cache (and whatever consumes it) run independently of whether an email is actually sent.
+- **Error-path coverage.** The success email builds its digest from the cache, but the separate error email (triggered from `log_class` on `ERROR`/`CRITICAL`) currently doesn't pull from it, there's room to enrich error notifications with whatever stats had already been collected before the failure.
+
+If any of this is interesting, it's a self-contained module with a small surface area, a good first contribution. See [🤝 Contributing](#-contributing) to get started.
+
+---
+
 ## 📧 Email Notifications (SMTP)
 
 The pipeline can send a **notification email at the end of every run**. It is optional and built on the Python standard library (`smtplib`) plus `python-dotenv` for the password.
 
 ### What it sends
 
-When enabled, the end-of-run email contains the run's timestamp, the `job_id`, a link to the project repository, and a copyright line. If an `ERROR` or `CRITICAL` log event occurs during the run, a separate error notification is also sent with the severity, function name, and message.
+Two kinds of emails can be sent, both built from the same `email_smtp_class`:
+
+- **Success notification**, sent once at the end of a completed `--engine_run`. It contains the run's timestamp, the `job_id`, a "Stat of Run" digest, a link to the project repository, and a copyright line. The digest is a bullet list assembled from the [run cache](#-run-cache-email-digest-buffer) and typically includes lines such as:
+  - the number of intensity words counted,
+  - the contextual neighborhood stats (words found before/between/after a central word),
+  - how many new entries were added to the persistent dictionary (only when a dictionary update actually ran),
+  - how many multi-corpus intensity rows were saved (only when the intensity cooldown was also met).
+- **Error notification**, sent independently, any time an `ERROR` or `CRITICAL` event is logged during the run (from `log_class`), with the severity, the function that raised it, and the message. This can fire zero, one, or several times per run, and is not tied to the run cache.
 
 If the email cannot be prepared or sent, the pipeline does **not** fail, it logs an `ERROR` and finishes normally.
 
@@ -588,6 +626,11 @@ dataset      = "local_api\\"
 database_run_sqlite         = "database_rss_run\\database_don_t_touch\\db_Weak_Signal_Finder.db"
 database_dictionnary_sqlite = "dictionnary_neighbord\\database\\dictionnaryWord.db"
 
+[filename]
+
+[filename .cache]
+email_content = "email_final_sender"
+
 [parameter]
 
 [parameter .global_program]
@@ -636,11 +679,12 @@ batch_longer_list = 5000
 | `[path .read_data_dictionnary]` | `exclude_file` / `dataset` | Dictionary exclusion list and the folder it reads from. |
 | `[path .database]` | `database_run_sqlite` | Path to the per-run pipeline SQLite database. |
 | `[path .database]` | `database_dictionnary_sqlite` | Path to the persistent dictionary SQLite database. |
-| `[parameter .global_program]` ✨ New | `start_file` | Root package name used by the dynamic class router to resolve module imports. |
-| `[parameter .global_program]` ✨ New | `argument_run` | List of accepted CLI flags (`--silent_mode`, `--endpoint_user`, `--install`, `--engine_run`). |
-| `[parameter .global_program]` ✨ New | `warning_size_object` | Size threshold, in GB, above which the startup check warns about an oversized input/database file. Default: `2`. |
-| `[parameter .install]` ✨ New | `initial_schema` | Maps each database name to the `.sql` schema file used by `--install` to (re)build it. |
-| `[parameter .endpoint_user]` ✨ New | `initial_menu` / `list_calcul` / `list_request` | Menu labels and available calculations/requests for the `--endpoint_user` terminal. |
+| `[parameter .global_program]` | `start_file` | Root package name used by the dynamic class router to resolve module imports. |
+| `[parameter .global_program]` | `argument_run` | List of accepted CLI flags (`--silent_mode`, `--endpoint_user`, `--install`, `--engine_run`). |
+| `[parameter .global_program]` | `warning_size_object` | Size threshold, in GB, above which the startup check warns about an oversized input/database file. Default: `2`. |
+| `[parameter .install]` | `initial_schema` | Maps each database name to the `.sql` schema file used by `--install` to (re)build it. |
+| `[parameter .endpoint_user]` | `initial_menu` / `list_calcul` / `list_request` | Menu labels and available calculations/requests for the `--endpoint_user` terminal. |
+| `[filename .cache]` ✨ New | `email_content` | Base name used for the per-run cache file that buffers stat lines for the end-of-run email (see [🗄️ Run Cache](#-run-cache-email-digest-buffer)). Default: `email_final_sender`. |
 | `[parameter .frequency_one_word]` | `filter_word` | Minimum frequency floor. Words with count ≤ this value are dropped. Default: `1`. |
 | `[parameter .for_launch]` | `cooldown_day_launch_dictionnary` | Days between dictionary updates. Default: `1`. |
 | `[parameter .for_launch]` | `cooldown_day_launch_inter_calcul_intensit_word` | Days between cross-corpus intensity aggregations. Default: `7`. |
@@ -741,15 +785,15 @@ weak-signal-finder/
 ├── main.py                                           ← Entry point (--engine_run, --endpoint_user, --install, --silent_mode)
 ├── core_engine_pipe.py                               ← Full NLP pipeline orchestration
 ├── endpoint_user_pipe.py                             ← Interactive terminal (--endpoint_user, WIP)
-├── verbose_initialize_wsf.py                         ← ✨ New: startup diagnostics (DB/file/internet checks, banner)
-├── exit_programs.py                                  ← ✨ New: graceful shutdown message on exit
+├── verbose_initialize_wsf.py                         ← Startup diagnostics (DB/file/internet checks, banner)
+├── exit_programs.py                                  ← Graceful shutdown message on exit, also wipes the run cache
 ├── config_weakSignalFinder.toml
 ├── requirements.txt
 ├── password_app.env                                  ← Created by you, NOT committed
 ├── routerClassPackage/
-│   └── routerClass.py                                ← ✨ New: dynamic class auto-discovery & security denylist
+│   └── routerClass.py                                ← Dynamic class auto-discovery & security denylist
 ├── install/
-│   └── install_pipe_class.py                         ← ✨ New: powers `--install` (auto DB/folder creation)
+│   └── install_pipe_class.py                         ← Powers `--install` (auto DB/folder creation)
 ├── archive_configuration/
 │   ├── config_weakSignalFinder.toml.archive
 │   └── password_app.env.archive
@@ -760,11 +804,13 @@ weak-signal-finder/
 │   ├── contextual_neighborhood_class.py              ← Semantic neighborhood computation
 │   ├── api_local_class.py                            ← JSON output writer
 │   ├── email_smtp_class.py                           ← SMTP notification
+│   ├── cache_gestion.py                              ← ✨ New: per-run cache buffer feeding the end-of-run email
 │   ├── log_class.py                                  ← Logging, job ID generation
 │   ├── config_tool_class.py                          ← TOML configuration loader
 │   ├── argument_start_class.py                       ← CLI argument parser
 │   ├── utils_class.py                                ← File I/O, path, type utilities
 │   ├── date_utils_tool_class.py                      ← Date comparison, cooldown logic
+│   ├── cache_service_wsf/                             ← ✨ New: runtime-only folder, created and deleted automatically
 │   └── input/
 │       ├── rssFeed.json                              ← Feed definitions
 │       ├── languageModel.json                        ← Language → spaCy model mapping
@@ -788,7 +834,7 @@ weak-signal-finder/
 ├── endpoint_user_core/                               ← Interactive terminal modules (WIP)
 │   ├── interaction_user_class.py
 │   ├── calcul_class.py
-│   ├── request_class.py                              ← ✨ New: dictionary stats & find_by_pattern search
+│   ├── request_class.py                              ← Dictionary stats & find_by_pattern search
 │   ├── utils_interaction_terminal_class.py
 │   └── template/
 │       ├── prepared_request.json
