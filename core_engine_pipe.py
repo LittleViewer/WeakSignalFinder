@@ -36,6 +36,6 @@ def main(job_id):
     stat_string = ""
     for one_line in content_cache:
         stat_string += f"- {one_line}\n"
-    message = f"Weak Signal Finder is finished! \nTime : {date_time}\n Job ID : {job_id}\nStat of Run:\n{stat_string}Link Github Repository : https://github.com/LittleViewer/WeakSignalFinder\n Copyright (c) 2025-present LittleViewer & WeakSignalFinder Contributors",f"Subject: Weak Signal Finder Notification : Execution completed successfully - {job_id} !"
+    message = str(f"Weak Signal Finder is finished! \nTime : {date_time}\n Job ID : {job_id}\nStat of Run:\n{stat_string}Link Github Repository : https://github.com/LittleViewer/WeakSignalFinder\n Copyright (c) 2025-present LittleViewer & WeakSignalFinder Contributors",f"Subject: Weak Signal Finder Notification : Execution completed successfully - {job_id} !")
     obj_class_router["email_smtp"]().sub_smtp_send(message,f"Subject: Weak Signal Finder Notification : Execution completed successfully - {job_id} !")
     print(f"[{date_time}] Stop execute program!")
