@@ -37,7 +37,7 @@ class prepare_request:
                 return True
         return False
 
-    def insert_data_database(self, cursor, handle_database, table_name, column_name, values):
+    def insert_data_database(self, job_id, cursor, handle_database, table_name, column_name, values):
         if self.obj_class_router["utils"]().is_string(table_name) != True or self.obj_class_router["utils"]().is_list(column_name) != True:
             self.obj_class_router["utils"]().error_with_reason("The expected formats are not provided as input in prepare_request.insert_data_database()#45!",True)
         temp_values = []
@@ -89,7 +89,7 @@ class prepare_request:
                 self.obj_class_router["utils"]().error_with_reason("There is an error with an integrity constraint, such that data already entered is entered again!")
             else:
                 self.obj_class_router["utils"]().error_with_reason("An unexpected error occurred while inserting data into the database!",True)
-        
+                           
     def delete_data(self, cursor, handle_database, table_name, column_name, data):
         try:
             if self.obj_class_router["utils"]().is_string(table_name) != True or self.obj_class_router["utils"]().is_string(column_name) != True or self.obj_class_router["utils"]().is_string(data) != True:

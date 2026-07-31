@@ -72,7 +72,7 @@ class prepare_data:
         return new_dict
             
 
-    def pipe_prepare_data(self,data_brut,obj_database,job_id):
+    def pipe_prepare_data(self,job_id, data_brut,obj_database):
         structured_data_sub_clean = {}
         if self.obj_class_router["utils"]().is_dict(data_brut) == False:
             self.obj_class_router["log"]().pipe_log("Input variable is not dict: prepare_data() : pipe_prepare_data()","CRITICAL","pipe_prepare_data()")
@@ -84,13 +84,13 @@ class prepare_data:
 
         structured_data_sub_clean = self.extract_possible_word(structured_data_brut)
         self.obj_class_router["log"]().save_state(structured_data_sub_clean,"Brut")
-        self.obj_class_router["prepare_request"]().insert_data_database(obj_database[0],obj_database[1],"saveData",["jobId","dateTime","type","data"],[[job_id,datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),"saveStateBrut",str(structured_data_sub_clean).replace("'",'"')]])
+        self.obj_class_router["prepare_request"]().insert_data_database(job_id, obj_database[0],obj_database[1],"saveData",["jobId","dateTime","type","data"],[[job_id,datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),"saveStateBrut",str(structured_data_sub_clean).replace("'",'"')]])
 
         structured_data_clean_ = {}
         for one_index_lang in structured_data_brut:
             structured_data_clean_ = self.remove_no_essential_word(structured_data_sub_clean, one_index_lang, structured_data_clean_)
         self.obj_class_router["log"]().save_state(structured_data_clean_,"Clean")
-        self.obj_class_router["prepare_request"]().insert_data_database(obj_database[0],obj_database[1],"saveData",["jobId","dateTime","type","data"],[[job_id,datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),"saveStateClean",str(structured_data_clean_).replace("'",'"')]])
+        self.obj_class_router["prepare_request"]().insert_data_database(job_id, obj_database[0],obj_database[1],"saveData",["jobId","dateTime","type","data"],[[job_id,datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),"saveStateClean",str(structured_data_clean_).replace("'",'"')]])
 
         return structured_data_clean_
 

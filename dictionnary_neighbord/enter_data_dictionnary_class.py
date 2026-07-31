@@ -98,6 +98,8 @@ class enter_data_dictionnary:
             self.cursor_database_.execute(prepare_request)
             self.handle_dabase_.commit()
             print(f"[{datetime.datetime.now()}] - {number_enter+1} new neighbords enter in database")
+            if self.obj_class_router["config_toml_tool"]().key_return("parameter","authorize_run","email_auto") == True :
+                self.obj_class_router["cache_gestion"]().pipe_add_data_content_file(self.job_id,f"Neighboord Database: {number_enter+1} new neighbords enter in database.",self.obj_class_router["config_toml_tool"]().key_return("filename","email_content","cache"))
             self.obj_class_router["log"]().pipe_log(f"{number_enter+1} new neighbords enter in the long-term dictionary!","INFO","enter_data_dictionnary() : neighbor_enter_db()")
 
     def pipe_enter_data(self, all_data):

@@ -29,8 +29,10 @@ class log:
         self.send_message(handle,json_message)
         if severity == "ERROR" or severity == "CRITICAL":
             prepare_message = f"Weak Signal Finder suffered an incident \n JobId : {self.job_id} \n Severity : {severity} \n Function Call : {function_call} \n Content : {content}\n Time : {datetime.datetime.now()}\nLink Github Repository : https://github.com/LittleViewer/WeakSignalFinder\n Copyright (c) 2025-present LittleViewer & WeakSignalFinder Contributors"
-            self.obj_class_router["email_smtp"]().sub_smtp_send(prepare_message,f"Subject: Weak Signal Finder Notification : Error - {function_call}!")    
-    
+            try :
+                self.obj_class_router["email_smtp"]().sub_smtp_send(prepare_message,f"Subject: Weak Signal Finder Notification : Error - {function_call}!")    
+            except :
+                pass
     
     def save_state(self, text, type_data = "Unknow"):
         handle = self.obj_class_router["utils"]().file_open(self.obj_class_router["utils"]().absolute_link(self.obj_class_router["config_toml_tool"]().key_return("path","save_state","log"))/f"{self.date.year}_{self.date.month}_{self.date.day}.savestate.txt","a+")
@@ -38,7 +40,7 @@ class log:
         for one_index in text:
             total_article += len(text[one_index])
         try :
-            formated_send =  json.dumps({"time_job_id" : f"{self.date.minute}{self.date.second}{self.date.microsecond}", "type_data" : type_data, "total_article" : total_article,"data" : text})    
+            formated_send =  json.dumps({"time_job_id" : f"{self.date.minute}{self.date.second}{self.date.microsecond}", "type_data" : type_data, "total_article" : total_article,"data" : text})
             handle.write(formated_send+"\n")
             self.pipe_log("A savestate is integrated with data.","INFO","log() : save_state()")
         except:
@@ -51,7 +53,7 @@ class log:
         try :
             if type(data) != int:
                 data = len(data)
-            formated_send =  json.dumps({"time_job_id" : f"{self.date.minute}{self.date.second}{self.date.microsecond}", "type_data" : type_data, "total_index" : data,"data" : text})    
+            formated_send =  json.dumps({"time_job_id" : f"{self.date.minute}{self.date.second}{self.date.microsecond}", "type_data" : type_data, "total_index" : data,"data" : text})
             handle.write(formated_send+"\n")
             self.pipe_log("A savestate is integrated with data.","INFO","log() : save_data_set()")
         except:
@@ -63,7 +65,7 @@ class log:
         date_sql = self.date.strftime('%Y-%m-%d %H:%M:%S')
         self.hex_code = random.randbytes(16).hex()
         self.job_id = f"{self.hex_code}-{self.date.year}{self.date.month}{self.date.second}{self.date.microsecond}{self.date.day}"
-        self.obj_class_router["prepare_request"]().insert_data_database(obj_database[0], obj_database[1], "jobIdDateTime", ["jobId","dateTime"], [[self.job_id,date_sql]])
+        self.obj_class_router["prepare_request"]().insert_data_database(self.job_id,obj_database[0], obj_database[1], "jobIdDateTime", ["jobId","dateTime"], [[self.job_id,date_sql]])
         self.pipe_log(f"Job ID generated: {self.job_id}", "INFO", "log() : pipe_jobId_session_generator()")
         return self.job_id
     

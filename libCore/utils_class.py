@@ -5,6 +5,8 @@ import os
 import datetime
 import unicodedata
 import time
+import shutil
+
 
 class utils :
     def check_file_exist(self, link):
@@ -90,6 +92,8 @@ class utils :
         print("\033[F\033[K", end="", flush=True)
         time.sleep(0.5)
 
+    def delete_recusive_file(self, path):
+        shutil.rmtree(self.absolute_link(path))
 
     def __init__(self):
         self.date_ = datetime.datetime.now()

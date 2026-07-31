@@ -104,6 +104,9 @@ class intensity_db_word_engine_class:
         self.obj_db_[1].execute(prepare_request[:-1]+';')
         self.obj_db_[0].commit()
         print(f"[{datetime.datetime.now()}] - {number_enter} multiple intensity saved in database")
+        if self.obj_class_router["config_toml_tool"]().key_return("parameter","authorize_run","email_auto") == True :
+            self.obj_class_router["cache_gestion"]().pipe_add_data_content_file(job_id,f"Multiple Intensity in DB: {number_enter} multiple intensity saved in database.",self.obj_class_router["config_toml_tool"]().key_return("filename","email_content","cache"))
+
         self.obj_class_router["log"]().pipe_log(f"Multiple intensity saved in database : {number_enter}", "INFO", "intensity_db_word_engine_class() : enter_in_db_multiple_intensity()")
 
     def pipe_main_engine(self, all_data,job_id):

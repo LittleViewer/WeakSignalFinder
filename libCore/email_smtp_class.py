@@ -22,7 +22,6 @@ class email_smtp:
     def sub_smtp_send(self, message = "No body text.", topic = "No topic."):
         if self.obj_class_router["config_toml_tool"]().key_return("parameter","authorize_run","email_auto") == False:
             return False
-
         try:
             dict_email = self.prepa_email(message, topic)
         except Exception as e:

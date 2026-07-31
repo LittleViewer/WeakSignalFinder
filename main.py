@@ -2,6 +2,7 @@ import routerClassPackage
 import exit_programs
 import core_engine_pipe as ceP
 import endpoint_user_pipe as euP
+import time
 import sys
 
 exit_programs.call_exit_all_time()
@@ -23,7 +24,8 @@ print(fr"""
     {licence_text[0].center(60)}
     {licence_text[1].center(30)}
     {licence_text[2].center(60)}""")
-
+time.sleep(1)
+print("\n")
 
 if args.install:
     print("[INFO] - You're session is not logged because the installation occurs in a degraded system situation!")
@@ -31,12 +33,11 @@ if args.install:
     sys.exit()
 
 
-try:
-    obj_database = obj_class_router["prepare_request"]().connect_dabase()
-    job_id = obj_class_router["log"]().pipe_jobId_session_generator(obj_database)
-except Exception as e:
-    print("Error with launch system : Please launch 'main.py --install'")
-    sys.exit()
+obj_database = obj_class_router["prepare_request"]().connect_dabase()
+job_id = obj_class_router["log"]().pipe_jobId_session_generator(obj_database)
+if obj_class_router["config_toml_tool"]().key_return("parameter","authorize_run","email_auto") == True:
+        obj_class_router["cache_gestion"]().pipe_create_cache_file(job_id,obj_class_router["config_toml_tool"]().key_return("filename","email_content","cache"))
+
 
 obj_class_router["log"]().pipe_log("Start execute program", "INFO","main")
 def log_mode(mode):
@@ -47,9 +48,6 @@ verbose = True
 if args.silent_mode :
    verbose = False
 obj_class_router["verbose_initialize"]().pipe_verbose_initialize(verbose)
-
-
-
 
 
 if args.endpoint_user:

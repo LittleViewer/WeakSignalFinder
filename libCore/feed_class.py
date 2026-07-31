@@ -20,7 +20,6 @@ class feed:
 
     async def parse_rss(self, dict_feed):
         list_key = list(dict_feed.keys())
-        tick_feed = 0
         task = {}
         for one_key in list_key:
             task[one_key] = []
